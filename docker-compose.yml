@@ -1,0 +1,29 @@
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: DockerFile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+
+  server:
+    build:
+      context: ./server
+      dockerfile: DockerFile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGO_URI=<your_mongo_connection_string>
+      - JWT_SECRET=<your_jwt_secret>

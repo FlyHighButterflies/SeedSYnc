@@ -1,0 +1,20 @@
+FROM node:23-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+RUN npm run build:css || echo "Skipping Tailwind build for development"
+
+# Port
+EXPOSE 5173
+
+# Start
+CMD ["npm", "run", "dev"]

@@ -1,13 +1,18 @@
-// import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home.jsx";
+import Home from "@/pages/Home.jsx";
+import SignUp from "@/pages/auth/SignUp";
+import Footer from "@/components/Footer";
 
 function App() {
     return (
         <Router>
-            <Routes>
-                <Route path="/" element={<Home />} />
-            </Routes>
+            <div className="flex flex-col h-screen w-screen">
+                <Routes>
+                    {/* <Route path="/" element={<Home />} /> */}
+                    <Route path="/" element={<SignUp />} />
+                </Routes>
+                <Footer />
+            </div>
         </Router>
     );
 }

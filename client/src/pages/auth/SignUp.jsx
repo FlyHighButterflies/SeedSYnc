@@ -1,6 +1,7 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { Plus, Edit3, Trash2, Upload } from "lucide-react";
 
 function Step1() {
     return (
@@ -15,7 +16,88 @@ function Step1() {
 }
 
 function Step2() {
-    return;
+    const [profileImage, setProfileImage] = useState(null);
+    const [isHovered, setIsHovered] = useState(false);
+    const fileInputRef = useRef(null);
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setProfileImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const openFileDialog = () => {
+        fileInputRef.current?.click();
+    };
+
+    const removeImage = () => {
+        setProfileImage(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    return (
+        <div className="flex flex-col items-center">
+            {/* Image Container */}
+            <div
+                className={`relative w-64 h-64 rounded-full overflow-hidden shadow-md transition-all duration-300 mb-4 ${
+                    !profileImage ? "cursor-pointer" : ""
+                }`}
+                onMouseEnter={() => !profileImage && setIsHovered(true)}
+                onMouseLeave={() => !profileImage && setIsHovered(false)}
+                onClick={!profileImage ? openFileDialog : undefined}
+            >
+                {profileImage ? (
+                    <img
+                        src={profileImage}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    /* Empty state with plus icon */
+                    <div className="w-full h-full bg-green-100 flex items-center justify-center hover:bg-green-200 transition-colors duration-200">
+                        <Plus
+                            className="w-12 h-12 text-green-600"
+                            strokeWidth={1.5}
+                        />
+                    </div>
+                )}
+            </div>
+
+            {/* Action Buttons (only show when image exists) */}
+            {profileImage && (
+                <div className="flex space-x-4">
+                    <button
+                        onClick={openFileDialog}
+                        className="flex items-center justify-center w-16 h-16"
+                    >
+                        <Edit3 className="w-7 h-7 text-green-600" />
+                    </button>
+                    <button
+                        onClick={removeImage}
+                        className="flex items-center justify-center w-16 h-16"
+                    >
+                        <Trash2 className="w-7 h-7 text-red-600" />
+                    </button>
+                </div>
+            )}
+
+            {/* Hidden file input */}
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+            />
+        </div>
+    );
 }
 
 function Step3() {
@@ -85,7 +167,9 @@ function SignUp() {
         <div className="w-full flex-1 flex flex-col items-center min-h-0">
             <div className="w-full h-16 flex justify-between items-center px-20 bg-lightGreen flex-shrink-0">
                 <div className="text-2xl font-bold">SeedSync</div>
-                <Button className="py-1 px-8">Sign In</Button>
+                <Button variant="dark" className="py-1 px-8">
+                    Sign In
+                </Button>
             </div>
             <div className="flex-1 flex w-full min-h-0">
                 <div className="bg-lighterGreen w-2/5 flex-shrink-0"></div>

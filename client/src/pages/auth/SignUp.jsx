@@ -1,7 +1,7 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { useState, useRef } from "react";
-import { Plus, Edit3, Trash2, Upload } from "lucide-react";
+import { Plus, Edit3, Trash2 } from "lucide-react";
 
 function Step1() {
     return (
@@ -116,11 +116,50 @@ function Step3() {
 }
 
 function Step4() {
-    return;
+    return (
+        // IF BUYER
+        // <>
+        //     <Input type="text" placeholder="Products Needed" />
+        //     <Input type="text" placeholder="Quantity Range" />
+        //     <Input type="text" placeholder="Urgency Purchase" />
+        //     <Input type="text" placeholder="Preferred Quality Standards" />
+        //     <Input type="text" placeholder="Frequency" />
+        //     <Input type="text" placeholder="Inventory Status" />
+        // </>
+
+        // IF SELLER
+        <>
+            <Input type="text" placeholder="Crops in Possession" />
+            <Input type="text" placeholder="Available Product" />
+            <Input type="text" placeholder="Surplus" />
+            <Input type="text" placeholder="Crop Diversity Count" />
+            <Input type="text" placeholder="Certifications" />
+            <Input type="text" placeholder="Farming Practices" />
+        </>
+    );
 }
 
 function Step5() {
-    return;
+    return (
+        <div className="flex flex-col gap-8 text-justify">
+            <p>
+                I hereby confirm that the information I have provided in this
+                form is true, complete, and accurate to the best of my
+                knowledge. I understand that any false or misleading information
+                may result in the rejection or invalidation of my profile.
+            </p>
+            <p>
+                I hereby confirm that the information I have provided in this
+                form is true, complete, and accurate to the best of my
+                knowledge. I understand that any false or misleading information
+                may result in the rejection or invalidation of my profile.
+            </p>
+            <div className="flex justify-center gap-3">
+                <input type="checkbox" id="terms" />
+                <p>I agree to the terms stated above.</p>
+            </div>
+        </div>
+    );
 }
 
 function SignUp() {
@@ -173,9 +212,9 @@ function SignUp() {
             </div>
             <div className="flex-1 flex w-full min-h-0">
                 <div className="bg-lighterGreen w-2/5 flex-shrink-0"></div>
-                <div className="w-3/5 overflow-y-auto no-scrollbar-arrows border border-red-500">
-                    <div className="flex flex-col items-center p-12 border border-black">
                         <div className="w-full max-w-[500px]">
+                <div className="w-3/5 overflow-y-auto no-scrollbar-arrows">
+                    <div className="flex flex-col items-center p-12">
                             <div className="flex flex-col items-center mb-10">
                                 <div className="flex justify-center mb-4">
                                     <div className="flex space-x-2">
@@ -195,7 +234,7 @@ function SignUp() {
                                     {steps[currentStep].label}
                                 </p>
                             </div>
-                            <div className="flex flex-col gap-6 w-[464px] mx-auto border border-blue-500">
+                            <div className="flex flex-col gap-6 w-full mx-auto border border-blue-500">
                                 {renderStepContent(currentStep)}
                             </div>
                             <div className="flex justify-between items-center mt-6 w-full">

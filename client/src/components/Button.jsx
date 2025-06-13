@@ -1,10 +1,13 @@
-import React from "react";
-
-function Button({ type, className, children }) {
+function Button({ type, variant, handleClick, className, children }) {
     return (
         <button
             type={type}
-            className={`py-2 px-10 bg-normalGreen rounded-lg ${className}`}
+            onClick={handleClick}
+            className={`py-2 px-10 ${
+                variant === "dark"
+                    ? "bg-normalGreen text-white"
+                    : "bg-lightGreen"
+            } font-semibold rounded-lg ${className}`}
         >
             {children}
         </button>

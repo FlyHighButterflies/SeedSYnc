@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Input({ type, id, placeholder, className, ...rest }) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -9,20 +10,20 @@ export default function Input({ type, id, placeholder, className, ...rest }) {
                 id={id}
                 {...rest}
                 placeholder={placeholder}
-                className={`p-2 border rounded bg-white border-slate-200 w-full ${className}`}
+                className={`p-2 px-3 border rounded bg-white border-slate-200 w-full ${className}`}
             />
-            {/* {type === "password" && (
+            {type === "password" && (
                 <div
                     className="absolute right-4 cursor-pointer"
                     onClick={() => setIsPasswordVisible(!isPasswordVisible)}
                 >
                     {isPasswordVisible ? (
-                        // EYE ICON
+                        <Eye size={20} color="#8A8B8B" />
                     ) : (
-                        // EYE OFF ICON
+                        <EyeOff size={20} color="#8A8B8B" />
                     )}
                 </div>
-            )} */}
+            )}
         </div>
     );
 }

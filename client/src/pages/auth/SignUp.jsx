@@ -2,6 +2,7 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { useState, useRef } from "react";
 import { Plus, Edit3, Trash2 } from "lucide-react";
+import Dropdown from "@/components/Dropdown";
 
 function Step1() {
     return (
@@ -108,9 +109,31 @@ function Step3() {
             <Input type="text" placeholder="City/Town" />
             <Input type="text" placeholder="Address" />
             <Input type="text" placeholder="Nearby Landmarks" />
-            <Input type="text" placeholder="Major Highway" />
-            <Input type="text" placeholder="Port/Hub" />
-            <Input type="text" placeholder="Transportation Mode Available" />
+            <Dropdown
+                id="highway"
+                placeholder="Major Highway"
+                options={[
+                    { label: "Yes", value: "yes" },
+                    { label: "No", value: "no" },
+                ]}
+            />
+            <Dropdown
+                id="port"
+                placeholder="Port/Hub"
+                options={[
+                    { label: "Yes", value: "yes" },
+                    { label: "No", value: "no" },
+                ]}
+            />
+            <Dropdown
+                id="transporation"
+                placeholder="Transportation Mode"
+                options={[
+                    { label: "Boat", value: "boat" },
+                    { label: "Truck", value: "truck" },
+                    { label: "On foot", value: "on foon" },
+                ]}
+            />
         </>
     );
 }
@@ -118,24 +141,78 @@ function Step3() {
 function Step4() {
     return (
         // IF BUYER
-        // <>
-        //     <Input type="text" placeholder="Products Needed" />
-        //     <Input type="text" placeholder="Quantity Range" />
-        //     <Input type="text" placeholder="Urgency Purchase" />
-        //     <Input type="text" placeholder="Preferred Quality Standards" />
-        //     <Input type="text" placeholder="Frequency" />
-        //     <Input type="text" placeholder="Inventory Status" />
-        // </>
+        <>
+            <Input type="text" placeholder="Products Needed" />
+            <Input type="text" placeholder="Quantity Range" />
+            <Dropdown
+                id="urgency of purchase"
+                placeholder="Urgency of Purchase"
+                options={[
+                    { label: "Immediate", value: "immediate" },
+                    { label: "Soon", value: "oon" },
+                    { label: "Flexible", value: "flexible" },
+                ]}
+            />
+            <Dropdown
+                id="quality standards"
+                placeholder="Preferred Quality Standards"
+                options={[
+                    { label: "Organic", value: "organic" },
+                    { label: "Non-GMO", value: "non-gmo" },
+                    { label: "Fair-Trade", value: "fair-trade" },
+                ]}
+            />
+            <Dropdown
+                id="frequency"
+                placeholder="Frequency of Purchase"
+                options={[
+                    { label: "Weekly", value: "weekly" },
+                    { label: "Monthly", value: "monthly" },
+                    { label: "Quarterly", value: "quarterly" },
+                ]}
+            />
+            <Dropdown
+                id="inventory status"
+                placeholder="Inventory Status"
+                options={[
+                    { label: "Low", value: "low" },
+                    { label: "Normal", value: "normal" },
+                    { label: "Sufficient", value: "sufficient" },
+                ]}
+            />
+        </>
 
         // IF SELLER
-        <>
-            <Input type="text" placeholder="Crops in Possession" />
-            <Input type="text" placeholder="Available Product" />
-            <Input type="text" placeholder="Surplus" />
-            <Input type="text" placeholder="Crop Diversity Count" />
-            <Input type="text" placeholder="Certifications" />
-            <Input type="text" placeholder="Farming Practices" />
-        </>
+        // <>
+        //     <Input type="text" placeholder="Crops in Possession" />
+        //     <Input type="text" placeholder="Available Product" />
+        //     <Dropdown
+        //         id="surplus"
+        //         placeholder="surplus"
+        //         options={[
+        //             { label: "Yes", value: "yes" },
+        //             { label: "No", value: "no" },
+        //         ]}
+        //     />
+        //     <Input type="text" placeholder="Crop Diversity Count" />
+        //     <Dropdown
+        //         id="certifications"
+        //         placeholder="Certifications"
+        //         options={[
+        //             { label: "Organic", value: "organic" },
+        //             { label: "Non-GMO", value: "non-gmo" },
+        //             { label: "Fair-Trade", value: "fair-trade" },
+        //         ]}
+        //     />
+        //     <Dropdown
+        //         id="farming practices"
+        //         placeholder="Farming Practices"
+        //         options={[
+        //             { label: "Eco-friendly", value: "eco-friendly" },
+        //             { label: "Water Efficient", value: "water efficient" },
+        //         ]}
+        //     />
+        // </>
     );
 }
 
@@ -212,9 +289,9 @@ function SignUp() {
             </div>
             <div className="flex-1 flex w-full min-h-0">
                 <div className="bg-lighterGreen w-2/5 flex-shrink-0"></div>
-                        <div className="w-full max-w-[500px]">
                 <div className="w-3/5 overflow-y-auto no-scrollbar-arrows">
                     <div className="flex flex-col items-center p-12">
+                        <div className="w-full max-w-[500px]">
                             <div className="flex flex-col items-center mb-10">
                                 <div className="flex justify-center mb-4">
                                     <div className="flex space-x-2">
@@ -234,7 +311,7 @@ function SignUp() {
                                     {steps[currentStep].label}
                                 </p>
                             </div>
-                            <div className="flex flex-col gap-6 w-full mx-auto border border-blue-500">
+                            <div className="flex flex-col gap-6 w-full mx-auto">
                                 {renderStepContent(currentStep)}
                             </div>
                             <div className="flex justify-between items-center mt-6 w-full">

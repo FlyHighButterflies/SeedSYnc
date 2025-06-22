@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
 export default function Dropdown({
@@ -6,24 +6,45 @@ export default function Dropdown({
     id,
     placeholder,
     className,
+    value,
+    onChange,
     ...rest
 }) {
     const [selected, setSelected] = useState("");
 
-    const isPlaceholder = selected === "";
+    // Update the local state when the form updates the value
+    useEffect(() => {
+        if (value !== undefined) {
+            setSelected(value);
+        }
+    }, [value]);
+
+    const handleChange = (e) => {
+        const newValue = e.target.value;
+        setSelected(newValue);
+
+        // If this is controlled by React Hook Form
+        if (onChange) {
+            onChange(e);
+        }
+    };
+
+    // Key fix: Always display selected value as black text
+    const displayValue = selected ? selected : "";
+    const hasSelection = displayValue !== "";
 
     return (
         <div className="flex relative items-center">
             <select
                 id={id}
-                value={selected}
-                onChange={(e) => setSelected(e.target.value)}
+                value={displayValue}
+                onChange={handleChange}
                 className={`appearance-none p-2 px-3 pr-10 border rounded bg-white border-slate-200 w-full ${
-                    isPlaceholder ? "text-slate-400" : "text-black"
+                    hasSelection ? "text-black" : "text-slate-400"
                 } ${className}`}
                 {...rest}
             >
-                <option value="" disabled hidden>
+                <option value="" disabled>
                     {placeholder || "-- Select --"}
                 </option>
                 {options.map((opt) => (

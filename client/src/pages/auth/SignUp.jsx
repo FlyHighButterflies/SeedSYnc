@@ -464,7 +464,14 @@ function SignUp() {
     return (
         <div className="w-full flex-1 flex flex-col items-center min-h-0">
             <div className="w-full h-16 flex justify-between items-center border-b border-black px-6 md:px-20 bg-lightGreen flex-shrink-0">
-                <div className="text-2xl font-bold">SeedSync</div>
+                <div className="flex items-center gap-3">
+                    <img
+                        src="/images/seedsync-logo.png"
+                        alt="seedsync logo"
+                        className="w-auto h-10"
+                    />
+                    <div className="text-2xl font-bold">SeedSync</div>
+                </div>
                 <Button variant="dark" className="py-1 px-8">
                     Sign In
                 </Button>

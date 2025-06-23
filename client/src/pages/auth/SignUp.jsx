@@ -463,27 +463,29 @@ function SignUp() {
 
     return (
         <div className="w-full flex-1 flex flex-col items-center min-h-0">
-            <div className="w-full h-16 flex justify-between items-center px-20 bg-lightGreen flex-shrink-0">
+            <div className="w-full h-16 flex justify-between items-center px-6 md:px-20 bg-lightGreen flex-shrink-0">
                 <div className="text-2xl font-bold">SeedSync</div>
                 <Button variant="dark" className="py-1 px-8">
                     Sign In
                 </Button>
             </div>
             <div className="flex-1 flex w-full min-h-0">
-                <div className="bg-lighterGreen w-2/5 flex-shrink-0"></div>
-                <div className="w-3/5 overflow-y-auto no-scrollbar-arrows">
+                {/* Hide on mobile with hidden class, show on medium screens and up */}
+                <div className="hidden md:block bg-lighterGreen w-2/5 flex-shrink-0"></div>
+                {/* Take full width on mobile, 3/5 width on medium screens and up */}
+                <div className="w-full md:w-3/5 overflow-y-auto no-scrollbar-arrows">
                     <form
                         onSubmit={handleSubmit(onSubmit)}
-                        className="flex flex-col items-center p-12"
+                        className="flex flex-col items-center p-8 md:p-12"
                     >
                         <div className="w-full max-w-[500px]">
-                            <div className="flex flex-col items-center mb-10">
+                            <div className="flex flex-col items-center mb-6 md:mb-10">
                                 <div className="flex justify-center mb-4">
-                                    <div className="flex space-x-2">
+                                    <div className="flex space-x-1 md:space-x-2">
                                         {[1, 2, 3, 4, 5].map((step) => (
                                             <div
                                                 key={step}
-                                                className={`h-2 w-16 rounded-full ${
+                                                className={`h-2 w-8 md:w-16 rounded-full ${
                                                     step <= currentStep
                                                         ? "bg-normalGreen"
                                                         : "bg-gray-300"
@@ -492,11 +494,11 @@ function SignUp() {
                                         ))}
                                     </div>
                                 </div>
-                                <p className="text-3xl font-bold">
+                                <p className="text-2xl md:text-3xl font-bold">
                                     {steps[currentStep].label}
                                 </p>
                             </div>
-                            <div className="flex flex-col gap-6 w-full mx-auto">
+                            <div className="flex flex-col gap-4 md:gap-6 w-full mx-auto">
                                 {renderStepContent(currentStep)}
                             </div>
                             <div className="flex justify-between items-center mt-6 w-full">

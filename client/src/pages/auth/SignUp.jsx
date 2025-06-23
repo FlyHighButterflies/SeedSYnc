@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import Dropdown from "@/components/Dropdown";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 
 function Step1({ register, errors }) {
     return (
@@ -472,9 +473,11 @@ function SignUp() {
                     />
                     <div className="text-2xl font-bold">SeedSync</div>
                 </div>
-                <Button variant="dark" className="py-1 px-8">
-                    Sign In
-                </Button>
+                <Link to="/login">
+                    <Button variant="dark" className="py-1 px-8">
+                        Sign In
+                    </Button>
+                </Link>
             </div>
             <div className="flex-1 flex w-full min-h-0">
                 {/* Hide on mobile with hidden class, show on medium screens and up */}

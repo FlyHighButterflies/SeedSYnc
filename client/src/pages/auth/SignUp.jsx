@@ -471,7 +471,13 @@ function SignUp() {
             </div>
             <div className="flex-1 flex w-full min-h-0">
                 {/* Hide on mobile with hidden class, show on medium screens and up */}
-                <div className="hidden md:block bg-lighterGreen w-2/5 flex-shrink-0"></div>
+                <div className="md:flex justify-center items-center hidden bg-lighterGreen w-2/5 flex-shrink-0">
+                    <img
+                        src="/images/auth-farmer.png"
+                        alt="farmer png"
+                        className="w-auto h-5/6"
+                    />
+                </div>
                 {/* Take full width on mobile, 3/5 width on medium screens and up */}
                 <div className="w-full md:w-3/5 overflow-y-auto no-scrollbar-arrows">
                     <form

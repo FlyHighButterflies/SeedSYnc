@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Hide scrollbar arrows */
+.no-scrollbar-arrows::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Optional: Also customize the scrollbar appearance */
+.no-scrollbar-arrows::-webkit-scrollbar {
+    width: 8px;
+}
+
+.no-scrollbar-arrows::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.no-scrollbar-arrows::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.no-scrollbar-arrows::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

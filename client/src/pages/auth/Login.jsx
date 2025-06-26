@@ -15,7 +15,7 @@ function Login() {
     };
 
     return (
-        <div className="w-full flex-1 flex flex-col items-center min-h-0 bg-lighterGreen">
+        <div className="w-full h-full flex-1 flex flex-col items-center bg-lighterGreen border">
             <div className="w-full h-16"></div>
             <div className="flex-1 flex w-full min-h-0">
                 <div className="md:flex justify-center items-center hidden bg-lighterGreen w-2/5">

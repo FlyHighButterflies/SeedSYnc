@@ -1,6 +1,4 @@
-import Button from "@/components/Button";
-import Input from "@/components/Input";
-import React from "react";
+import { Button, Input } from "@/components";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 

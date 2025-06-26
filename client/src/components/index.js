@@ -2,3 +2,6 @@ export { default as Button } from "./Button";
 export { default as Dropdown } from "./Dropdown";
 export { default as Footer } from "./Footer";
 export { default as Input } from "./Input";
+export { default as Sidebar } from "./Sidebar";
+export { default as AuthLayout } from "./AuthLayout";
+export { default as DashboardLayout } from "./DashboardLayout";

@@ -8,6 +8,7 @@ import {
     ArrowLeftFromLine,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SidebarLink = ({ icon, text, to, onClick }) => (
     <NavLink
@@ -27,6 +28,13 @@ const SidebarLink = ({ icon, text, to, onClick }) => (
 );
 
 function Sidebar({ isOpen, onClose }) {
+    const { logout } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+        onClose();
+    };
+
     return (
         <>
             <div
@@ -49,14 +57,45 @@ function Sidebar({ isOpen, onClose }) {
                     </button>
                 </div>
                 <nav className="flex flex-col gap-2">
-                    <SidebarLink icon={<Home />} text="Home" to="/home" />
-                    <SidebarLink icon={<User />} text="Profile" to="/profile" />
-                    <SidebarLink icon={<List />} text="Listings" to="/listings" />
-                    <SidebarLink icon={<MessageCircle />} text="Messages" to="/messages" />
-                    <SidebarLink icon={<Backpack />} text="Inventory" to="/inventory" />
+                    <SidebarLink
+                        icon={<Home />}
+                        text="Home"
+                        to="/home"
+                        onClick={onClose}
+                    />
+                    <SidebarLink
+                        icon={<User />}
+                        text="Profile"
+                        to="/profile"
+                        onClick={onClose}
+                    />
+                    <SidebarLink
+                        icon={<List />}
+                        text="Listings"
+                        to="/listings"
+                        onClick={onClose}
+                    />
+                    <SidebarLink
+                        icon={<MessageCircle />}
+                        text="Messages"
+                        to="/messages"
+                        onClick={onClose}
+                    />
+                    <SidebarLink
+                        icon={<Backpack />}
+                        text="Inventory"
+                        to="/inventory"
+                        onClick={onClose}
+                    />
                 </nav>
                 <div className="mt-auto">
-                    <SidebarLink icon={<LogOut />} text="Logout" to="/login" />
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center p-2 px-3 text-lg rounded-lg transition-colors duration-200 hover:bg-gray-700 hover:text-white w-full text-left"
+                    >
+                        <LogOut />
+                        <span className="ml-4">Logout</span>
+                    </button>
                 </div>
             </div>
         </>

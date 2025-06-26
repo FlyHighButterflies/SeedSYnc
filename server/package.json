@@ -3,17 +3,19 @@
   "version": "1.0.0",
   "description": "A backend API for managing crops, inventory, reviews, and trade history.",
   "main": "src/server.js",
+  "type": "module",
   "scripts": {
     "start": "node src/server.js",
     "test": "jest"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "mongoose": "^5.10.9",
-    "dotenv": "^8.2.0",
-    "cors": "^2.8.5",
     "bcrypt": "^5.0.1",
-    "jsonwebtoken": "^8.5.1"
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.9",
+    "nodemon": "^3.1.10"
   },
   "devDependencies": {
     "jest": "^26.6.0",

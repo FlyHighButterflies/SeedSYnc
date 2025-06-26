@@ -5,12 +5,17 @@ import { Footer } from "@/components";
 function App() {
     return (
         <Router>
-            <div className="flex flex-col h-screen w-screen">
-                <Routes>
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/login" element={<Login />} />
-                </Routes>
+            {/* Use w-full to prevent horizontal overflow */}
+            <div className="flex flex-col h-screen w-full">
+                {/* This wrapper will grow and handle scrolling */}
+                <div className="flex-1 overflow-y-auto">
+                    <Routes>
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/login" element={<Login />} />
+                    </Routes>
+                </div>
+                {/* The footer is outside the scrollable area and will not shrink */}
                 <Footer />
             </div>
         </Router>

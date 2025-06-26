@@ -1,8 +1,6 @@
-import Button from "@/components/Button";
-import Input from "@/components/Input";
+import { Button, Input, Dropdown } from "@/components";
 import { useState, useRef, useEffect } from "react";
 import { Plus, Edit3, Trash2 } from "lucide-react";
-import Dropdown from "@/components/Dropdown";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 

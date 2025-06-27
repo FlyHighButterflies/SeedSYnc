@@ -23,13 +23,12 @@ export default function Dropdown({
         const newValue = e.target.value;
         setSelected(newValue);
 
-        // If this is controlled by React Hook Form
         if (onChange) {
             onChange(e);
         }
     };
 
-    // Key fix: Always display selected value as black text
+    // Always display selected value as black text
     const displayValue = selected ? selected : "";
     const hasSelection = displayValue !== "";
 

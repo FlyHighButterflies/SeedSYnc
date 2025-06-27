@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import { Footer, Input, Sidebar } from "@/components";
 import { Menu, Search } from "lucide-react";
 
-function DashboardLayout({ children }) {
+function DashboardLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -51,7 +52,7 @@ function DashboardLayout({ children }) {
 
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <main className="flex-1 overflow-y-auto no-scrollbar-arrows">
-                        {children}
+                        <Outlet />
                     </main>
                     <Footer />
                 </div>

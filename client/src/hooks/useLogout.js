@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks";
 import { authService } from "@/services";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
 export const useLogout = () => {

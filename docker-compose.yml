@@ -37,7 +37,8 @@ services:
     volumes:
       - ./ai-agent:/app
     environment:
-      - FLASK_ENV=production
+      - FLASK_ENV=development
+      - FLASK_APP=main.py
 
   mongodb:
     image: mongo:8.0

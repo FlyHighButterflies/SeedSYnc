@@ -1,0 +1,53 @@
+from service.proximity import a_star
+from service.branch_and_bound import branch_and_bound
+from service.string_search import bmhs
+from service.hashing import HashTable
+
+def calculate_score(farmer, buyer, options, graph):
+    score = 0
+
+    # A* Proximity
+    if options.get("use_astar"):
+        path = a_star(graph, farmer["location"], buyer["location"])
+        proximity_score = 1 / len(path) if path else 0.1
+        score += 0.3 * proximity_score
+    else:
+        score += 0.3 * (1.0 if farmer["location"] == buyer["location"] else 0.5)
+
+    # Inventory Score
+    product = buyer["product"]
+    inventory_score = min(farmer["inventory"].get(product, 0) / 100, 1.0)
+    score += 0.3 * inventory_score
+
+    # Review Score
+    review_score = farmer.get("review", 3.0) / 5.0
+    score += 0.2 * review_score
+
+    # Sustainability
+    if farmer.get("sustainability"):
+        score += 0.2
+
+    # BMHS keyword match
+    if options.get("use_bmhs"):
+        desc = farmer.get("description", "")
+        keyword = buyer.get("product", "")
+        if bmhs(desc.lower(), keyword.lower()) != -1:
+            score += 0.1
+
+    return score
+
+
+def apply_branch_and_bound_if_enabled(farmers, buyer, options):
+    if options.get("use_branch_and_bound"):
+        best = branch_and_bound(farmers, buyer)
+        return [best] if best else []
+    return farmers
+
+
+def hash_farmers_if_enabled(farmers, options):
+    if options.get("use_hashing"):
+        htable = HashTable()
+        for f in farmers:
+            htable.put(f["id"], f)
+        return htable
+    return None

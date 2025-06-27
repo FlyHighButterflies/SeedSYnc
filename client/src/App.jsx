@@ -4,7 +4,7 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { Home,OnboardingPage2, SignUp, Login, Listings, Inventory, Profile } from "@/pages";
+import { Home,OnboardingPage2, OnboardingPage3, SignUp, Login, Listings, Inventory, Profile } from "@/pages";
 import {
     AuthLayout,
     DashboardLayout,
@@ -27,8 +27,25 @@ function App() {
                     >
                         <Route path="/signup" element={<SignUp />} />
                         <Route path="/login" element={<Login />} />
-                         <Route path="/Onboarding2" element={<OnboardingPage2 />} />
                     </Route>
+                         {/* OnboardingPage2 without DashboardLayout */}
+    <Route
+        path="/Onboarding2"
+        element={
+            <ProtectedRoute>
+                <OnboardingPage2 />
+            </ProtectedRoute>
+        }
+    />
+    {/* OnboardingPage3 without DashboardLayout */}
+    <Route
+        path="/Onboarding3"
+        element={
+            <ProtectedRoute>
+                <OnboardingPage3 />
+            </ProtectedRoute>
+        }
+    />
 
                     <Route
                         element={
@@ -37,7 +54,7 @@ function App() {
                             </ProtectedRoute>
                         }
                     >
-                       
+                        
                         <Route path="/home" element={<Home />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/listings" element={<Listings />} />

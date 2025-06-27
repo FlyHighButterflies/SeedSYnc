@@ -1,5 +1,5 @@
 import Footer from "../components/Footer";
-export default function OnboardingPage2() {
+export default function OnboardingPage3() {
     // Example click handler
     const handleButtonClick = () => {
         alert("Button clicked!");
@@ -10,16 +10,16 @@ export default function OnboardingPage2() {
             className="relative w-[1977px] h-[913px] mx-flex justify-center items-center"
             style={{ background: "#E6F3EC" }}
         >
-            {/* ONBOARDING2.png */}
+            {/* ONBOARDING3.png */}
             <img
-                src="/images/ONBOARDING2.png"
+                src="/images/Landingpage3.png"
                 alt="Onboarding"
                 className="absolute"
                 style={{
-                    width: "1427px",
-                    height: "767px",
-                    top: "18px",
-                    left: "290px",
+                    width: "1750px",
+                    height: "920px",
+                    top: "1px",
+                    left: "110px",
                     borderWidth: 0,
                     borderStyle: "solid",
                 }}
@@ -33,7 +33,7 @@ export default function OnboardingPage2() {
                     width: "100px",
                     height: "10px",
                     top: "770px",
-                    left: "959px",
+                    left: "1790px",
                     padding: 0,
                     border: "none",
                     background: "none",

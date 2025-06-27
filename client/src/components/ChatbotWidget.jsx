@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { X, Send } from "lucide-react";
 import Button from "./Button";
 import Input from "./Input";
 
@@ -73,12 +73,9 @@ function ChatbotWidget() {
                                 alt="Chatbot"
                                 className="w-6 h-6"
                             />
-                            <div>
-                                <h3 className="font-semibold">
-                                    SeedSync Assistant
-                                </h3>
-                                <p className="text-xs opacity-90">Online now</p>
-                            </div>
+                            <h3 className="font-semibold">
+                                SeedSync Assistant
+                            </h3>
                         </div>
                         <button
                             onClick={toggleChat}

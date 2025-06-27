@@ -4,7 +4,7 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { Home, SignUp, Login, Listings } from "@/pages";
+import { Home, SignUp, Login, Listings, Onboarding } from "@/pages";
 import {
     AuthLayout,
     DashboardLayout,
@@ -36,6 +36,17 @@ function App() {
                                 <AuthLayout>
                                     <Login />
                                 </AuthLayout>
+                            </PublicRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/onboarding"
+                        element={
+                            <PublicRoute>
+                                <AuthLayout>
+                                    <Onboarding />
+                                    </AuthLayout>
                             </PublicRoute>
                         }
                     />

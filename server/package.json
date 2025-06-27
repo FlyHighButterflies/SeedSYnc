@@ -1,5 +1,5 @@
 {
-  "name": "farm-trade-api",
+  "name": "seedsync-api",
   "version": "1.0.0",
   "description": "A backend API for managing crops, inventory, reviews, and trade history.",
   "main": "src/server.js",
@@ -9,18 +9,21 @@
     "test": "jest"
   },
   "dependencies": {
-    "bcrypt": "^5.0.1",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.13.23",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.1",
+    "glob": "^11.0.3",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.1",
     "nodemon": "^3.1.10",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {
-    "jest": "^26.6.0",
-    "supertest": "^6.1.0"
+    "jest": "^30.0.3",
+    "supertest": "^7.1.1"
   },
   "author": "Your Name",
   "license": "MIT"

@@ -18,12 +18,36 @@ services:
       context: ./server
       dockerfile: DockerFile
     ports:
-      - "5000:5000"
+      - "3001:3001"
+    depends_on:
+      - ai-agent
+      - mongodb
     volumes:
       - ./server:/app
       - /app/node_modules
+    env_file:
+      - ./server/.env
+
+  ai-agent:
+    build:
+      context: ./ai-agent
+      dockerfile: DockerFile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai-agent:/app
     environment:
-      - NODE_ENV=development
-      - PORT=5000
-      - MONGO_URI=<your_mongo_connection_string>
-      - JWT_SECRET=<your_jwt_secret>
+      - FLASK_ENV=production
+
+  mongodb:
+    image: mongo:8.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: seedsync
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:

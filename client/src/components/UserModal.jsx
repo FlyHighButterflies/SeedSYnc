@@ -6,6 +6,9 @@ import {
     Mail,
     MessageCircle,
     Star,
+    Award,
+    Truck,
+    Clock,
 } from "lucide-react";
 import { useState } from "react";
 import Button from "./Button";
@@ -71,7 +74,7 @@ function UserModal({ user, isOpen, onClose }) {
             ></div>
 
             <div className="fixed inset-0 flex items-center justify-center z-40 p-2 sm:p-4">
-                <div className="bg-white rounded-xl w-full max-w-sm sm:max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto m-2">
+                <div className="bg-white rounded-xl w-full max-w-sm sm:max-w-lg max-h-[95vh] sm:max-h-[90vh] overflow-y-auto m-2">
                     <div className="p-6">
                         {!showRatingForm ? (
                             <>
@@ -93,61 +96,178 @@ function UserModal({ user, isOpen, onClose }) {
                                 {/* Profile Section */}
                                 <div className="text-center mb-4 sm:mb-6">
                                     <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl mx-auto mb-3 sm:mb-4">
-                                        {user.avatar}
+                                        {user.firstName?.charAt(0) ||
+                                            user.name?.charAt(0) ||
+                                            "U"}
+                                        {user.lastName?.charAt(0) || ""}
                                     </div>
                                     <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
-                                        {user.name}
+                                        {user.firstName && user.lastName
+                                            ? `${user.firstName} ${user.lastName}`
+                                            : user.name || "Unknown User"}
                                     </h4>
-                                    <p className="text-xs sm:text-sm text-gray-600 mb-2">
-                                        {user.type}
+                                    <p className="text-xs sm:text-sm text-gray-600 mb-2 capitalize">
+                                        {user.userType || user.type || "Trader"}
                                     </p>
-                                    <StarRating rating={user.rating} />
+                                    <StarRating rating={user.rating || 0} />
                                 </div>
 
-                                {/* User Details */}
+                                {/* Location & Contact */}
                                 <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                                     <div className="flex items-center gap-3">
                                         <MapPin className="w-4 h-4 text-gray-500 flex-shrink-0" />
                                         <span className="text-xs sm:text-sm text-gray-700 break-words">
-                                            {user.location}
+                                            {user.city && user.province
+                                                ? `${user.city}, ${user.province}`
+                                                : user.location ||
+                                                  "Location not specified"}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Package className="w-4 h-4 text-gray-500 flex-shrink-0" />
                                         <span className="text-xs sm:text-sm text-gray-700">
-                                            {user.totalTrades || 25} successful
+                                            {user.totalTrades || 0} successful
                                             trades
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Phone className="w-4 h-4 text-gray-500 flex-shrink-0" />
                                         <span className="text-xs sm:text-sm text-gray-700 break-all">
-                                            {user.phone || "+1 (555) 123-4567"}
+                                            {user.contactNumber ||
+                                                "Contact not available"}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Mail className="w-4 h-4 text-gray-500 flex-shrink-0" />
                                         <span className="text-xs sm:text-sm text-gray-700 break-all">
                                             {user.email ||
-                                                "jane.doe@example.com"}
+                                                "Email not available"}
                                         </span>
                                     </div>
+                                    {user.transportation && (
+                                        <div className="flex items-center gap-3">
+                                            <Truck className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                                            <span className="text-xs sm:text-sm text-gray-700 capitalize">
+                                                Transportation:{" "}
+                                                {user.transportation}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
 
+                                {/* Specialties/Products */}
                                 <div className="mb-4 sm:mb-6">
-                                    <h5 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">
-                                        Specialty
-                                    </h5>
-                                    <p className="text-xs sm:text-sm text-gray-700 mb-3">
-                                        {user.specialty ||
-                                            "Organic farming and sustainable agriculture"}
-                                    </p>
-                                    <h5 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">
-                                        Current Offer
-                                    </h5>
-                                    <p className="text-xs sm:text-sm text-gray-700 mb-3">
-                                        "{user.trade}"
-                                    </p>
+                                    {user.userType === "farmer" ||
+                                    user.type === "farmer" ? (
+                                        <>
+                                            {user.specialties &&
+                                                user.specialties.length > 0 && (
+                                                    <div className="mb-4">
+                                                        <h5 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">
+                                                            Specialties
+                                                        </h5>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {user.specialties.map(
+                                                                (
+                                                                    specialty,
+                                                                    index
+                                                                ) => (
+                                                                    <span
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                                                                    >
+                                                                        {
+                                                                            specialty
+                                                                        }
+                                                                    </span>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            {user.certifications &&
+                                                user.certifications.length >
+                                                    0 && (
+                                                    <div className="mb-4">
+                                                        <h5 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">
+                                                            Certifications
+                                                        </h5>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {user.certifications.map(
+                                                                (
+                                                                    cert,
+                                                                    index
+                                                                ) => (
+                                                                    <span
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full flex items-center gap-1"
+                                                                    >
+                                                                        <Award className="w-3 h-3" />
+                                                                        {cert}
+                                                                    </span>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            {user.productsNeeded &&
+                                                user.productsNeeded.length >
+                                                    0 && (
+                                                    <div className="mb-4">
+                                                        <h5 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">
+                                                            Products Needed
+                                                        </h5>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {user.productsNeeded.map(
+                                                                (
+                                                                    product,
+                                                                    index
+                                                                ) => (
+                                                                    <span
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full"
+                                                                    >
+                                                                        {
+                                                                            product
+                                                                        }
+                                                                    </span>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            {user.quantityRange && (
+                                                <div className="mb-4">
+                                                    <h5 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">
+                                                        Quantity Range
+                                                    </h5>
+                                                    <p className="text-xs sm:text-sm text-gray-700">
+                                                        {user.quantityRange}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {user.frequency && (
+                                                <div className="mb-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="w-4 h-4 text-gray-500" />
+                                                        <span className="text-xs sm:text-sm text-gray-700 capitalize">
+                                                            Purchase Frequency:{" "}
+                                                            {user.frequency}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
                                 </div>
 
                                 {/* Action Buttons */}
@@ -182,10 +302,10 @@ function UserModal({ user, isOpen, onClose }) {
                             </>
                         ) : (
                             <>
-                                {/* Rating Form */}
+                                {/* Rating Form - Same as before */}
                                 <div className="flex justify-between items-center mb-6">
                                     <h3 className="text-xl font-bold text-gray-900">
-                                        Rate {user.name}
+                                        Rate {user.firstName || user.name}
                                     </h3>
                                     <Button
                                         variant="ghost"
@@ -199,10 +319,15 @@ function UserModal({ user, isOpen, onClose }) {
 
                                 <div className="text-center mb-6">
                                     <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-3">
-                                        {user.avatar}
+                                        {user.firstName?.charAt(0) ||
+                                            user.name?.charAt(0) ||
+                                            "U"}
+                                        {user.lastName?.charAt(0) || ""}
                                     </div>
                                     <h4 className="font-semibold text-gray-900">
-                                        {user.name}
+                                        {user.firstName && user.lastName
+                                            ? `${user.firstName} ${user.lastName}`
+                                            : user.name || "Unknown User"}
                                     </h4>
                                 </div>
 

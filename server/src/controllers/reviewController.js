@@ -1,3 +1,5 @@
+import { io, userSockets } from '../server.js';
+
 class ReviewController {
     constructor(ReviewModel) {
         this.ReviewModel = ReviewModel;
@@ -7,6 +9,12 @@ class ReviewController {
         try {
             const review = new this.ReviewModel(req.body);
             await review.save();
+
+            const recipientSocketId = userSockets.get(review.reviewee.toString());
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit('review:create', review);
+            }
+
             res.status(201).json(review);
         } catch (error) {
             res.status(400).json({ message: error.message });

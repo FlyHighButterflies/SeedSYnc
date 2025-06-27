@@ -11,5 +11,7 @@ router.use('/inventory', inventoryRoutes);
 
 router.use('/reviews', reviewRoutes);
 router.use('/trades', tradeRoutes);
+router.use('/matches', matchRoutes);
+router.use('/messages', messageRoutes);
 
 export default router;

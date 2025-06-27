@@ -4,7 +4,7 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { Home, SignUp, Login, Listings, Onboarding } from "@/pages";
+import { Home, SignUp, Login, Listings, OnboardingPage1 } from "@/pages";
 import {
     AuthLayout,
     DashboardLayout,
@@ -41,11 +41,11 @@ function App() {
                     />
 
                     <Route
-                        path="/onboarding"
+                        path="/onboardingpage1"
                         element={
                             <PublicRoute>
                                 <AuthLayout>
-                                    <Onboarding />
+                                    <OnboardingPage1 />
                                     </AuthLayout>
                             </PublicRoute>
                         }

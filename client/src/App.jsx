@@ -4,7 +4,7 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { Home, SignUp, Login } from "@/pages";
+import { Home, SignUp, Login, Listings } from "@/pages";
 import {
     AuthLayout,
     DashboardLayout,
@@ -18,7 +18,7 @@ function App() {
         <AuthProvider>
             <Router>
                 <Routes>
-                    {/* Public routes (redirect if authenticated) */}
+                    {/* Public routes */}
                     <Route
                         path="/signup"
                         element={
@@ -40,7 +40,7 @@ function App() {
                         }
                     />
 
-                    {/* Protected routes (require authentication) */}
+                    {/* Protected routes */}
                     <Route
                         path="/home"
                         element={
@@ -51,8 +51,6 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-
-                    {/* Add more protected routes here */}
                     <Route
                         path="/profile"
                         element={
@@ -68,7 +66,7 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <DashboardLayout>
-                                    <div>Listings Page</div>
+                                    <Listings />
                                 </DashboardLayout>
                             </ProtectedRoute>
                         }
@@ -93,6 +91,10 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+
+                    {/* Default route */}
+                    <Route path="/" element={<Navigate to="/home" replace />} />
+                    <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>
             </Router>
         </AuthProvider>

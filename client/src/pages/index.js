@@ -7,3 +7,4 @@ export { default as Profile } from "./Profile";
 export { default as OnboardingPage1 } from "./OnboardingPage1";
 export { default as OnboardingPage2 } from "./OnboardingPage2";
 export { default as UserProfile } from "./UserProfile";
+export { default as Messages } from "./Messages";

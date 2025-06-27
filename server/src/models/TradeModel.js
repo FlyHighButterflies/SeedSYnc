@@ -1,27 +1,14 @@
 import mongoose from "mongoose";
 
-const tradeSchema = new mongoose.Schema(
-  {
-    buyerId: {
-      type: String,
-      required: true,
-    },
-    sellerId: {
-      type: String,
-      required: true,
-    },
-    cropId: {
-      type: String,
-      required: true,
-    },
-    tradeDate: {
-      type: Date,
-      default: Date.now,
-    },
-  },
-  { timestamps: true }
-);
+const tradeSchema = new mongoose.Schema({
+  inventory: { type: mongoose.Schema.Types.ObjectId, ref: "Inventory", required: true },
+  buyer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  seller: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  quantity: { type: Number, required: true, min: 1 },
+  totalPrice: { type: Number, required: true },
+  status: { type: String, enum: ["pending", "completed", "cancelled"], default: "pending" },
+  match: { type: mongoose.Schema.Types.ObjectId, ref: "Match" }, // Optional link to the original match
+}, { timestamps: true });
 
-const TradeModel = mongoose.model("Trade", tradeSchema);
-
-export default TradeModel;
+const Trade = mongoose.model("Trade", tradeSchema);
+export default Trade;

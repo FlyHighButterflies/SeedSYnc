@@ -1,39 +1,11 @@
 import mongoose from "mongoose";
 
 const cropSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-  farmerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Farmer",
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-cropSchema.pre("save", function (next) {
-  this.updatedAt = Date.now();
-  next();
-});
+  name: { type: String, required: true, unique: true, trim: true },
+  description: { type: String, trim: true },
+  category: { type: String, required: true, trim: true }, // e.g., 'Vegetable', 'Fruit', 'Tool', 'Seed'
+  images: [{ type: String }],
+}, { timestamps: true });
 
 const Crop = mongoose.model("Crop", cropSchema);
-
 export default Crop;

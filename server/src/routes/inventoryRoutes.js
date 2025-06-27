@@ -1,20 +1,8 @@
-import express from "express";
-import InventoryController from "../controllers/inventoryController.js";
-import Inventory from "../models/InventoryModel.js";
-
+import express from 'express';
 const router = express.Router();
-const inventoryController = new InventoryController(Inventory);
 
-// Routes for inventory management
-router.post("/", inventoryController.createInventory.bind(inventoryController));
-router.get("/", inventoryController.getInventory.bind(inventoryController));
-router.put(
-  "/:id",
-  inventoryController.updateInventory.bind(inventoryController)
-);
-router.delete(
-  "/:id",
-  inventoryController.deleteInventory.bind(inventoryController)
-);
+// Placeholder for inventory routes
+// router.get('/', inventoryController.getAllInventory);
+// router.post('/', inventoryController.createInventory);
 
 export default router;

@@ -4,7 +4,7 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { Home,OnboardingPage2, SignUp, Login, Listings, Inventory, Profile } from "@/pages";
+import { Home,OnboardingPage2, SignUp, Login, Listings, Inventory, Profile, OnboardingPage3 } from "@/pages";
 import {
     AuthLayout,
     DashboardLayout,
@@ -37,7 +37,14 @@ function App() {
             </ProtectedRoute>
         }
     />
-    
+    <Route
+        path="/Onboarding3"
+        element={
+            <ProtectedRoute>
+                <OnboardingPage3 />
+            </ProtectedRoute>
+        }
+    />
 
                     <Route
                         element={

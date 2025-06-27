@@ -4,7 +4,7 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { Home, SignUp, Login, Listings, Inventory, Profile } from "@/pages";
+import { Home,OnboardingPage2, SignUp, Login, Listings, Inventory, Profile } from "@/pages";
 import {
     AuthLayout,
     DashboardLayout,
@@ -27,6 +27,7 @@ function App() {
                     >
                         <Route path="/signup" element={<SignUp />} />
                         <Route path="/login" element={<Login />} />
+                         <Route path="/Onboarding2" element={<OnboardingPage2 />} />
                     </Route>
 
                     <Route
@@ -36,6 +37,7 @@ function App() {
                             </ProtectedRoute>
                         }
                     >
+                       
                         <Route path="/home" element={<Home />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/listings" element={<Listings />} />

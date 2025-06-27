@@ -4,7 +4,15 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { Home, SignUp, Login, Listings, OnboardingPage1 } from "@/pages";
+import {
+    Home,
+    SignUp,
+    Login,
+    Listings,
+    Inventory,
+    Profile,
+    OnboardingPage1,
+} from "@/pages";
 import {
     AuthLayout,
     DashboardLayout,
@@ -18,92 +26,35 @@ function App() {
         <AuthProvider>
             <Router>
                 <Routes>
-                    {/* Public routes */}
                     <Route
-                        path="/signup"
                         element={
                             <PublicRoute>
-                                <AuthLayout>
-                                    <SignUp />
-                                </AuthLayout>
+                                <AuthLayout />
                             </PublicRoute>
                         }
-                    />
-                    <Route
-                        path="/login"
-                        element={
-                            <PublicRoute>
-                                <AuthLayout>
-                                    <Login />
-                                </AuthLayout>
-                            </PublicRoute>
-                        }
-                    />
+                    >
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/login" element={<Login />} />
+                    </Route>
 
                     <Route
-                        path="/onboardingpage1"
                         element={
-                            <PublicRoute>
-                                <AuthLayout>
-                                    <OnboardingPage1 />
-                                    </AuthLayout>
-                            </PublicRoute>
+                            <ProtectedRoute>
+                                <DashboardLayout />
+                            </ProtectedRoute>
                         }
-                    />
+                    >
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/listings" element={<Listings />} />
+                        <Route path="/inventory" element={<Inventory />} />
+                        <Route
+                            path="/messages"
+                            element={<div>Messages Page</div>}
+                        />
+                    </Route>
 
-                    {/* Protected routes */}
-                    <Route
-                        path="/home"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardLayout>
-                                    <Home />
-                                </DashboardLayout>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/profile"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardLayout>
-                                    <div>Profile Page</div>
-                                </DashboardLayout>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/listings"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardLayout>
-                                    <Listings />
-                                </DashboardLayout>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/messages"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardLayout>
-                                    <div>Messages Page</div>
-                                </DashboardLayout>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/inventory"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardLayout>
-                                    <div>Inventory Page</div>
-                                </DashboardLayout>
-                            </ProtectedRoute>
-                        }
-                    />
-
-                    {/* Default route */}
+                    {/* Default routes */}
                     <Route path="/" element={<Navigate to="/home" replace />} />
                     <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>

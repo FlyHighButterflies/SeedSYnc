@@ -1,6 +1,6 @@
 import { Button, ListingCard, UserModal } from "@/components";
 import { useUserModal } from "@/hooks";
-import { ChevronRight, Star } from "lucide-react";
+import { ChevronRight, Star, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function Home() {
@@ -36,7 +36,11 @@ function Home() {
                     <p className="text-lg sm:text-xl lg:text-2xl text-center">
                         Source fresh products for your needs!
                     </p>
-                    <Button variant="dark" className="w-full sm:w-auto">
+                    <Button
+                        variant="primary"
+                        size="lg"
+                        className="w-full sm:w-auto"
+                    >
                         Find Now!
                     </Button>
                 </div>
@@ -110,12 +114,21 @@ function Home() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
-                        <button className="bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base">
+                        <Button
+                            variant="primary"
+                            size="lg"
+                            className="flex-1 sm:flex-none"
+                        >
+                            <MessageCircle className="w-4 h-4" />
                             Start Trading
-                        </button>
-                        <button className="border border-gray-300 text-gray-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm sm:text-base">
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="lg"
+                            className="flex-1 sm:flex-none"
+                        >
                             View Profile
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

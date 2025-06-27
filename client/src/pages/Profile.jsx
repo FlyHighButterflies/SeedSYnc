@@ -10,20 +10,20 @@ import {
     Clock,
     Award,
     Truck,
-    User,
     Settings,
 } from "lucide-react";
+import Button from "@/components/Button";
 
-// Sample user data based on signup fields
+// Sample user data
 const sampleFarmerProfile = {
-    // Personal Info (Step 1)
+    // Personal Info
     email: "farmer.john@example.com",
     firstName: "John",
     lastName: "Santos",
     contactNumber: "+63 912 345 6789",
     profileImage: "/images/farmer-profile.jpg",
 
-    // Location & Logistics (Step 3)
+    // Location & Logistics
     country: "Philippines",
     province: "Nueva Ecija",
     city: "Cabanatuan City",
@@ -46,14 +46,14 @@ const sampleFarmerProfile = {
 };
 
 const sampleBuyerProfile = {
-    // Personal Info (Step 1)
+    // Personal Info
     email: "buyer.maria@example.com",
     firstName: "Maria",
     lastName: "Cruz",
     contactNumber: "+63 917 123 4567",
     profileImage: "/images/buyer-profile.jpg",
 
-    // Location & Logistics (Step 3)
+    // Location & Logistics
     country: "Philippines",
     province: "Metro Manila",
     city: "Quezon City",
@@ -63,7 +63,7 @@ const sampleBuyerProfile = {
     port: "yes",
     transportation: "truck",
 
-    // Buyer-specific data (Step 4)
+    // Buyer-specific data
     userType: "buyer",
     joinDate: "2024-02-20",
     rating: 4.6,
@@ -115,7 +115,7 @@ function InfoRow({ icon, label, value }) {
 }
 
 function Profile() {
-    const [userType, setUserType] = useState("farmer"); // This would come from auth context
+    const [userType, setUserType] = useState("farmer");
     const [isEditing, setIsEditing] = useState(false);
 
     const profileData =
@@ -141,24 +141,26 @@ function Profile() {
                         </h1>
                     </div>
                     <div className="flex gap-2">
-                        <button
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() =>
                                 setUserType(
                                     userType === "farmer" ? "buyer" : "farmer"
                                 )
                             }
-                            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
                         >
                             Switch to{" "}
                             {userType === "farmer" ? "Buyer" : "Farmer"} View
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            variant="primary"
+                            size="sm"
                             onClick={handleEdit}
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 text-sm"
                         >
                             <Edit3 className="w-4 h-4" />
                             Edit Profile
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
@@ -173,12 +175,14 @@ function Profile() {
                                     {profileData.firstName.charAt(0)}
                                     {profileData.lastName.charAt(0)}
                                 </div>
-                                <button
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
                                     onClick={handleImageUpload}
-                                    className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-50"
+                                    className="absolute bottom-2 right-2 p-2 rounded-full"
                                 >
-                                    <Camera className="w-4 h-4 text-gray-600" />
-                                </button>
+                                    <Camera className="w-4 h-4" />
+                                </Button>
                             </div>
 
                             {/* Profile Info */}

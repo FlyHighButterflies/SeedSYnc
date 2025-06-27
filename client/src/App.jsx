@@ -18,81 +18,35 @@ function App() {
         <AuthProvider>
             <Router>
                 <Routes>
-                    {/* Public routes */}
                     <Route
-                        path="/signup"
                         element={
                             <PublicRoute>
-                                <AuthLayout>
-                                    <SignUp />
-                                </AuthLayout>
+                                <AuthLayout />
                             </PublicRoute>
                         }
-                    />
-                    <Route
-                        path="/login"
-                        element={
-                            <PublicRoute>
-                                <AuthLayout>
-                                    <Login />
-                                </AuthLayout>
-                            </PublicRoute>
-                        }
-                    />
+                    >
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/login" element={<Login />} />
+                    </Route>
 
-                    {/* Protected routes */}
                     <Route
-                        path="/home"
                         element={
                             <ProtectedRoute>
-                                <DashboardLayout>
-                                    <Home />
-                                </DashboardLayout>
+                                <DashboardLayout />
                             </ProtectedRoute>
                         }
-                    />
-                    <Route
-                        path="/profile"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardLayout>
-                                    <Profile />
-                                </DashboardLayout>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/listings"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardLayout>
-                                    <Listings />
-                                </DashboardLayout>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/messages"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardLayout>
-                                    <div>Messages Page</div>
-                                </DashboardLayout>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/inventory"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardLayout>
-                                    <Inventory />
-                                </DashboardLayout>
-                            </ProtectedRoute>
-                        }
-                    />
+                    >
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/listings" element={<Listings />} />
+                        <Route path="/inventory" element={<Inventory />} />
+                        <Route
+                            path="/messages"
+                            element={<div>Messages Page</div>}
+                        />
+                    </Route>
 
-                    {/* Default route */}
+                    {/* Default routes */}
                     <Route path="/" element={<Navigate to="/home" replace />} />
                     <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>

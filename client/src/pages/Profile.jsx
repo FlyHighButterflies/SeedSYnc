@@ -13,6 +13,7 @@ import {
     User,
     Settings,
 } from "lucide-react";
+import Button from "@/components/Button";
 
 // Sample user data based on signup fields
 const sampleFarmerProfile = {
@@ -141,24 +142,26 @@ function Profile() {
                         </h1>
                     </div>
                     <div className="flex gap-2">
-                        <button
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() =>
                                 setUserType(
                                     userType === "farmer" ? "buyer" : "farmer"
                                 )
                             }
-                            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
                         >
                             Switch to{" "}
                             {userType === "farmer" ? "Buyer" : "Farmer"} View
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            variant="primary"
+                            size="sm"
                             onClick={handleEdit}
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 text-sm"
                         >
                             <Edit3 className="w-4 h-4" />
                             Edit Profile
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
@@ -173,12 +176,14 @@ function Profile() {
                                     {profileData.firstName.charAt(0)}
                                     {profileData.lastName.charAt(0)}
                                 </div>
-                                <button
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
                                     onClick={handleImageUpload}
-                                    className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-50"
+                                    className="absolute bottom-2 right-2 p-2 rounded-full"
                                 >
-                                    <Camera className="w-4 h-4 text-gray-600" />
-                                </button>
+                                    <Camera className="w-4 h-4" />
+                                </Button>
                             </div>
 
                             {/* Profile Info */}

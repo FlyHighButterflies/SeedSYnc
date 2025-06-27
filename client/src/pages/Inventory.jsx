@@ -10,6 +10,7 @@ import {
     Bell,
     Star,
 } from "lucide-react";
+import Button from "@/components/Button";
 
 // Sample data for demo
 const sampleFarmerItems = [
@@ -222,20 +223,24 @@ function FarmerInventoryCard({ item, onEdit, onDelete }) {
 
             {/* Actions */}
             <div className="flex gap-2 mt-auto">
-                <button
+                <Button
+                    variant="primary"
+                    size="sm"
                     onClick={() => onEdit(item)}
-                    className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="flex-1"
                 >
                     <Edit3 className="w-4 h-4" />
                     Edit
-                </button>
-                <button
+                </Button>
+                <Button
+                    variant="danger"
+                    size="sm"
                     onClick={() => onDelete(item)}
-                    className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="flex-1"
                 >
                     <Trash2 className="w-4 h-4" />
                     Delete
-                </button>
+                </Button>
             </div>
         </div>
     );
@@ -309,20 +314,24 @@ function BuyerInventoryCard({ item, onEdit, onDelete }) {
 
             {/* Actions */}
             <div className="flex gap-2 mt-auto">
-                <button
+                <Button
+                    variant="primary"
+                    size="sm"
                     onClick={() => onEdit(item)}
-                    className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="flex-1"
                 >
                     <Edit3 className="w-4 h-4" />
                     Edit
-                </button>
-                <button
+                </Button>
+                <Button
+                    variant="danger"
+                    size="sm"
                     onClick={() => onDelete(item)}
-                    className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="flex-1"
                 >
                     <Trash2 className="w-4 h-4" />
                     Delete
-                </button>
+                </Button>
             </div>
         </div>
     );
@@ -357,24 +366,22 @@ function Inventory() {
                         </h1>
                     </div>
                     <div className="flex gap-2">
-                        <button
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() =>
                                 setUserType(
                                     userType === "farmer" ? "buyer" : "farmer"
                                 )
                             }
-                            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
                         >
                             Switch to{" "}
                             {userType === "farmer" ? "Buyer" : "Farmer"}
-                        </button>
-                        <button
-                            onClick={handleAdd}
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 text-sm"
-                        >
+                        </Button>
+                        <Button variant="primary" size="sm" onClick={handleAdd}>
                             <Plus className="w-4 h-4" />
                             {userType === "farmer" ? "Add Crop" : "Add Need"}
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
@@ -399,14 +406,15 @@ function Inventory() {
                                     ? "Start by adding your first crop to your inventory."
                                     : "Start by adding your first purchase requirement."}
                             </p>
-                            <button
+                            <Button
+                                variant="primary"
+                                size="lg"
                                 onClick={handleAdd}
-                                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
                             >
                                 {userType === "farmer"
                                     ? "Add Your First Crop"
                                     : "Add Your First Requirement"}
-                            </button>
+                            </Button>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 lg:gap-12 justify-items-center">
@@ -433,12 +441,14 @@ function Inventory() {
             </div>
 
             {/* Quick Actions Floating Button (Mobile) */}
-            <button
+            <Button
+                variant="primary"
+                size="lg"
                 onClick={handleAdd}
-                className="fixed bottom-6 right-6 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 lg:hidden"
+                className="fixed bottom-6 right-6 rounded-full p-4 lg:hidden shadow-lg"
             >
                 <Plus className="w-6 h-6" />
-            </button>
+            </Button>
         </div>
     );
 }

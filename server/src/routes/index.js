@@ -13,5 +13,7 @@ router.use('/reviews', reviewRoutes);
 router.use('/trades', tradeRoutes);
 router.use('/matches', matchRoutes);
 router.use('/messages', messageRoutes);
+router.use('/chatlogs', chatLogRoutes);
+router.use('/notifications', notificationRoutes);
 
 export default router;

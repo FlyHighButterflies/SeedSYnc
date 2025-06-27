@@ -1,5 +1,4 @@
-const jwt = require('jsonwebtoken');
-const { promisify } = require('util');
+import jwt from 'jsonwebtoken';
 
 const authMiddleware = async (req, res, next) => {
     try {
@@ -8,7 +7,7 @@ const authMiddleware = async (req, res, next) => {
             return res.status(401).json({ message: 'Unauthorized access' });
         }
 
-        const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (error) {
@@ -16,4 +15,4 @@ const authMiddleware = async (req, res, next) => {
     }
 };
 
-module.exports = authMiddleware;
+export default authMiddleware;

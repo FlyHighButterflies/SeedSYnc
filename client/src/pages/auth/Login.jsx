@@ -86,7 +86,8 @@ function Login() {
                                 <div className="flex flex-col pt-2">
                                     <Button
                                         type="submit"
-                                        variant="dark"
+                                        variant="primary"
+                                        size="lg"
                                         disabled={isSubmitting}
                                         className="w-full"
                                     >

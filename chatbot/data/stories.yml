@@ -1,0 +1,66 @@
+version: "3.1"
+
+stories:
+
+- story: Buyer inquires about produce
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: request_produce
+  - action: action_check_produce_availability
+  - intent: ask_price
+  - action: utter_price_info
+  - intent: confirm_order
+  - action: action_confirm_order
+  - intent: thank
+  - action: utter_welcome
+
+- story: Buyer asks about availability first
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_availability
+  - action: utter_availability_info
+  - intent: request_produce
+  - action: action_check_produce_availability
+  - intent: ask_price
+  - action: utter_price_info
+  - intent: confirm_order
+  - action: action_confirm_order
+
+- story: Farmer wants to sell
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: farmer_seller
+  - action: utter_farmer_options
+  - action: action_set_user_type
+
+
+
+- story: User is undecided
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: request_produce
+  - action: action_check_produce_availability
+  - intent: ask_price
+  - action: utter_price_info
+  - intent: decision_pending
+  - action: utter_decision_help
+
+- story: New user wants to know how it works
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: how_it_works
+  - action: utter_how_it_works
+  - intent: get_started
+  - action: utter_get_started
+
+- story: User asks about delivery
+  steps:
+  - intent: ask_delivery
+  - action: utter_delivery_info
+  - intent: confirm_order
+  - action: action_confirm_order

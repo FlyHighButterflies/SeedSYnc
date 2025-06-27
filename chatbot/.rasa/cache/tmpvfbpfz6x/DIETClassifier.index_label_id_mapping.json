@@ -1,0 +1,16 @@
+{
+  "0": "about_seedsync",
+  "1": "ask_availability",
+  "2": "ask_delivery",
+  "3": "ask_price",
+  "4": "buyer",
+  "5": "check_locations",
+  "6": "confirm_order",
+  "7": "decision_pending",
+  "8": "farmer_seller",
+  "9": "get_started",
+  "10": "greet",
+  "11": "how_it_works",
+  "12": "request_produce",
+  "13": "thank"
+}

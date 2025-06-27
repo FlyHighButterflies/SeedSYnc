@@ -13,6 +13,7 @@ import {
     Profile,
     OnboardingPage1,
     OnboardingPage2,
+    Messages,
 } from "@/pages";
 import {
     AuthLayout,
@@ -53,10 +54,7 @@ function App() {
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/listings" element={<Listings />} />
                         <Route path="/inventory" element={<Inventory />} />
-                        <Route
-                            path="/messages"
-                            element={<div>Messages Page</div>}
-                        />
+                        <Route path="/messages" element={<Messages />} />
                     </Route>
 
                     {/* Default routes */}

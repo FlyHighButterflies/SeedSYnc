@@ -4,7 +4,15 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { Home, SignUp, Login, Listings, Inventory, Profile } from "@/pages";
+import {
+    Home,
+    SignUp,
+    Login,
+    Listings,
+    Inventory,
+    Profile,
+    OnboardingPage1,
+} from "@/pages";
 import {
     AuthLayout,
     DashboardLayout,

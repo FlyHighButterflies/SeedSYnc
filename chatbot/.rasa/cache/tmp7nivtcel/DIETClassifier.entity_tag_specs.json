@@ -1,0 +1,28 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-produce_type",
+      "2": "I-produce_type",
+      "3": "L-produce_type",
+      "4": "U-produce_type",
+      "5": "B-quantity",
+      "6": "I-quantity",
+      "7": "L-quantity",
+      "8": "U-quantity",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-produce_type": 1,
+      "I-produce_type": 2,
+      "L-produce_type": 3,
+      "U-produce_type": 4,
+      "B-quantity": 5,
+      "I-quantity": 6,
+      "L-quantity": 7,
+      "U-quantity": 8,
+      "O": 0
+    },
+    "num_tags": 9
+  }
+]

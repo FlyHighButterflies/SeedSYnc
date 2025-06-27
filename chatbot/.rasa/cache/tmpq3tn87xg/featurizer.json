@@ -1,0 +1,77 @@
+{
+  "type": "MaxHistoryTrackerFeaturizer",
+  "state_featurizer": {
+    "action_texts": [],
+    "entity_tag_specs": [],
+    "feature_states": {
+      "intent": {
+        "about_seedsync": 0,
+        "ask_availability": 1,
+        "ask_delivery": 2,
+        "ask_price": 3,
+        "back": 4,
+        "buyer": 5,
+        "check_locations": 6,
+        "confirm_order": 7,
+        "decision_pending": 8,
+        "farmer_seller": 9,
+        "get_started": 10,
+        "goodbye": 11,
+        "greet": 12,
+        "how_it_works": 13,
+        "nlu_fallback": 14,
+        "out_of_scope": 15,
+        "request_produce": 16,
+        "restart": 17,
+        "session_start": 18,
+        "thank": 19
+      },
+      "action_name": {
+        "action_listen": 0,
+        "action_restart": 1,
+        "action_session_start": 2,
+        "action_default_fallback": 3,
+        "action_deactivate_loop": 4,
+        "action_revert_fallback_events": 5,
+        "action_default_ask_affirmation": 6,
+        "action_default_ask_rephrase": 7,
+        "action_two_stage_fallback": 8,
+        "action_unlikely_intent": 9,
+        "action_back": 10,
+        "...": 11,
+        "action_extract_slots": 12,
+        "action_check_produce_availability": 13,
+        "action_confirm_order": 14,
+        "action_set_user_type": 15,
+        "utter_about_seedsync": 16,
+        "utter_availability_info": 17,
+        "utter_check_locations": 18,
+        "utter_decision_help": 19,
+        "utter_delivery_info": 20,
+        "utter_farmer_get_started": 21,
+        "utter_farmer_options": 22,
+        "utter_get_started": 23,
+        "utter_goodbye": 24,
+        "utter_greet": 25,
+        "utter_how_it_works": 26,
+        "utter_order_confirmed": 27,
+        "utter_price_info": 28,
+        "utter_welcome": 29
+      },
+      "entities": {
+        "produce_type": 0,
+        "quantity": 1
+      },
+      "slots": {
+        "quantity_0": 0,
+        "produce_type_0": 1,
+        "user_type_0": 2,
+        "user_type_1": 3,
+        "user_type_2": 4
+      },
+      "active_loop": {}
+    }
+  },
+  "remove_duplicates": true,
+  "max_history": 5
+}

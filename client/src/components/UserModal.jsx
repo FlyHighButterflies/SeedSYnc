@@ -7,6 +7,7 @@ import {
     MessageCircle,
     Star,
 } from "lucide-react";
+import Button from "./Button";
 
 // StarRating component
 const StarRating = ({ rating }) => {
@@ -54,12 +55,14 @@ function UserModal({ user, isOpen, onClose }) {
                             <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                                 Trader Profile
                             </h3>
-                            <button
+                            <Button
+                                variant="ghost"
+                                size="sm"
                                 onClick={onClose}
-                                className="p-1 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+                                className="p-1 rounded-full"
                             >
-                                <X className="w-5 h-5 text-gray-500" />
-                            </button>
+                                <X className="w-5 h-5" />
+                            </Button>
                         </div>
 
                         <div className="text-center mb-4 sm:mb-6">
@@ -119,13 +122,21 @@ function UserModal({ user, isOpen, onClose }) {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                            <button className="w-full bg-green-600 text-white py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base">
+                            <Button
+                                variant="primary"
+                                size="md"
+                                className="w-full"
+                            >
                                 <MessageCircle className="w-4 h-4" />
                                 Start Chat
-                            </button>
-                            <button className="w-full border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm sm:text-base">
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="md"
+                                className="w-full"
+                            >
                                 View Full Profile
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>

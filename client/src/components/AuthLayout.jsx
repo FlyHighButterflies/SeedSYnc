@@ -1,10 +1,12 @@
+import { Outlet } from "react-router-dom";
 import { Footer } from "@/components";
 
-function AuthLayout({ children }) {
-    console.log("From auth layout");
+function AuthLayout() {
     return (
         <div className="flex flex-col h-screen w-full">
-            <div className="flex-1 overflow-y-auto">{children}</div>
+            <div className="flex-1 overflow-y-auto">
+                <Outlet />
+            </div>
             <Footer />
         </div>
     );

@@ -1,0 +1,97 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - request_produce
+  - ask_price
+  - confirm_order
+  - ask_delivery
+  - thank
+  - ask_availability
+  - get_started
+  - how_it_works
+  - about_seedsync
+  - check_locations
+  - farmer_seller
+  - buyer
+  - decision_pending
+
+entities:
+  - quantity
+  - produce_type
+
+slots:
+  quantity:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: quantity
+  
+  produce_type:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: produce_type
+  
+  user_type:
+    type: categorical
+    values:
+      - farmer
+      - buyer
+    mappings:
+    - type: custom
+
+responses:
+  utter_greet:
+  - text: "Hi! I'm your smart assistant here at SeedSync. Whether you're a farmer looking to sell or a buyer searching for fresh produce, I'm here to help you connect fast and trade smarter."
+  - text: "Good morning! Yes, we have about 250kg ready for harvest tomorrow. They're fully organic and freshly picked."
+
+  utter_goodbye:
+  - text: "Goodbye! Feel free to reach out anytime for your agricultural trading needs."
+
+  utter_price_info:
+  - text: "P65 per kg, negotiable for bulk orders. Delivery can be arranged within 2 days."
+
+  utter_delivery_info:
+  - text: "Yes, delivery can be arranged within 2 days for bulk orders."
+
+  utter_availability_info:
+  - text: "Yes, we have about 250kg ready for harvest tomorrow. They're fully organic and freshly picked."
+
+  utter_decision_help:
+  - text: "Take your time to decide! I'm here if you need any more information about pricing, quality, or delivery options."
+
+  utter_welcome:
+  - text: "You're welcome! Happy to help with your agricultural trading needs."
+
+  utter_get_started:
+  - text: "Great! To get started, you can:\n• Find buyers for your crops\n• Check current market prices\n• Update your farm info\n• Track your deliveries\n\nWhat would you like to do first?"
+  - text: "Perfect! Let's get you started. You can:\n• List your produce for sale\n• Find potential buyers\n• Set competitive prices\n• Arrange deliveries\n\nWhat would you like to begin with?"
+
+  utter_how_it_works:
+  - text: "SeedSync connects farmers and buyers through smart matching based on location, preferences, product availability, and behavior history to ensure efficient trade and sustainable growth."
+
+  utter_about_seedsync:
+  - text: "SeedSync is your Smart Agricultural Matching System — an innovative platform designed to connect farmers and buyers with ease and intelligence. We match based on location, preferences, product availability, and behavior history for efficient trade and local support."
+
+  utter_check_locations:
+  - text: "You can check available locations and find farmers or buyers near you through our location matching system. Would you like me to help you find trading partners in your area?"
+
+  utter_farmer_options:
+  - text: "Perfect! As a farmer, I can help you:\n• List your produce for sale\n• Find potential buyers\n• Set competitive prices\n• Arrange deliveries\n\nTo get started, what produce do you have available?"
+
+  utter_farmer_get_started:
+  - text: "Perfect! Let's get you started selling your produce. You can:\n• List your crops for sale\n• Set your prices\n• Connect with local buyers\n• Manage your inventory\n\nWhat produce do you have available to sell?"
+
+  utter_order_confirmed:
+  - text: "Thank you! Confirming 200kg at P65/kg. I'll share the delivery details shortly."
+
+actions:
+  - action_check_produce_availability
+  - action_confirm_order
+  - action_set_user_type
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

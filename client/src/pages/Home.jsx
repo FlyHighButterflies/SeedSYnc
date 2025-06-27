@@ -7,6 +7,7 @@ function Home() {
     const { selectedUser, isModalOpen, openModal, closeModal } = useUserModal();
 
     const bestMatch = {
+        id: "1", // Add an ID for the best match user
         name: "John Smith",
         type: "Farmer",
         location: "Texas",
@@ -16,6 +17,26 @@ function Home() {
         specialty: "Organic Vegetables",
         description:
             "John is a dedicated farmer specializing in organic vegetables. With over 10 years of experience, he ensures the highest quality produce for his customers.",
+        // Add more profile data that matches your UserModal structure
+        firstName: "John",
+        lastName: "Smith",
+        userType: "farmer",
+        city: "Austin",
+        province: "Texas",
+        email: "john.smith@example.com",
+        contactNumber: "+1 (555) 123-4567",
+        specialties: ["Organic Vegetables", "Herbs", "Fruits"],
+        certifications: ["Organic", "Non-GMO"],
+        totalTrades: 120,
+    };
+
+    // Handler for Best Match View Profile button
+    const handleViewBestMatchProfile = () => {
+        window.open(
+            `/profile/${bestMatch.id}`,
+            "_blank",
+            "noopener,noreferrer"
+        );
     };
 
     return (
@@ -85,7 +106,8 @@ function Home() {
 
                 <div className="flex flex-col items-center max-w-md mx-auto">
                     <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold mb-3 sm:mb-4 text-xl sm:text-2xl">
-                        A
+                        {bestMatch.firstName?.charAt(0) || "J"}
+                        {bestMatch.lastName?.charAt(0) || "S"}
                     </div>
                     <h3 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">
                         {bestMatch.name}
@@ -126,6 +148,7 @@ function Home() {
                             variant="outline"
                             size="lg"
                             className="flex-1 sm:flex-none"
+                            onClick={handleViewBestMatchProfile}
                         >
                             View Profile
                         </Button>

@@ -11,6 +11,7 @@ import {
     Clock,
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 
 // StarRating component
@@ -33,6 +34,7 @@ const StarRating = ({ rating }) => {
 };
 
 function UserModal({ user, isOpen, onClose }) {
+    const navigate = useNavigate();
     const [showRatingForm, setShowRatingForm] = useState(false);
     const [rating, setRating] = useState(0);
     const [hoveredRating, setHoveredRating] = useState(0);
@@ -62,6 +64,11 @@ function UserModal({ user, isOpen, onClose }) {
         setRating(0);
         setShowRatingForm(false);
         onClose();
+    };
+
+    const handleViewProfile = () => {
+        onClose();
+        window.open(`/profile/${user.id}`, "_blank", "noopener,noreferrer");
     };
 
     return (
@@ -285,6 +292,7 @@ function UserModal({ user, isOpen, onClose }) {
                                             variant="outline"
                                             size="md"
                                             className="flex-1"
+                                            onClick={handleViewProfile}
                                         >
                                             View Full Profile
                                         </Button>

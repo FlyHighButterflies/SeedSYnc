@@ -214,16 +214,6 @@ function Messages() {
                     </form>
                 </div>
             </main>
-
-            {/* Chatbot Button */}
-            <button
-                className="fixed right-8 bottom-28 z-50 bg-normalGreen hover:bg-darkGreen text-white rounded-full shadow-lg w-16 h-16 flex items-center justify-center transition-all duration-200 hover:scale-105"
-                title="Open Chatbot"
-            >
-                <span role="img" aria-label="Chatbot" className="text-2xl">
-                    🤖
-                </span>
-            </button>
         </div>
     );
 }

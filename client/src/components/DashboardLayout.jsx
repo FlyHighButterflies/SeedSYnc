@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { Footer, Input, Sidebar } from "@/components";
+import { Footer, Input, Sidebar, ChatbotWidget } from "@/components";
 import { Menu, Search } from "lucide-react";
 
 function DashboardLayout() {
@@ -32,6 +32,7 @@ function DashboardLayout() {
                             SeedSync
                         </div>
                     </div>
+
                     <div className="flex items-center gap-2">
                         <button className="p-2 rounded-md hover:bg-gray-200 sm:hidden">
                             <Search size={20} color="#56B280" />
@@ -57,6 +58,9 @@ function DashboardLayout() {
                     <Footer />
                 </div>
             </div>
+
+            {/* Chatbot Widget */}
+            <ChatbotWidget />
         </div>
     );
 }

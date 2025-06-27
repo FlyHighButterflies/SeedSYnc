@@ -10,21 +10,20 @@ import {
     Clock,
     Award,
     Truck,
-    User,
     Settings,
 } from "lucide-react";
 import Button from "@/components/Button";
 
-// Sample user data based on signup fields
+// Sample user data
 const sampleFarmerProfile = {
-    // Personal Info (Step 1)
+    // Personal Info
     email: "farmer.john@example.com",
     firstName: "John",
     lastName: "Santos",
     contactNumber: "+63 912 345 6789",
     profileImage: "/images/farmer-profile.jpg",
 
-    // Location & Logistics (Step 3)
+    // Location & Logistics
     country: "Philippines",
     province: "Nueva Ecija",
     city: "Cabanatuan City",
@@ -47,14 +46,14 @@ const sampleFarmerProfile = {
 };
 
 const sampleBuyerProfile = {
-    // Personal Info (Step 1)
+    // Personal Info
     email: "buyer.maria@example.com",
     firstName: "Maria",
     lastName: "Cruz",
     contactNumber: "+63 917 123 4567",
     profileImage: "/images/buyer-profile.jpg",
 
-    // Location & Logistics (Step 3)
+    // Location & Logistics
     country: "Philippines",
     province: "Metro Manila",
     city: "Quezon City",
@@ -64,7 +63,7 @@ const sampleBuyerProfile = {
     port: "yes",
     transportation: "truck",
 
-    // Buyer-specific data (Step 4)
+    // Buyer-specific data
     userType: "buyer",
     joinDate: "2024-02-20",
     rating: 4.6,
@@ -116,7 +115,7 @@ function InfoRow({ icon, label, value }) {
 }
 
 function Profile() {
-    const [userType, setUserType] = useState("farmer"); // This would come from auth context
+    const [userType, setUserType] = useState("farmer");
     const [isEditing, setIsEditing] = useState(false);
 
     const profileData =

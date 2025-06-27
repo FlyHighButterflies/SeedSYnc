@@ -1,90 +1,68 @@
 import { useState } from "react";
-import {
-    Plus,
-    Package,
-    Edit3,
-    Trash2,
-    MapPin,
-    DollarSign,
-    Clock,
-    Bell,
-    Star,
-} from "lucide-react";
-import Button from "@/components/Button";
+import { Plus, Package, Edit3, Trash2, DollarSign, Clock } from "lucide-react";
+import Button from "@/components";
 
 // Sample data for demo
 const sampleFarmerItems = [
     {
         id: 1,
         name: "Organic Tomatoes",
-        variety: "Roma",
         quantity: 500,
         unit: "kg",
         price: 120.5,
         status: "Available",
         harvestDate: "2024-06-15",
         expiryDate: "2024-07-01",
-        rating: 4.8,
     },
     {
         id: 2,
         name: "Fresh Lettuce",
-        variety: "Iceberg",
         quantity: 200,
         unit: "kg",
         price: 85.0,
         status: "Low Stock",
         harvestDate: "2024-06-20",
         expiryDate: "2024-06-30",
-        rating: 4.5,
     },
     {
         id: 3,
         name: "Sweet Corn",
-        variety: "Yellow",
         quantity: 1000,
         unit: "kg",
         price: 45.75,
         status: "Available",
         harvestDate: "2024-06-18",
         expiryDate: "2024-07-05",
-        rating: 4.9,
     },
     {
         id: 4,
         name: "Baby Carrots",
-        variety: "Orange",
         quantity: 300,
         unit: "kg",
         price: 65.0,
         status: "Available",
         harvestDate: "2024-06-22",
         expiryDate: "2024-07-08",
-        rating: 4.7,
     },
     {
         id: 5,
         name: "Fresh Spinach",
-        variety: "Baby Spinach",
         quantity: 150,
         unit: "kg",
         price: 180.0,
         status: "Available",
         harvestDate: "2024-06-25",
         expiryDate: "2024-07-02",
-        rating: 4.6,
     },
     {
         id: 6,
         name: "Bell Peppers",
-        variety: "Mixed Colors",
         quantity: 250,
         unit: "kg",
         price: 140.5,
         status: "Low Stock",
         harvestDate: "2024-06-20",
         expiryDate: "2024-07-05",
-        rating: 4.4,
     },
 ];
 
@@ -97,8 +75,6 @@ const sampleBuyerItems = [
         budgetPerUnit: 65.0,
         neededBy: "2024-07-10",
         urgency: "High",
-        status: "Active",
-        matchingSuppliers: 5,
     },
     {
         id: 2,
@@ -108,8 +84,6 @@ const sampleBuyerItems = [
         budgetPerUnit: 180.0,
         neededBy: "2024-07-15",
         urgency: "Medium",
-        status: "Active",
-        matchingSuppliers: 3,
     },
     {
         id: 3,
@@ -119,8 +93,6 @@ const sampleBuyerItems = [
         budgetPerUnit: 125.0,
         neededBy: "2024-07-12",
         urgency: "Low",
-        status: "Active",
-        matchingSuppliers: 7,
     },
     {
         id: 4,
@@ -130,8 +102,6 @@ const sampleBuyerItems = [
         budgetPerUnit: 100.0,
         neededBy: "2024-07-08",
         urgency: "High",
-        status: "Active",
-        matchingSuppliers: 4,
     },
     {
         id: 5,
@@ -141,8 +111,6 @@ const sampleBuyerItems = [
         budgetPerUnit: 40.0,
         neededBy: "2024-07-20",
         urgency: "Medium",
-        status: "Active",
-        matchingSuppliers: 2,
     },
     {
         id: 6,
@@ -152,8 +120,6 @@ const sampleBuyerItems = [
         budgetPerUnit: 75.0,
         neededBy: "2024-07-14",
         urgency: "Low",
-        status: "Active",
-        matchingSuppliers: 6,
     },
 ];
 
@@ -188,16 +154,9 @@ function FarmerInventoryCard({ item, onEdit, onDelete }) {
             </div>
 
             {/* Product Info */}
-            <h3 className="font-semibold text-lg text-gray-900 mb-1">
+            <h3 className="font-semibold text-lg text-gray-900 mb-4">
                 {item.name}
             </h3>
-            <p className="text-sm text-gray-600 mb-2">{item.variety}</p>
-
-            {/* Rating */}
-            <div className="flex items-center gap-1 mb-3">
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm">{item.rating}</span>
-            </div>
 
             {/* Details */}
             <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
@@ -280,17 +239,9 @@ function BuyerInventoryCard({ item, onEdit, onDelete }) {
             <h3 className="font-semibold text-lg text-gray-900 mb-1">
                 {item.productName}
             </h3>
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-gray-600 mb-6">
                 Need: {item.quantityNeeded} {item.unit}
             </p>
-
-            {/* Supplier matches */}
-            <div className="flex items-center gap-1 mb-3">
-                <Bell className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-green-600">
-                    {item.matchingSuppliers} suppliers found
-                </span>
-            </div>
 
             {/* Details */}
             <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
@@ -305,10 +256,6 @@ function BuyerInventoryCard({ item, onEdit, onDelete }) {
                     <span>
                         Due: {new Date(item.neededBy).toLocaleDateString()}
                     </span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Package className="w-4 h-4" />
-                    <span>Status: {item.status}</span>
                 </div>
             </div>
 
@@ -439,16 +386,6 @@ function Inventory() {
                     )}
                 </div>
             </div>
-
-            {/* Quick Actions Floating Button (Mobile) */}
-            <Button
-                variant="primary"
-                size="lg"
-                onClick={handleAdd}
-                className="fixed bottom-6 right-6 rounded-full p-4 lg:hidden shadow-lg"
-            >
-                <Plus className="w-6 h-6" />
-            </Button>
         </div>
     );
 }

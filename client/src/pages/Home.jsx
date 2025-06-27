@@ -1,7 +1,11 @@
-import { Button, ListingCard } from "@/components";
+import { Button, ListingCard, UserModal } from "@/components";
+import { useUserModal } from "@/hooks";
 import { ChevronRight, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function Home() {
+    const { selectedUser, isModalOpen, openModal, closeModal } = useUserModal();
+
     const bestMatch = {
         name: "John Smith",
         type: "Farmer",
@@ -13,6 +17,7 @@ function Home() {
         description:
             "John is a dedicated farmer specializing in organic vegetables. With over 10 years of experience, he ensures the highest quality produce for his customers.",
     };
+
     return (
         <div className="flex flex-col w-full">
             {/* Hero Section */}
@@ -40,7 +45,7 @@ function Home() {
             {/* Suggestions Section */}
             <div className="flex flex-col items-center justify-between p-4 sm:p-6 lg:p-8 min-h-[600px] lg:h-[780px]">
                 <p className="text-2xl sm:text-3xl lg:text-4xl mb-6 sm:mb-8 font-bold text-center">
-                    More Suggestions for you
+                    Suggestions for you
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 justify-items-center w-full max-w-7xl">
                     {[1, 2, 3, 4, 5, 6].map((item, index) => (
@@ -55,13 +60,17 @@ function Home() {
                                 location: "California",
                                 rating: 4.5,
                             }}
+                            onClick={openModal}
                         />
                     ))}
                 </div>
-                <div className="flex h-12 items-center gap-2 mt-6 sm:mt-8 cursor-pointer text-darkGreen hover:text-normalGreen transition-colors duration-400 font-bold">
+                <Link
+                    to="/listings"
+                    className="flex h-12 items-center gap-2 mt-6 sm:mt-8 cursor-pointer text-darkGreen hover:text-normalGreen transition-colors duration-400 font-bold"
+                >
                     <p>View more</p>
                     <ChevronRight />
-                </div>
+                </Link>
             </div>
 
             {/* Best Match Section */}
@@ -110,6 +119,15 @@ function Home() {
                     </div>
                 </div>
             </div>
+
+            {/* User Modal */}
+            {selectedUser && (
+                <UserModal
+                    user={selectedUser}
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                />
+            )}
         </div>
     );
 }

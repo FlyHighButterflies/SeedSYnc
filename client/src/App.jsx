@@ -6,13 +6,13 @@ import {
 } from "react-router-dom";
 import {
     Home,
-    OnboardingPage2,
     SignUp,
     Login,
     Listings,
     Inventory,
     Profile,
     OnboardingPage1,
+    OnboardingPage2,
 } from "@/pages";
 import {
     AuthLayout,
@@ -36,10 +36,10 @@ function App() {
                     >
                         <Route path="/signup" element={<SignUp />} />
                         <Route path="/login" element={<Login />} />
-                        <Route
+                        {/* <Route
                             path="/Onboarding2"
                             element={<OnboardingPage2 />}
-                        />
+                        /> */}
                     </Route>
 
                     <Route

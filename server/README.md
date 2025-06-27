@@ -25,7 +25,7 @@ The Farm Trade API is a RESTful API designed for managing crops, inventory, revi
 
    ```bash
    git clone <repository-url>
-   cd farm-trade-api
+   cd seedsync-api
    ```
 
 2. **Install Dependencies**

@@ -98,12 +98,12 @@ function Messages() {
             </main>
             {/* Chatbot Button */}
             <button
-                className="fixed bottom-8 right-8 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg w-16 h-16 flex items-center justify-center transition"
-                title="Open Chatbot"
-                style={{fontSize: 32}}
+            className="fixed right-8 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg w-16 h-16 flex items-center justify-center transition"
+            title="Open Chatbot"
+            style={{ fontSize: 32, bottom: "7rem" }} // Adjust this value as needed
             >
-                <span role="img" aria-label="Chatbot">🤖</span>
-            </button>
+            <span role="img" aria-label="Chatbot">🤖</span>
+        </button>
         </div>
     );
 }

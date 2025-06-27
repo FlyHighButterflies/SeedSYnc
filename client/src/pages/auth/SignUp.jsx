@@ -472,7 +472,7 @@ function SignUp() {
                     <div className="text-2xl font-bold">SeedSync</div>
                 </div>
                 <Link to="/login">
-                    <Button variant="dark" className="py-1 px-8">
+                    <Button variant="primary" size="sm" className="py-1 px-8">
                         Sign In
                     </Button>
                 </Link>
@@ -518,8 +518,9 @@ function SignUp() {
                             <div className="flex justify-between items-center mt-6 w-full">
                                 <Button
                                     type="button"
-                                    variant="light"
-                                    handleClick={handleBack}
+                                    variant="secondary"
+                                    size="lg"
+                                    onClick={handleBack}
                                     disabled={currentStep === 1}
                                 >
                                     Back
@@ -527,7 +528,8 @@ function SignUp() {
                                 {currentStep === totalSteps ? (
                                     <Button
                                         type="submit"
-                                        variant="dark"
+                                        variant="primary"
+                                        size="lg"
                                         disabled={isSubmitting}
                                     >
                                         {isSubmitting
@@ -537,8 +539,9 @@ function SignUp() {
                                 ) : (
                                     <Button
                                         type="button"
-                                        variant="dark"
-                                        handleClick={handleNext}
+                                        variant="primary"
+                                        size="lg"
+                                        onClick={handleNext}
                                     >
                                         Next
                                     </Button>

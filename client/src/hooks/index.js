@@ -3,3 +3,8 @@ export { useLogin } from "./useLogin";
 export { useRegister } from "./useRegister";
 export { useLogout } from "./useLogout";
 export { useUserModal } from "./useUserModal";
+export { useBestMatch } from "./useBestMatch";
+export { useCrops } from "./useCrops";
+export { useStock } from "./useStock";
+export { useListings } from "./useListings";
+export { useProfile } from "./useProfile";

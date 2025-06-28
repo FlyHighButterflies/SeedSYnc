@@ -2,7 +2,10 @@ import { Button, Input, Dropdown } from "@/components";
 import { useState, useRef, useEffect } from "react";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
 
 function Step1({ register, errors }) {
     return (
@@ -86,6 +89,24 @@ function Step1({ register, errors }) {
                     type="text"
                     placeholder="Contact Number"
                     className={errors.contactNumber ? "border-red-500" : ""}
+                />
+            </div>
+
+            <div>
+                {errors.role && (
+                    <p className="text-red-500 text-sm">
+                        {errors.role.message}
+                    </p>
+                )}
+                <Dropdown
+                    {...register("role", { required: "Role is required" })}
+                    id="role"
+                    placeholder="Select Role"
+                    options={[
+                        { label: "Farmer", value: "farmer" },
+                        { label: "Buyer", value: "buyer" },
+                    ]}
+                    className={errors.role ? "border-red-500" : ""}
                 />
             </div>
         </>
@@ -386,6 +407,7 @@ function Step5({ register, errors }) {
 function SignUp() {
     const [currentStep, setCurrentStep] = useState(1);
     const totalSteps = 5;
+    const navigate = useNavigate();
 
     const {
         register,
@@ -405,6 +427,7 @@ function SignUp() {
                 "lastName",
                 "password",
                 "contactNumber",
+                "role", // Added role to validation
             ],
         },
         2: { label: "Profile", fields: [] },
@@ -432,9 +455,25 @@ function SignUp() {
         }
     };
 
-    const onSubmit = (data) => {
-        console.log("Form Data:", data);
-        alert("Registration successful! Check console for data.");
+    const onSubmit = async (data) => {
+        try {
+            // Prepare data for backend
+            const payload = {
+                ...data,
+                profilePicture: data.profileImagePreview, // Send base64 string if available
+            };
+            delete payload.profileImage; // Remove File object
+            delete payload.profileImagePreview; // Remove preview URL if not sending as profilePicture
+            delete payload.terms; // Remove terms as it's not part of the schema
+
+            const response = await axios.post(`${API_BASE_URL}/auth/register`, payload);
+            console.log("Registration successful:", response.data);
+            alert("Registration successful! You can now sign in.");
+            navigate("/login"); // Redirect to login page
+        } catch (error) {
+            console.error("Registration failed:", error.response?.data || error.message);
+            alert(`Registration failed: ${error.response?.data?.message || error.message}`);
+        }
     };
 
     const renderStepContent = (step) => {

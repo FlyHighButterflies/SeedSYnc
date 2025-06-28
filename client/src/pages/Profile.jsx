@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Edit3,
     Camera,
@@ -13,70 +13,9 @@ import {
     Settings,
 } from "lucide-react";
 import Button from "@/components/Button";
+import axios from "axios";
 
-// Sample user data
-const sampleFarmerProfile = {
-    // Personal Info
-    email: "farmer.john@example.com",
-    firstName: "John",
-    lastName: "Santos",
-    contactNumber: "+63 912 345 6789",
-    profileImage: "/images/farmer-profile.jpg",
-
-    // Location & Logistics
-    country: "Philippines",
-    province: "Nueva Ecija",
-    city: "Cabanatuan City",
-    address: "123 Rice Field Road, Barangay Magsaysay",
-    landmarks: "Near Cabanatuan Public Market",
-    highway: "yes",
-    port: "no",
-    transportation: "truck",
-
-    // Farmer-specific data
-    userType: "farmer",
-    joinDate: "2024-01-15",
-    rating: 4.8,
-    totalTrades: 45,
-    specialties: ["Rice", "Corn", "Vegetables"],
-    certifications: ["Organic", "Non-GMO"],
-    farmingPractices: ["Sustainable", "Water Efficient"],
-    totalCrops: 12,
-    activeCrops: 8,
-};
-
-const sampleBuyerProfile = {
-    // Personal Info
-    email: "buyer.maria@example.com",
-    firstName: "Maria",
-    lastName: "Cruz",
-    contactNumber: "+63 917 123 4567",
-    profileImage: "/images/buyer-profile.jpg",
-
-    // Location & Logistics
-    country: "Philippines",
-    province: "Metro Manila",
-    city: "Quezon City",
-    address: "456 Market Street, Barangay Kamuning",
-    landmarks: "Near Kamuning Market",
-    highway: "yes",
-    port: "yes",
-    transportation: "truck",
-
-    // Buyer-specific data
-    userType: "buyer",
-    joinDate: "2024-02-20",
-    rating: 4.6,
-    totalTrades: 32,
-    productsNeeded: ["Rice", "Vegetables", "Fruits"],
-    quantityRange: "500-1000 kg",
-    urgency: "soon",
-    qualityStandards: ["Organic", "Non-GMO"],
-    frequency: "weekly",
-    inventoryStatus: "low",
-    activeRequirements: 5,
-    totalRequirements: 12,
-};
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
 
 function ProfileCard({ icon, title, value, subtitle }) {
     return (
@@ -115,20 +54,80 @@ function InfoRow({ icon, label, value }) {
 }
 
 function Profile() {
-    const [userType, setUserType] = useState("farmer");
+    const [profileData, setProfileData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
 
-    const profileData =
-        userType === "farmer" ? sampleFarmerProfile : sampleBuyerProfile;
+    // Get user info from localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (!user || !token) {
+                setError("User not logged in.");
+                setLoading(false);
+                return;
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+
+            let endpoint = "";
+            if (user.role === "Farmer") {
+                endpoint = `${API_BASE_URL}/farmers/profile`;
+            } else if (user.role === "Buyer") {
+                endpoint = `${API_BASE_URL}/buyers/profile`;
+            } else {
+                setError("Invalid user role.");
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const response = await axios.get(endpoint, config);
+                setProfileData(response.data);
+            } catch (err) {
+                console.error("Failed to fetch profile:", err.response?.data || err.message);
+                setError(err.response?.data?.message || "Failed to load profile.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, [user?.role, token]); // Re-fetch if user role or token changes
 
     const handleEdit = () => {
         setIsEditing(true);
-        console.log("Edit profile");
+        // In a real app, you'd open a modal or navigate to an edit form
+        alert("Edit functionality to be implemented. Check console for data.");
+        console.log("Current Profile Data for Editing:", profileData);
     };
 
     const handleImageUpload = () => {
+        alert("Image upload functionality to be implemented.");
         console.log("Upload new profile image");
     };
+
+    if (loading) {
+        return <div className="text-center p-8">Loading profile...</div>;
+    }
+
+    if (error) {
+        return <div className="text-center p-8 text-red-500">Error: {error}</div>;
+    }
+
+    if (!profileData) {
+        return <div className="text-center p-8">No profile data available.</div>;
+    }
+
+    // Determine userType for display based on fetched data
+    const userType = profileData.constructor.modelName || user.role; // Fallback to role from token
 
     return (
         <div className="flex flex-col w-full">
@@ -141,18 +140,7 @@ function Profile() {
                         </h1>
                     </div>
                     <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                                setUserType(
-                                    userType === "farmer" ? "buyer" : "farmer"
-                                )
-                            }
-                        >
-                            Switch to{" "}
-                            {userType === "farmer" ? "Buyer" : "Farmer"} View
-                        </Button>
+                        {/* Removed role switch button as it's now based on logged-in user */}
                         <Button
                             variant="primary"
                             size="sm"
@@ -172,8 +160,8 @@ function Profile() {
                             {/* Profile Image */}
                             <div className="relative">
                                 <div className="w-32 h-32 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-3xl">
-                                    {profileData.firstName.charAt(0)}
-                                    {profileData.lastName.charAt(0)}
+                                    {profileData.firstName?.charAt(0)}
+                                    {profileData.lastName?.charAt(0)}
                                 </div>
                                 <Button
                                     variant="secondary"
@@ -192,7 +180,7 @@ function Profile() {
                                     {profileData.lastName}
                                 </h2>
                                 <p className="text-lg text-gray-600 mb-2 capitalize">
-                                    {profileData.userType}
+                                    {userType}
                                 </p>
                                 <div className="flex items-center justify-center sm:justify-start gap-6 mb-4">
                                     <div className="flex items-center gap-1">
@@ -209,7 +197,7 @@ function Profile() {
                                 <div className="text-sm text-gray-600">
                                     Member since{" "}
                                     {new Date(
-                                        profileData.joinDate
+                                        profileData.createdAt
                                     ).toLocaleDateString()}
                                 </div>
                             </div>
@@ -221,17 +209,17 @@ function Profile() {
                         <ProfileCard
                             icon={<Package className="w-5 h-5 text-blue-600" />}
                             title={
-                                userType === "farmer"
+                                userType === "Farmer"
                                     ? "Active Crops"
                                     : "Active Needs"
                             }
                             value={
-                                userType === "farmer"
+                                userType === "Farmer"
                                     ? profileData.activeCrops
                                     : profileData.activeRequirements
                             }
                             subtitle={`${
-                                userType === "farmer"
+                                userType === "Farmer"
                                     ? profileData.totalCrops
                                     : profileData.totalRequirements
                             } total`}
@@ -307,7 +295,7 @@ function Profile() {
                         </InfoSection>
 
                         {/* Farmer-specific or Buyer-specific Info */}
-                        {userType === "farmer" ? (
+                        {userType === "Farmer" ? (
                             <InfoSection title="Farming Information">
                                 <div className="space-y-3">
                                     <InfoRow
@@ -315,7 +303,7 @@ function Profile() {
                                             <Package className="w-4 h-4 text-gray-500" />
                                         }
                                         label="Specialties"
-                                        value={profileData.specialties.join(
+                                        value={profileData.specialties?.join(
                                             ", "
                                         )}
                                     />
@@ -324,7 +312,7 @@ function Profile() {
                                             <Award className="w-4 h-4 text-gray-500" />
                                         }
                                         label="Certifications"
-                                        value={profileData.certifications.join(
+                                        value={profileData.certifications?.join(
                                             ", "
                                         )}
                                     />
@@ -333,7 +321,7 @@ function Profile() {
                                             <Settings className="w-4 h-4 text-gray-500" />
                                         }
                                         label="Practices"
-                                        value={profileData.farmingPractices.join(
+                                        value={profileData.farmingPractices?.join(
                                             ", "
                                         )}
                                     />
@@ -347,7 +335,7 @@ function Profile() {
                                             <Package className="w-4 h-4 text-gray-500" />
                                         }
                                         label="Products Needed"
-                                        value={profileData.productsNeeded.join(
+                                        value={profileData.productsNeeded?.join(
                                             ", "
                                         )}
                                     />
@@ -370,7 +358,7 @@ function Profile() {
                                             <Award className="w-4 h-4 text-gray-500" />
                                         }
                                         label="Quality Standards"
-                                        value={profileData.qualityStandards.join(
+                                        value={profileData.qualityStandards?.join(
                                             ", "
                                         )}
                                     />

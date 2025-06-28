@@ -3,9 +3,10 @@ import Notification from '../models/NotificationModel.js';
 class NotificationController {
     async createNotification(req, res) {
         try {
-            const { recipient, type, message, relatedEntity, relatedEntityType } = req.body;
+            const { recipient, recipientType, type, message, relatedEntity, relatedEntityType } = req.body;
             const notification = new Notification({
                 recipient,
+                recipientType,
                 type,
                 message,
                 relatedEntity,
@@ -20,10 +21,11 @@ class NotificationController {
 
     async getNotifications(req, res) {
         try {
-            const userId = req.user.id; // Authenticated user's ID
+            const userId = req.user._id; // Authenticated user's ID
+            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
             const { read, limit = 50, offset = 0 } = req.query;
 
-            let query = { recipient: userId };
+            let query = { recipient: userId, recipientType: userType };
             if (read !== undefined) {
                 query.read = read === 'true';
             }
@@ -42,10 +44,11 @@ class NotificationController {
     async markNotificationAsRead(req, res) {
         try {
             const { id } = req.params;
-            const userId = req.user.id; // Authenticated user's ID
+            const userId = req.user._id; // Authenticated user's ID
+            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
 
             const notification = await Notification.findOneAndUpdate(
-                { _id: id, recipient: userId },
+                { _id: id, recipient: userId, recipientType: userType },
                 { $set: { read: true } },
                 { new: true }
             );
@@ -62,10 +65,11 @@ class NotificationController {
 
     async markAllNotificationsAsRead(req, res) {
         try {
-            const userId = req.user.id; // Authenticated user's ID
+            const userId = req.user._id; // Authenticated user's ID
+            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
 
             await Notification.updateMany(
-                { recipient: userId, read: false },
+                { recipient: userId, recipientType: userType, read: false },
                 { $set: { read: true } }
             );
 
@@ -78,9 +82,10 @@ class NotificationController {
     async deleteNotification(req, res) {
         try {
             const { id } = req.params;
-            const userId = req.user.id; // Authenticated user's ID
+            const userId = req.user._id; // Authenticated user's ID
+            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
 
-            const notification = await Notification.findOneAndDelete({ _id: id, recipient: userId });
+            const notification = await Notification.findOneAndDelete({ _id: id, recipient: userId, recipientType: userType });
 
             if (!notification) {
                 return res.status(404).json({ message: 'Notification not found or not authorized' });

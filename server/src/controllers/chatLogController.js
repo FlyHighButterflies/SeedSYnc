@@ -5,11 +5,21 @@ class ChatLogController {
     async createMessage(req, res) {
         try {
             const { recipientId, message } = req.body;
-            const senderId = req.user.id; // Assuming authMiddleware populates req.user.id
+            const senderId = req.user._id; // Authenticated user's ID
+            const senderType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
+
+            // Determine recipientType based on recipientId (this might need a lookup if not provided by frontend)
+            // For simplicity, assuming recipientType is also passed or can be inferred.
+            // In a real app, you might fetch the recipient to get their type.
+            // For now, let's assume recipientType is also sent in req.body or we default it.
+            // For this implementation, I will assume recipientType is also passed in req.body.
+            const { recipientType } = req.body; // Assuming recipientType is sent from frontend
 
             const chatLog = new ChatLog({
                 sender: senderId,
+                senderType: senderType,
                 recipient: recipientId,
+                recipientType: recipientType,
                 message,
             });
 
@@ -30,18 +40,21 @@ class ChatLogController {
     async getChatHistory(req, res) {
         try {
             const { partnerId } = req.params;
-            const userId = req.user.id; // Authenticated user's ID
+            const userId = req.user._id; // Authenticated user's ID
+            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
             const { limit = 50, offset = 0 } = req.query;
 
             const chatHistory = await ChatLog.find({
                 $or: [
-                    { sender: userId, recipient: partnerId },
-                    { sender: partnerId, recipient: userId },
+                    { sender: userId, senderType: userType, recipient: partnerId },
+                    { recipient: userId, recipientType: userType, sender: partnerId },
                 ],
             })
             .sort({ createdAt: 1 })
             .skip(parseInt(offset))
-            .limit(parseInt(limit));
+            .limit(parseInt(limit))
+            .populate('sender') // Populate sender details
+            .populate('recipient'); // Populate recipient details
 
             res.status(200).json(chatHistory);
         } catch (error) {
@@ -52,10 +65,11 @@ class ChatLogController {
     async markMessagesAsRead(req, res) {
         try {
             const { partnerId } = req.params;
-            const userId = req.user.id; // Authenticated user's ID
+            const userId = req.user._id; // Authenticated user's ID
+            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
 
             await ChatLog.updateMany(
-                { sender: partnerId, recipient: userId, read: false },
+                { sender: partnerId, recipient: userId, recipientType: userType, read: false },
                 { $set: { read: true } }
             );
 

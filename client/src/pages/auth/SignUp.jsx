@@ -274,34 +274,10 @@ function Step4({ register, userType, setUserType }) {
             {/* Conditional Fields Based on User Type */}
             {userType === "farmer" ? (
                 <>
-                    <Input
-                        {...register("specialties")}
-                        type="text"
-                        placeholder="Crops/Specialties (comma separated)"
-                    />
-                    <Input
-                        {...register("availableProduct")}
-                        type="text"
-                        placeholder="Available Products"
-                    />
-                    <Dropdown
-                        {...register("surplus")}
-                        id="surplus"
-                        placeholder="Surplus Available"
-                        options={[
-                            { label: "Yes", value: "yes" },
-                            { label: "No", value: "no" },
-                        ]}
-                    />
-                    <Input
-                        {...register("cropDiversityCount")}
-                        type="number"
-                        placeholder="Number of Crop Types"
-                    />
                     <Dropdown
                         {...register("certifications")}
                         id="certifications"
-                        placeholder="Certifications"
+                        placeholder="Certifications (Optional)"
                         options={[
                             { label: "Organic", value: "organic" },
                             { label: "Non-GMO", value: "non-gmo" },
@@ -312,40 +288,27 @@ function Step4({ register, userType, setUserType }) {
                     <Dropdown
                         {...register("farmingPractices")}
                         id="farmingPractices"
-                        placeholder="Farming Practices"
+                        placeholder="Primary Farming Practice"
                         options={[
+                            { label: "Sustainable", value: "sustainable" },
                             { label: "Eco-friendly", value: "eco-friendly" },
                             {
                                 label: "Water Efficient",
                                 value: "water-efficient",
                             },
                             { label: "Traditional", value: "traditional" },
-                            { label: "Sustainable", value: "sustainable" },
                         ]}
                     />
+                    <div className="bg-lightGreen p-4 rounded-lg">
+                        <p className="text-sm text-darkGreen">
+                            <strong>Next Steps:</strong> After registration, you
+                            can add your specific crops, quantities, and prices
+                            in the Inventory page.
+                        </p>
+                    </div>
                 </>
             ) : (
                 <>
-                    <Input
-                        {...register("productsNeeded")}
-                        type="text"
-                        placeholder="Products Needed (comma separated)"
-                    />
-                    <Input
-                        {...register("quantityRange")}
-                        type="text"
-                        placeholder="Quantity Range (e.g., 100-500 kg)"
-                    />
-                    <Dropdown
-                        {...register("urgency")}
-                        id="urgency"
-                        placeholder="Urgency of Purchase"
-                        options={[
-                            { label: "Immediate", value: "immediate" },
-                            { label: "Soon", value: "soon" },
-                            { label: "Flexible", value: "flexible" },
-                        ]}
-                    />
                     <Dropdown
                         {...register("qualityStandards")}
                         id="qualityStandards"
@@ -360,7 +323,7 @@ function Step4({ register, userType, setUserType }) {
                     <Dropdown
                         {...register("frequency")}
                         id="frequency"
-                        placeholder="Frequency of Purchase"
+                        placeholder="General Purchase Frequency"
                         options={[
                             { label: "Weekly", value: "weekly" },
                             { label: "Monthly", value: "monthly" },
@@ -368,16 +331,13 @@ function Step4({ register, userType, setUserType }) {
                             { label: "As needed", value: "as-needed" },
                         ]}
                     />
-                    <Dropdown
-                        {...register("inventoryStatus")}
-                        id="inventoryStatus"
-                        placeholder="Current Inventory Status"
-                        options={[
-                            { label: "Low", value: "low" },
-                            { label: "Normal", value: "normal" },
-                            { label: "Sufficient", value: "sufficient" },
-                        ]}
-                    />
+                    <div className="bg-lightGreen p-4 rounded-lg">
+                        <p className="text-sm text-darkGreen">
+                            <strong>Next Steps:</strong> After registration, you
+                            can specify your exact product needs, quantities,
+                            and budget in the Inventory page.
+                        </p>
+                    </div>
                 </>
             )}
         </>

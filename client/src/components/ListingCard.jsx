@@ -1,4 +1,4 @@
-import { MapPin, Star, Award, Package } from "lucide-react";
+import { MapPin, Star, Package } from "lucide-react";
 
 function ListingCard({ person, onClick }) {
     return (
@@ -8,7 +8,7 @@ function ListingCard({ person, onClick }) {
         >
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                <div className="w-16 h-16 bg-gradient-to-br from-normalGreen to-darkGreen rounded-full flex items-center justify-center text-white font-bold text-xl">
                     {person.firstName?.charAt(0) ||
                         person.name?.charAt(0) ||
                         person.avatar}
@@ -32,7 +32,7 @@ function ListingCard({ person, onClick }) {
 
             {/* User Info */}
             <div className="flex-1">
-                <h3 className="font-semibold text-lg text-gray-900 mb-2">
+                <h3 className="font-semibold text-lg text-darkGreen mb-2">
                     {person.firstName && person.lastName
                         ? `${person.firstName} ${person.lastName}`
                         : person.name || "Unknown User"}
@@ -48,66 +48,64 @@ function ListingCard({ person, onClick }) {
                     </span>
                 </div>
 
-                {/* What they sell/need - Most Important Section */}
+                {/* Products Section - Most Important */}
                 <div className="mb-3 min-h-[80px] flex flex-col justify-start">
                     {person.userType === "farmer" ||
                     person.type === "farmer" ? (
                         <>
-                            <p className="text-xs text-gray-500 mb-2 uppercase tracking-wide font-medium">
+                            <p className="text-xs text-normalGreen mb-2 uppercase tracking-wide font-bold">
                                 Selling
                             </p>
-                            {person.specialties &&
-                            person.specialties.length > 0 ? (
+                            {person.products && person.products.length > 0 ? (
+                                <div className="flex flex-wrap gap-1 mb-2">
+                                    {person.products
+                                        .slice(0, 3)
+                                        .map((product, index) => (
+                                            <span
+                                                key={index}
+                                                className="px-2 py-1 bg-lightGreen text-darkGreen text-xs font-medium rounded-full"
+                                            >
+                                                {product}
+                                            </span>
+                                        ))}
+                                    {person.products.length > 3 && (
+                                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                                            +{person.products.length - 3}
+                                        </span>
+                                    )}
+                                </div>
+                            ) : person.specialties &&
+                              person.specialties.length > 0 ? (
                                 <div className="flex flex-wrap gap-1 mb-2">
                                     {person.specialties
                                         .slice(0, 3)
                                         .map((specialty, index) => (
                                             <span
                                                 key={index}
-                                                className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full"
+                                                className="px-2 py-1 bg-lightGreen text-darkGreen text-xs font-medium rounded-full"
                                             >
                                                 {specialty}
                                             </span>
                                         ))}
                                     {person.specialties.length > 3 && (
-                                        <span className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">
+                                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
                                             +{person.specialties.length - 3}
                                         </span>
                                     )}
                                 </div>
                             ) : person.trade ? (
-                                <p className="text-sm text-gray-700 font-medium mb-2">
+                                <p className="text-sm text-darkGreen font-medium mb-2">
                                     {person.trade}
                                 </p>
                             ) : (
                                 <p className="text-sm text-gray-500 italic mb-2">
-                                    No specialties listed
+                                    No products listed
                                 </p>
                             )}
-
-                            {/* Certifications for farmers */}
-                            {person.certifications &&
-                                person.certifications.length > 0 && (
-                                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                                        <Award className="w-3 h-3" />
-                                        <span>
-                                            {person.certifications
-                                                .slice(0, 2)
-                                                .join(", ")}
-                                        </span>
-                                        {person.certifications.length > 2 && (
-                                            <span>
-                                                +
-                                                {person.certifications.length -
-                                                    2}
-                                            </span>
-                                        )}
-                                    </div>
-                                )}
                         </>
                     ) : (
                         <>
-                            <p className="text-xs text-gray-500 mb-2 uppercase tracking-wide font-medium">
+                            <p className="text-xs text-orange-600 mb-2 uppercase tracking-wide font-bold">
                                 Looking For
                             </p>
                             {person.productsNeeded &&
@@ -118,19 +116,19 @@ function ListingCard({ person, onClick }) {
                                         .map((product, index) => (
                                             <span
                                                 key={index}
-                                                className="px-3 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded-full"
+                                                className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full"
                                             >
                                                 {product}
                                             </span>
                                         ))}
                                     {person.productsNeeded.length > 3 && (
-                                        <span className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">
+                                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
                                             +{person.productsNeeded.length - 3}
                                         </span>
                                     )}
                                 </div>
                             ) : person.trade ? (
-                                <p className="text-sm text-gray-700 font-medium mb-2">
+                                <p className="text-sm text-darkGreen font-medium mb-2">
                                     {person.trade}
                                 </p>
                             ) : (

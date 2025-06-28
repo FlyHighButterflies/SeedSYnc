@@ -1,21 +1,12 @@
 import admin from '../config/firebase.js';
-import Farmer from '../models/FarmerModel.js';
-import Buyer from '../models/BuyerModel.js';
+import Account from '../models/AccountModel.js';
 
-const sendPushNotification = async (userId, userType, title, body, data = {}) => {
+const sendPushNotification = async (userId, title, body, data = {}) => {
   try {
-    let user = null;
-    if (userType === 'Farmer') {
-      user = await Farmer.findById(userId);
-    } else if (userType === 'Buyer') {
-      user = await Buyer.findById(userId);
-    } else {
-      console.error(`Invalid user type: ${userType}. Cannot send push notification.`);
-      return;
-    }
+    const user = await Account.findById(userId);
 
     if (!user || !user.fcmToken) {
-      console.log(`No FCM token found for user ${userId} (${userType}). Skipping push notification.`);
+      console.log(`No FCM token found for user ${userId}. Skipping push notification.`);
       return;
     }
 
@@ -27,7 +18,7 @@ const sendPushNotification = async (userId, userType, title, body, data = {}) =>
       data: {
         ...data,
         userId: userId.toString(), // Ensure userId is always in data
-        userType: userType, // Include userType in data
+        userType: user.role, // Include userType in data
       },
       token: user.fcmToken,
     };

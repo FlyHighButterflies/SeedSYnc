@@ -17,7 +17,6 @@ class MatchController {
             // Send push notification
             await sendPushNotification(
                 match.buyer,
-                'Buyer',
                 'New Match Found!',
                 `You have a new match for ${match.inventory.product.name}. Check it out!`,
                 { type: 'match_found', matchId: match._id.toString() }

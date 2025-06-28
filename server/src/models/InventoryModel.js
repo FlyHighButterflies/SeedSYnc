@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const inventorySchema = new mongoose.Schema({
   product: { type: mongoose.Schema.Types.ObjectId, ref: "Crop", required: true },
-  farmer: { type: mongoose.Schema.Types.ObjectId, ref: "Farmer", required: true },
+  farmer: { type: mongoose.Schema.Types.ObjectId, ref: "Account", required: true },
   quantity: { type: Number, required: true, min: 0 },
   unit: { type: String, required: true, enum: ['kg', 'lbs', 'piece', 'bunch', 'item'] },
   price: { type: Number, required: true, min: 0 },

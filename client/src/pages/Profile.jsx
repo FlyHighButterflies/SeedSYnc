@@ -77,16 +77,7 @@ function Profile() {
                 },
             };
 
-            let endpoint = "";
-            if (user.role === "Farmer") {
-                endpoint = `${API_BASE_URL}/farmers/profile`;
-            } else if (user.role === "Buyer") {
-                endpoint = `${API_BASE_URL}/buyers/profile`;
-            } else {
-                setError("Invalid user role.");
-                setLoading(false);
-                return;
-            }
+            const endpoint = `${API_BASE_URL}/profile/me`;
 
             try {
                 const response = await axios.get(endpoint, config);
@@ -100,11 +91,11 @@ function Profile() {
         };
 
         fetchProfile();
-    }, [user?.role, token]); // Re-fetch if user role or token changes
+    }, [token]); // Only re-fetch if token changes, user object is derived from token
 
     const handleEdit = () => {
         setIsEditing(true);
-        // In a real app, you'd open a modal or navigate to an edit form
+        // In a real app, you'd open a modal or navigate to an an edit form
         alert("Edit functionality to be implemented. Check console for data.");
         console.log("Current Profile Data for Editing:", profileData);
     };
@@ -126,8 +117,8 @@ function Profile() {
         return <div className="text-center p-8">No profile data available.</div>;
     }
 
-    // Determine userType for display based on fetched data
-    const userType = profileData.constructor.modelName || user.role; // Fallback to role from token
+    // Determine userType for display based on fetched data's role
+    const userRole = profileData.role; 
 
     return (
         <div className="flex flex-col w-full">
@@ -180,7 +171,7 @@ function Profile() {
                                     {profileData.lastName}
                                 </h2>
                                 <p className="text-lg text-gray-600 mb-2 capitalize">
-                                    {userType}
+                                    {userRole}
                                 </p>
                                 <div className="flex items-center justify-center sm:justify-start gap-6 mb-4">
                                     <div className="flex items-center gap-1">
@@ -209,17 +200,17 @@ function Profile() {
                         <ProfileCard
                             icon={<Package className="w-5 h-5 text-blue-600" />}
                             title={
-                                userType === "Farmer"
+                                userRole === "Farmer"
                                     ? "Active Crops"
                                     : "Active Needs"
                             }
                             value={
-                                userType === "Farmer"
+                                userRole === "Farmer"
                                     ? profileData.activeCrops
                                     : profileData.activeRequirements
                             }
                             subtitle={`${
-                                userType === "Farmer"
+                                userRole === "Farmer"
                                     ? profileData.totalCrops
                                     : profileData.totalRequirements
                             } total`}
@@ -295,7 +286,7 @@ function Profile() {
                         </InfoSection>
 
                         {/* Farmer-specific or Buyer-specific Info */}
-                        {userType === "Farmer" ? (
+                        {userRole === "Farmer" ? (
                             <InfoSection title="Farming Information">
                                 <div className="space-y-3">
                                     <InfoRow

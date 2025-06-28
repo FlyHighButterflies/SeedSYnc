@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-const buyerSchema = new mongoose.Schema({
-  // Personal Information
+const accountSchema = new mongoose.Schema({
+  // Common Personal Information
   email: { type: String, required: true, unique: true, trim: true, lowercase: true },
   password: { type: String, required: true },
   firstName: { type: String, required: true, trim: true },
@@ -9,8 +9,9 @@ const buyerSchema = new mongoose.Schema({
   contactNumber: { type: String, required: true, trim: true },
   profilePicture: { type: String },
   fcmToken: { type: String },
+  role: { type: String, enum: ['Farmer', 'Buyer', 'Admin'], required: true },
 
-  // Location & Logistics (from SignUp.jsx Step 3)
+  // Common Location & Logistics
   country: { type: String, trim: true },
   province: { type: String, trim: true },
   city: { type: String, trim: true },
@@ -29,7 +30,18 @@ const buyerSchema = new mongoose.Schema({
     }
   },
 
-  // Buyer-specific data (from Profile.jsx sampleBuyerProfile & SignUp.jsx Step 4)
+  // Farmer-specific data (optional for Buyers)
+  specialties: [{ type: String }],
+  certifications: [{ type: String }],
+  farmingPractices: [{ type: String }],
+  totalCrops: { type: Number, default: 0 },
+  activeCrops: { type: Number, default: 0 },
+  surplus: { type: String, enum: ['yes', 'no'] },
+  cropDiversityCount: { type: Number, default: 0 },
+  cropsInPossession: [{ type: String }],
+  availableProduct: [{ type: String }],
+
+  // Buyer-specific data (optional for Farmers)
   productsNeeded: [{ type: String }],
   quantityRange: { type: String },
   urgency: { type: String, enum: ['immediate', 'soon', 'flexible'] },
@@ -39,14 +51,14 @@ const buyerSchema = new mongoose.Schema({
   activeRequirements: { type: Number, default: 0 },
   totalRequirements: { type: Number, default: 0 },
 
-  // General user stats (from Profile.jsx)
+  // Common General user stats
   joinDate: { type: Date, default: Date.now },
   rating: { type: Number, default: 0, min: 0, max: 5 },
   totalTrades: { type: Number, default: 0 },
 
 }, { timestamps: true });
 
-buyerSchema.index({ location: '2dsphere' });
+accountSchema.index({ location: '2dsphere' });
 
-const Buyer = mongoose.model("Buyer", buyerSchema);
-export default Buyer;
+const Account = mongoose.model("Account", accountSchema);
+export default Account;

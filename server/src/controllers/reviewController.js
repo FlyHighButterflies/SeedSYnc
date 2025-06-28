@@ -1,17 +1,34 @@
 import { io, userSockets } from '../server.js';
 import Review from '../models/ReviewModel.js';
 import { sendPushNotification } from '../services/notificationService.js';
+import Account from '../models/AccountModel.js';
 
 class ReviewController {
     async createReview(req, res) {
         try {
-            // Assuming req.body contains trade, reviewer, reviewerType, reviewee, revieweeType, rating, comment
-            const review = new Review(req.body);
+            // Assuming req.body contains trade, reviewer, reviewee, rating, comment
+            const { trade, reviewer, reviewee, rating, comment } = req.body;
+
+            const reviewerAccount = await Account.findById(reviewer);
+            const revieweeAccount = await Account.findById(reviewee);
+
+            if (!reviewerAccount || !revieweeAccount) {
+                return res.status(400).json({ message: 'Reviewer or Reviewee not found.' });
+            }
+
+            const review = new Review({
+                trade,
+                reviewer,
+                reviewerType: reviewerAccount.role,
+                reviewee,
+                revieweeType: revieweeAccount.role,
+                rating,
+                comment,
+            });
             await review.save();
 
             // Emit real-time event to the reviewee
             const revieweeId = review.reviewee.toString();
-            const revieweeType = review.revieweeType;
             const recipientSocketId = userSockets.get(revieweeId);
 
             if (recipientSocketId) {
@@ -21,7 +38,6 @@ class ReviewController {
             // Send push notification to the reviewee
             await sendPushNotification(
                 revieweeId,
-                revieweeType,
                 'New Review Received!',
                 `You have received a new ${review.rating}-star review.`,
                 { type: 'new_review', reviewId: review._id.toString(), tradeId: review.trade.toString() }
@@ -36,12 +52,12 @@ class ReviewController {
     async getReviews(req, res) {
         try {
             const userId = req.user._id; // Authenticated user's ID
-            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
+            const userRole = req.user.role; // Authenticated user's role
 
             const reviews = await Review.find({
                 $or: [
-                    { reviewer: userId, reviewerType: userType },
-                    { reviewee: userId, revieweeType: userType },
+                    { reviewer: userId, reviewerType: userRole },
+                    { reviewee: userId, revieweeType: userRole },
                 ],
             }).populate('trade').populate('reviewer').populate('reviewee');
 
@@ -55,9 +71,10 @@ class ReviewController {
         try {
             const { id } = req.params;
             const userId = req.user._id; // Authenticated user's ID
+            const userRole = req.user.role; // Authenticated user's role
 
             const review = await Review.findOneAndUpdate(
-                { _id: id, reviewer: userId }, // Only allow the reviewer to update their review
+                { _id: id, reviewer: userId, reviewerType: userRole }, // Only allow the reviewer to update their review
                 req.body,
                 { new: true }
             );
@@ -75,8 +92,9 @@ class ReviewController {
         try {
             const { id } = req.params;
             const userId = req.user._id; // Authenticated user's ID
+            const userRole = req.user.role; // Authenticated user's role
 
-            const review = await Review.findOneAndDelete({ _id: id, reviewer: userId }); // Only allow the reviewer to delete their review
+            const review = await Review.findOneAndDelete({ _id: id, reviewer: userId, reviewerType: userRole }); // Only allow the reviewer to delete their review
 
             if (!review) {
                 return res.status(404).json({ message: 'Review not found or not authorized to delete' });

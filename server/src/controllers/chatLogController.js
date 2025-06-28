@@ -1,19 +1,19 @@
 import ChatLog from '../models/ChatLogModel.js';
 import { io, userSockets } from '../server.js';
+import Account from '../models/AccountModel.js';
 
 class ChatLogController {
     async createMessage(req, res) {
         try {
             const { recipientId, message } = req.body;
             const senderId = req.user._id; // Authenticated user's ID
-            const senderType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
+            const senderType = req.user.role; // 'Farmer' or 'Buyer'
 
-            // Determine recipientType based on recipientId (this might need a lookup if not provided by frontend)
-            // For simplicity, assuming recipientType is also passed or can be inferred.
-            // In a real app, you might fetch the recipient to get their type.
-            // For now, let's assume recipientType is also sent in req.body or we default it.
-            // For this implementation, I will assume recipientType is also passed in req.body.
-            const { recipientType } = req.body; // Assuming recipientType is sent from frontend
+            const recipientUser = await Account.findById(recipientId);
+            if (!recipientUser) {
+                return res.status(404).json({ message: 'Recipient not found.' });
+            }
+            const recipientType = recipientUser.role;
 
             const chatLog = new ChatLog({
                 sender: senderId,
@@ -41,7 +41,7 @@ class ChatLogController {
         try {
             const { partnerId } = req.params;
             const userId = req.user._id; // Authenticated user's ID
-            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
+            const userType = req.user.role; // Authenticated user's role
             const { limit = 50, offset = 0 } = req.query;
 
             const chatHistory = await ChatLog.find({
@@ -66,7 +66,7 @@ class ChatLogController {
         try {
             const { partnerId } = req.params;
             const userId = req.user._id; // Authenticated user's ID
-            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
+            const userType = req.user.role; // Authenticated user's role
 
             await ChatLog.updateMany(
                 { sender: partnerId, recipient: userId, recipientType: userType, read: false },

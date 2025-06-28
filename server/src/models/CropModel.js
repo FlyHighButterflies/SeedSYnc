@@ -5,7 +5,7 @@ const cropSchema = new mongoose.Schema({
   description: { type: String, trim: true },
   category: { type: String, required: true, trim: true }, // e.g., 'Vegetable', 'Fruit', 'Tool', 'Seed'
   images: [{ type: String }],
-  farmer: { type: mongoose.Schema.Types.ObjectId, ref: "Farmer", required: true },
+  farmer: { type: mongoose.Schema.Types.ObjectId, ref: "Account", required: true },
 }, { timestamps: true });
 
 const Crop = mongoose.model("Crop", cropSchema);

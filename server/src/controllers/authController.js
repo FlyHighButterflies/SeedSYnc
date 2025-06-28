@@ -1,25 +1,19 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import Farmer from '../models/FarmerModel.js';
-import Buyer from '../models/BuyerModel.js';
+import Account from '../models/AccountModel.js';
 
 class AuthController {
     async register(req, res) {
         try {
             const { role, email, password, ...profileData } = req.body;
 
-            if (!role || !['farmer', 'buyer'].includes(role)) {
+            if (!role || !['Farmer', 'Buyer'].includes(role)) {
                 return res.status(400).json({ message: 'Invalid user role specified.' });
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            let newUser;
-            if (role === 'farmer') {
-                newUser = new Farmer({ email, password: hashedPassword, ...profileData });
-            } else {
-                newUser = new Buyer({ email, password: hashedPassword, ...profileData });
-            }
+            const newUser = new Account({ email, password: hashedPassword, role, ...profileData });
 
             await newUser.save();
 
@@ -36,16 +30,11 @@ class AuthController {
         try {
             const { email, password, role } = req.body;
 
-            if (!role || !['farmer', 'buyer'].includes(role)) {
+            if (!role || !['Farmer', 'Buyer'].includes(role)) {
                 return res.status(400).json({ message: 'Invalid user role specified.' });
             }
 
-            let user = null;
-            if (role === 'farmer') {
-                user = await Farmer.findOne({ email });
-            } else {
-                user = await Buyer.findOne({ email });
-            }
+            const user = await Account.findOne({ email, role });
 
             if (!user) {
                 return res.status(400).json({ message: 'Invalid credentials.' });
@@ -57,12 +46,12 @@ class AuthController {
             }
 
             const token = jwt.sign(
-                { id: user._id, role: user.constructor.modelName }, // Store modelName as role
+                { id: user._id, role: user.role },
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
 
-            res.status(200).json({ token, user: { id: user._id, email: user.email, role: user.constructor.modelName } });
+            res.status(200).json({ token, user: { id: user._id, email: user.email, role: user.role } });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }

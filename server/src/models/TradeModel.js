@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const tradeSchema = new mongoose.Schema({
   inventory: { type: mongoose.Schema.Types.ObjectId, ref: "Inventory", required: true },
-  buyer: { type: mongoose.Schema.Types.ObjectId, ref: "Buyer", required: true },
-  seller: { type: mongoose.Schema.Types.ObjectId, ref: "Farmer", required: true },
+  buyer: { type: mongoose.Schema.Types.ObjectId, ref: "Account", required: true },
+  seller: { type: mongoose.Schema.Types.ObjectId, ref: "Account", required: true },
   quantity: { type: Number, required: true, min: 1 },
   totalPrice: { type: Number, required: true },
   status: { type: String, enum: ["pending", "completed", "cancelled"], default: "pending" },

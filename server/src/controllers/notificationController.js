@@ -22,7 +22,7 @@ class NotificationController {
     async getNotifications(req, res) {
         try {
             const userId = req.user._id; // Authenticated user's ID
-            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
+            const userType = req.user.role; // Authenticated user's role
             const { read, limit = 50, offset = 0 } = req.query;
 
             let query = { recipient: userId, recipientType: userType };
@@ -45,7 +45,7 @@ class NotificationController {
         try {
             const { id } = req.params;
             const userId = req.user._id; // Authenticated user's ID
-            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
+            const userType = req.user.role; // Authenticated user's role
 
             const notification = await Notification.findOneAndUpdate(
                 { _id: id, recipient: userId, recipientType: userType },
@@ -66,7 +66,7 @@ class NotificationController {
     async markAllNotificationsAsRead(req, res) {
         try {
             const userId = req.user._id; // Authenticated user's ID
-            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
+            const userType = req.user.role; // Authenticated user's role
 
             await Notification.updateMany(
                 { recipient: userId, recipientType: userType, read: false },
@@ -83,7 +83,7 @@ class NotificationController {
         try {
             const { id } = req.params;
             const userId = req.user._id; // Authenticated user's ID
-            const userType = req.user.constructor.modelName; // 'Farmer' or 'Buyer'
+            const userType = req.user.role; // Authenticated user's role
 
             const notification = await Notification.findOneAndDelete({ _id: id, recipient: userId, recipientType: userType });
 

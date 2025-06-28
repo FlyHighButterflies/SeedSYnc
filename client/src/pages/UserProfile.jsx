@@ -15,28 +15,36 @@ import {
 } from "lucide-react";
 import Button from "@/components/Button";
 
-// StarRating component
-const StarRating = ({ rating, totalRatings = 0 }) => {
-    return (
-        <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                        key={star}
-                        className={`w-5 h-5 ${
-                            star <= rating
-                                ? "text-yellow-400 fill-current"
-                                : "text-gray-300"
-                        }`}
-                    />
-                ))}
-            </div>
-            <span className="text-lg font-semibold">{rating}</span>
-            <span className="text-sm text-gray-600">
-                ({totalRatings} ratings)
-            </span>
-        </div>
-    );
+// Updated sample data to match SignUp Step 3 structure
+const sampleUserData = {
+    // Personal Info (Step 1)
+    email: "john.santos@example.com",
+    firstName: "John",
+    lastName: "Santos",
+    contactNumber: "+63 912 345 6789",
+    profileImage: "/images/farmer-profile.jpg",
+
+    // Location & Logistics (Step 3) - Match SignUp structure
+    country: "Philippines",
+    province: "Nueva Ecija",
+    city: "Cabanatuan City",
+    address: "123 Rice Field Road, Barangay Magsaysay",
+    landmarks: "Near Cabanatuan Public Market",
+    highway: "yes",
+    port: "no",
+    transportation: "truck",
+
+    // Business Information (Step 4)
+    userType: "farmer",
+    certifications: "organic",
+    farmingPractices: "sustainable",
+
+    // System-generated fields
+    joinDate: "2024-01-15",
+    rating: 4.8,
+    totalTrades: 45,
+    totalCrops: 12,
+    activeCrops: 8,
 };
 
 function ProfileCard({ icon, title, value, subtitle }) {
@@ -70,7 +78,9 @@ function InfoRow({ icon, label, value }) {
         <div className="flex items-center gap-3 py-2">
             {icon}
             <span className="text-sm text-gray-600 w-28">{label}:</span>
-            <span className="text-sm text-gray-900 flex-1">{value}</span>
+            <span className="text-sm text-gray-900 flex-1 capitalize">
+                {value}
+            </span>
         </div>
     );
 }
@@ -86,38 +96,7 @@ function UserProfile() {
         const fetchUserProfile = async () => {
             try {
                 // TODO: Replace with actual API call
-                // const response = await api.get(`/users/${userId}`);
-                // setUserData(response.data);
-
-                // Mock data for now
-                const mockUser = {
-                    id: userId,
-                    firstName: "John",
-                    lastName: "Santos",
-                    email: "john.santos@example.com",
-                    contactNumber: "+63 912 345 6789",
-                    userType: "farmer",
-                    city: "Cabanatuan City",
-                    province: "Nueva Ecija",
-                    address: "123 Rice Field Road, Barangay Magsaysay",
-                    landmarks: "Near Cabanatuan Public Market",
-                    transportation: "truck",
-                    rating: 4.8,
-                    totalTrades: 45,
-                    joinDate: "2024-01-15",
-                    specialties: ["Rice", "Corn", "Vegetables"],
-                    certifications: ["Organic", "Non-GMO"],
-                    farmingPractices: ["Sustainable", "Water Efficient"],
-                    totalCrops: 12,
-                    activeCrops: 8,
-                    // For buyers:
-                    productsNeeded: ["Rice", "Vegetables", "Fruits"],
-                    quantityRange: "500-1000 kg",
-                    frequency: "weekly",
-                    qualityStandards: ["Organic", "Non-GMO"],
-                };
-
-                setUserData(mockUser);
+                setUserData(sampleUserData);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching user profile:", error);
@@ -129,7 +108,6 @@ function UserProfile() {
     }, [userId]);
 
     const handleStartChat = () => {
-        // TODO: Implement chat functionality
         console.log("Starting chat with user:", userId);
     };
 
@@ -161,15 +139,23 @@ function UserProfile() {
             {/* Header Section */}
             <div className="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-7xl mb-6 gap-4">
-                    <div className="flex items-center gap-4">
+                    <div className="text-center sm:text-left">
                         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
                             User Profile
                         </h1>
                     </div>
                     <div className="flex gap-2">
                         <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleGoBack}
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                            Go Back
+                        </Button>
+                        <Button
                             variant="primary"
-                            size="md"
+                            size="sm"
                             onClick={handleStartChat}
                         >
                             <MessageCircle className="w-4 h-4" />
@@ -185,9 +171,9 @@ function UserProfile() {
                         <div className="flex flex-col sm:flex-row items-center gap-6">
                             {/* Profile Image */}
                             <div className="relative">
-                                <div className="w-32 h-32 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-3xl">
-                                    {userData.firstName?.charAt(0)}
-                                    {userData.lastName?.charAt(0)}
+                                <div className="w-32 h-32 bg-gradient-to-br from-normalGreen to-darkGreen rounded-full flex items-center justify-center text-white font-bold text-3xl">
+                                    {userData.firstName.charAt(0)}
+                                    {userData.lastName.charAt(0)}
                                 </div>
                             </div>
 
@@ -199,11 +185,13 @@ function UserProfile() {
                                 <p className="text-lg text-gray-600 mb-2 capitalize">
                                     {userData.userType}
                                 </p>
-                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-4">
-                                    <StarRating
-                                        rating={userData.rating}
-                                        totalRatings={userData.totalTrades}
-                                    />
+                                <div className="flex items-center justify-center sm:justify-start gap-6 mb-4">
+                                    <div className="flex items-center gap-1">
+                                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                        <span className="text-sm font-medium">
+                                            {userData.rating}
+                                        </span>
+                                    </div>
                                     <div className="text-sm text-gray-600">
                                         {userData.totalTrades} completed trades
                                     </div>
@@ -230,12 +218,12 @@ function UserProfile() {
                             value={
                                 userData.userType === "farmer"
                                     ? userData.activeCrops
-                                    : userData.activeRequirements || 5
+                                    : userData.activeRequirements || 0
                             }
                             subtitle={`${
                                 userData.userType === "farmer"
                                     ? userData.totalCrops
-                                    : userData.totalRequirements || 12
+                                    : userData.totalRequirements || 0
                             } total`}
                         />
                         <ProfileCard
@@ -254,152 +242,160 @@ function UserProfile() {
 
                     {/* Main Content Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Left Column */}
-                        <div className="space-y-6">
-                            {/* Contact Information */}
-                            <InfoSection title="Contact Information">
+                        {/* Contact Information */}
+                        <InfoSection title="Contact Information">
+                            <div className="space-y-3">
+                                <InfoRow
+                                    icon={
+                                        <Mail className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="Email"
+                                    value={userData.email}
+                                />
+                                <InfoRow
+                                    icon={
+                                        <Phone className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="Phone"
+                                    value={userData.contactNumber}
+                                />
+                            </div>
+                        </InfoSection>
+
+                        {/* Location Information - Separate Fields to Match SignUp */}
+                        <InfoSection title="Location & Logistics">
+                            <div className="space-y-3">
+                                <InfoRow
+                                    icon={
+                                        <MapPin className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="Country"
+                                    value={userData.country}
+                                />
+                                <InfoRow
+                                    icon={
+                                        <MapPin className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="Province"
+                                    value={userData.province}
+                                />
+                                <InfoRow
+                                    icon={
+                                        <MapPin className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="City"
+                                    value={userData.city}
+                                />
+                                <InfoRow
+                                    icon={
+                                        <MapPin className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="Address"
+                                    value={userData.address}
+                                />
+                                <InfoRow
+                                    icon={
+                                        <MapPin className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="Landmarks"
+                                    value={userData.landmarks}
+                                />
+                                <InfoRow
+                                    icon={
+                                        <Truck className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="Highway Access"
+                                    value={userData.highway}
+                                />
+                                <InfoRow
+                                    icon={
+                                        <Truck className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="Port Access"
+                                    value={userData.port}
+                                />
+                                <InfoRow
+                                    icon={
+                                        <Truck className="w-4 h-4 text-gray-500" />
+                                    }
+                                    label="Transportation"
+                                    value={userData.transportation}
+                                />
+                            </div>
+                        </InfoSection>
+
+                        {/* Business Information */}
+                        {userData.userType === "farmer" ? (
+                            <InfoSection title="Business Information">
                                 <div className="space-y-3">
                                     <InfoRow
                                         icon={
-                                            <Mail className="w-4 h-4 text-gray-500" />
+                                            <Award className="w-4 h-4 text-gray-500" />
                                         }
-                                        label="Email"
-                                        value={userData.email}
+                                        label="Certification"
+                                        value={
+                                            userData.certifications || "None"
+                                        }
                                     />
                                     <InfoRow
                                         icon={
-                                            <Phone className="w-4 h-4 text-gray-500" />
+                                            <Settings className="w-4 h-4 text-gray-500" />
                                         }
-                                        label="Phone"
-                                        value={userData.contactNumber}
+                                        label="Farming Practice"
+                                        value={
+                                            userData.farmingPractices ||
+                                            "Not specified"
+                                        }
                                     />
                                 </div>
                             </InfoSection>
-
-                            {/* Location Information */}
-                            <InfoSection title="Location & Logistics">
+                        ) : (
+                            <InfoSection title="Purchase Preferences">
                                 <div className="space-y-3">
                                     <InfoRow
                                         icon={
-                                            <MapPin className="w-4 h-4 text-gray-500" />
+                                            <Award className="w-4 h-4 text-gray-500" />
                                         }
-                                        label="City"
-                                        value={`${userData.city}, ${userData.province}`}
+                                        label="Quality Standards"
+                                        value={
+                                            userData.qualityStandards || "Any"
+                                        }
                                     />
                                     <InfoRow
                                         icon={
-                                            <MapPin className="w-4 h-4 text-gray-500" />
+                                            <Clock className="w-4 h-4 text-gray-500" />
                                         }
-                                        label="Address"
-                                        value={userData.address}
-                                    />
-                                    <InfoRow
-                                        icon={
-                                            <MapPin className="w-4 h-4 text-gray-500" />
+                                        label="Purchase Frequency"
+                                        value={
+                                            userData.frequency || "As needed"
                                         }
-                                        label="Landmarks"
-                                        value={userData.landmarks}
-                                    />
-                                    <InfoRow
-                                        icon={
-                                            <Truck className="w-4 h-4 text-gray-500" />
-                                        }
-                                        label="Transport"
-                                        value={userData.transportation}
                                     />
                                 </div>
                             </InfoSection>
-                        </div>
+                        )}
 
-                        {/* Right Column */}
-                        <div className="space-y-6">
-                            {userData.userType === "farmer" ? (
-                                <InfoSection title="Farming Information">
-                                    <div className="space-y-3">
-                                        <InfoRow
-                                            icon={
-                                                <Package className="w-4 h-4 text-gray-500" />
-                                            }
-                                            label="Specialties"
-                                            value={
-                                                userData.specialties?.join(
-                                                    ", "
-                                                ) || "Not specified"
-                                            }
-                                        />
-                                        <InfoRow
-                                            icon={
-                                                <Award className="w-4 h-4 text-gray-500" />
-                                            }
-                                            label="Certifications"
-                                            value={
-                                                userData.certifications?.join(
-                                                    ", "
-                                                ) || "None"
-                                            }
-                                        />
-                                        <InfoRow
-                                            icon={
-                                                <Settings className="w-4 h-4 text-gray-500" />
-                                            }
-                                            label="Practices"
-                                            value={
-                                                userData.farmingPractices?.join(
-                                                    ", "
-                                                ) || "Not specified"
-                                            }
-                                        />
-                                    </div>
-                                </InfoSection>
-                            ) : (
-                                <InfoSection title="Purchase Preferences">
-                                    <div className="space-y-3">
-                                        <InfoRow
-                                            icon={
-                                                <Package className="w-4 h-4 text-gray-500" />
-                                            }
-                                            label="Products Needed"
-                                            value={
-                                                userData.productsNeeded?.join(
-                                                    ", "
-                                                ) || "Not specified"
-                                            }
-                                        />
-                                        <InfoRow
-                                            icon={
-                                                <Settings className="w-4 h-4 text-gray-500" />
-                                            }
-                                            label="Quantity Range"
-                                            value={
-                                                userData.quantityRange ||
-                                                "Not specified"
-                                            }
-                                        />
-                                        <InfoRow
-                                            icon={
-                                                <Clock className="w-4 h-4 text-gray-500" />
-                                            }
-                                            label="Frequency"
-                                            value={
-                                                userData.frequency ||
-                                                "Not specified"
-                                            }
-                                        />
-                                        <InfoRow
-                                            icon={
-                                                <Award className="w-4 h-4 text-gray-500" />
-                                            }
-                                            label="Quality Standards"
-                                            value={
-                                                userData.qualityStandards?.join(
-                                                    ", "
-                                                ) || "Not specified"
-                                            }
-                                        />
-                                    </div>
-                                </InfoSection>
-                            )}
-                        </div>
+                        {/* Products/Inventory Section */}
+                        {/* <InfoSection
+                            title={
+                                userData.userType === "farmer"
+                                    ? "Crop Management"
+                                    : "Requirements Management"
+                            }
+                        >
+                            <div className="space-y-3">
+                                <div className="text-center py-8">
+                                    <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                    <p className="text-gray-600 mb-4">
+                                        {userData.userType === "farmer"
+                                            ? "View their crops and inventory"
+                                            : "View their product requirements"}
+                                    </p>
+                                    <Button variant="primary" size="sm">
+                                        View Inventory
+                                    </Button>
+                                </div>
+                            </div>
+                        </InfoSection> */}
                     </div>
                 </div>
             </div>

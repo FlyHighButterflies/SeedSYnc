@@ -458,6 +458,9 @@ function SignUp() {
     };
 
     const handleBack = () => {
+        if (currentStep === 5) {
+            setValue("terms", false); // Reset the terms field when going back from Step 5
+        }
         if (currentStep > 1) {
             setCurrentStep(currentStep - 1);
         }
@@ -468,9 +471,10 @@ function SignUp() {
         const fieldsToValidate = steps[currentStep].fields;
         if (fieldsToValidate.length > 0) {
             const isStepValid = await trigger(fieldsToValidate);
-            if (!isStepValid) return;
+            if (!isStepValid) return; // Stop if validation fails
         }
 
+        // Only submit if on the last step
         if (currentStep < totalSteps) {
             setCurrentStep(currentStep + 1);
         }

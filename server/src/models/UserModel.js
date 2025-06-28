@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     distance_radius_km: Number,
   },
   performance_score: { type: Number, default: 0 },
+  fcmToken: { type: String },
 }, { timestamps: true });
 
 // Index for geospatial queries

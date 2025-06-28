@@ -11,6 +11,9 @@ import searchRoutes from "./searchRoutes.js";
 
 const router = express.Router();
 
+router.use("/auth", authRoutes);
+router.use("/farmers", farmerRoutes);
+router.use("/buyers", buyerRoutes);
 router.use("/crops", cropRoutes);
 router.use("/inventory", inventoryRoutes);
 

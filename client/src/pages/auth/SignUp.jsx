@@ -3,9 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+import { usePhLocation } from "@/hooks";
+import SearchableSelect from "@/components/SearchableSelect";
 
 function Step1({ register, errors }) {
     return (
@@ -118,24 +117,6 @@ function Step1({ register, errors }) {
                     className={errors.contactNumber ? "border-red-500" : ""}
                 />
             </div>
-
-            <div>
-                {errors.role && (
-                    <p className="text-red-500 text-sm">
-                        {errors.role.message}
-                    </p>
-                )}
-                <Dropdown
-                    {...register("role", { required: "Role is required" })}
-                    id="role"
-                    placeholder="Select Role"
-                    options={[
-                        { label: "Farmer", value: "farmer" },
-                        { label: "Buyer", value: "buyer" },
-                    ]}
-                    className={errors.role ? "border-red-500" : ""}
-                />
-            </div>
         </>
     );
 }
@@ -236,39 +217,127 @@ function Step2({ register, setValue, watch }) {
     );
 }
 
-function Step3({ register }) {
+function Step3({ register, setValue, watch }) {
+    const { regions, provinces, cities } = usePhLocation();
+    const [selectedRegion, setSelectedRegion] = useState("");
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedCity, setSelectedCity] = useState("");
+
+    // Watch form values
+    const watchedProvince = watch("province");
+    const watchedCity = watch("city");
+
+    // Transform data to dropdown format
+    const regionOptions = regions.map((region) => ({
+        value: region.id,
+        label: region.name,
+    }));
+
+    const provinceOptions = provinces
+        .filter((province) => province.region_code === selectedRegion)
+        .map((province) => ({
+            value: province.id,
+            label: province.name,
+        }));
+
+    const cityOptions = cities
+        .filter((city) => city.province_code === selectedProvince)
+        .map((city) => ({
+            value: city.id,
+            label: city.name,
+        }));
+
+    const handleRegionChange = (regionId) => {
+        setSelectedRegion(regionId);
+        setSelectedProvince("");
+        setSelectedCity("");
+
+        // Find region name and set form value
+        const region = regions.find((r) => r.id === regionId);
+        setValue("province", region ? region.name : "");
+        setValue("city", "");
+    };
+
+    const handleProvinceChange = (provinceId) => {
+        setSelectedProvince(provinceId);
+        setSelectedCity("");
+
+        // Find province name and set form value
+        const province = provinces.find((p) => p.id === provinceId);
+        setValue("province", province ? province.name : "");
+        setValue("city", "");
+    };
+
+    const handleCityChange = (cityId) => {
+        setSelectedCity(cityId);
+
+        // Find city name and set form value
+        const city = cities.find((c) => c.id === cityId);
+        setValue("city", city ? city.name : "");
+    };
+
     return (
         <>
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
                     Country
                 </label>
-                <Input
-                    {...register("country")}
-                    type="text"
-                    placeholder="Country"
+                <SearchableSelect
+                    options={[{ value: "Philippines", label: "Philippines" }]}
+                    value="Philippines"
+                    onChange={(value) => setValue("country", value)}
+                    placeholder="Select Country"
                 />
             </div>
+
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Region
+                </label>
+                <SearchableSelect
+                    options={regionOptions}
+                    value={selectedRegion}
+                    onChange={handleRegionChange}
+                    placeholder="Select Region"
+                />
+            </div>
+
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
                     Province/Region
                 </label>
-                <Input
+                <SearchableSelect
+                    options={provinceOptions}
+                    value={selectedProvince}
+                    onChange={handleProvinceChange}
+                    placeholder="Select Province"
+                    disabled={!selectedRegion}
+                />
+                <input
+                    type="hidden"
                     {...register("province")}
-                    type="text"
-                    placeholder="Province/Region"
+                    value={watchedProvince || ""}
                 />
             </div>
+
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
                     City/Town
                 </label>
-                <Input
+                <SearchableSelect
+                    options={cityOptions}
+                    value={selectedCity}
+                    onChange={handleCityChange}
+                    placeholder="Select City"
+                    disabled={!selectedProvince}
+                />
+                <input
+                    type="hidden"
                     {...register("city")}
-                    type="text"
-                    placeholder="City/Town"
+                    value={watchedCity || ""}
                 />
             </div>
+
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
                     Address
@@ -279,6 +348,7 @@ function Step3({ register }) {
                     placeholder="Address"
                 />
             </div>
+
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
                     Nearby Landmarks
@@ -289,34 +359,37 @@ function Step3({ register }) {
                     placeholder="Nearby Landmarks"
                 />
             </div>
+
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
-                    Major Highway
+                    Major Highway Access
                 </label>
                 <Dropdown
                     {...register("highway")}
                     id="highway"
-                    placeholder="Major Highway"
+                    placeholder="Major Highway Access"
                     options={[
                         { label: "Yes", value: "yes" },
                         { label: "No", value: "no" },
                     ]}
                 />
             </div>
+
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
-                    Port/Hub
+                    Port/Hub Access
                 </label>
                 <Dropdown
                     {...register("port")}
                     id="port"
-                    placeholder="Port/Hub"
+                    placeholder="Port/Hub Access"
                     options={[
                         { label: "Yes", value: "yes" },
                         { label: "No", value: "no" },
                     ]}
                 />
             </div>
+
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
                     Transportation Mode
@@ -527,7 +600,6 @@ function SignUp() {
                 "lastName",
                 "password",
                 "contactNumber",
-                "role", // Added role to validation
             ],
         },
         2: { label: "Profile Picture", fields: [] },
@@ -582,7 +654,13 @@ function SignUp() {
                     />
                 );
             case 3:
-                return <Step3 register={register} />;
+                return (
+                    <Step3
+                        register={register}
+                        setValue={setValue}
+                        watch={watch}
+                    />
+                );
             case 4:
                 return (
                     <Step4

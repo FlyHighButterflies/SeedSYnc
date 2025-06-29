@@ -1,10 +1,20 @@
 import { Button, ListingCard, UserModal } from "@/components";
 import { useUserModal } from "@/hooks";
-import { ChevronRight, Star, MessageCircle, Package } from "lucide-react";
+import {
+    ChevronRight,
+    Star,
+    MessageCircle,
+    Package,
+    Search,
+} from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState, useRef } from "react";
 
 function Home() {
     const { selectedUser, isModalOpen, openModal, closeModal } = useUserModal();
+    const [hasBestMatch, setHasBestMatch] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const bestMatchRef = useRef(null); // Add ref for scrolling
 
     const bestMatch = {
         id: "1",
@@ -29,7 +39,7 @@ function Home() {
             "Sweet Corn",
             "Green Beans",
         ],
-        certifications: "Organic", // Single value
+        certifications: "Organic",
         totalTrades: 120,
     };
 
@@ -39,6 +49,29 @@ function Home() {
             "_blank",
             "noopener,noreferrer"
         );
+    };
+
+    const handleFindNow = async () => {
+        setIsSearching(true);
+
+        // Simulate API call to find best match
+        try {
+            // TODO: Replace with actual API call
+            await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate loading
+            setHasBestMatch(true); // Set to true when match is found
+
+            // Scroll to best match section after finding match
+            setTimeout(() => {
+                bestMatchRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+            }, 300); // Small delay to ensure state update
+        } catch (error) {
+            console.error("Error finding best match:", error);
+        } finally {
+            setIsSearching(false);
+        }
     };
 
     return (
@@ -63,8 +96,17 @@ function Home() {
                         variant="primary"
                         size="lg"
                         className="w-full sm:w-auto"
+                        onClick={handleFindNow}
+                        disabled={isSearching}
                     >
-                        Find Now!
+                        {isSearching ? (
+                            <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                Searching...
+                            </>
+                        ) : (
+                            "Find Now!"
+                        )}
                     </Button>
                 </div>
             </div>
@@ -109,80 +151,125 @@ function Home() {
                 </Link>
             </div>
 
-            {/* Enhanced Best Match Section - Show ALL Products */}
-            <div className="flex flex-col items-center justify-center w-full min-h-[500px] sm:min-h-[550px] lg:h-[610px] bg-lighterGreen p-4 sm:p-6 lg:p-8">
-                <h2 className="text-lg sm:text-xl font-semibold text-darkGreen mb-4 sm:mb-6 text-center">
-                    Best Match for You!
-                </h2>
-
-                <div className="flex flex-col items-center max-w-lg mx-auto">
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-gradient-to-br from-normalGreen to-darkGreen rounded-full flex items-center justify-center text-white font-semibold mb-3 sm:mb-4 text-xl sm:text-2xl">
-                        {bestMatch.firstName?.charAt(0) || "J"}
-                        {bestMatch.lastName?.charAt(0) || "S"}
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-darkGreen text-center">
-                        {bestMatch.name}
-                    </h3>
-
-                    <p className="text-gray-600 mb-3 text-center text-sm sm:text-base">
-                        {bestMatch.type} • {bestMatch.location}
-                    </p>
-
-                    <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 text-gray-600 text-sm sm:text-base">
-                        <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
-                        {bestMatch.rating}
-                        <span className="text-xs sm:text-sm text-gray-500">
-                            •
-                        </span>
-                        <span className="text-xs sm:text-sm">
-                            {bestMatch.trades} successful trades
-                        </span>
-                    </div>
-
-                    {/* Products Section - Show ALL Products */}
-                    <div className="mb-4 sm:mb-6 text-center">
-                        <p className="text-xs text-normalGreen mb-3 uppercase tracking-wide font-bold">
-                            Currently Selling
-                        </p>
-                        <div className="flex flex-wrap justify-center gap-2 mb-3">
-                            {bestMatch.products.map((product, index) => (
-                                <span
-                                    key={index}
-                                    className="px-3 py-1 bg-lightGreen text-darkGreen text-sm font-medium rounded-full"
-                                >
-                                    {product}
-                                </span>
-                            ))}
+            {/* Best Match Section - Conditional Rendering */}
+            <div
+                ref={bestMatchRef} // Add ref here
+                className="flex flex-col items-center justify-center w-full min-h-[500px] sm:min-h-[550px] lg:h-[610px] bg-lighterGreen p-4 sm:p-6 lg:p-8"
+            >
+                {isSearching ? (
+                    /* Searching State */
+                    <div className="flex flex-col items-center max-w-lg mx-auto text-center">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-gradient-to-br from-normalGreen to-darkGreen rounded-full flex items-center justify-center text-white mb-6 animate-pulse">
+                            <Search className="w-8 h-8 sm:w-10 sm:h-10 animate-bounce" />
                         </div>
-
-                        {/* Product count */}
-                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                            <Package className="w-4 h-4" />
-                            <span>
-                                {bestMatch.products.length} products available
+                        <h2 className="text-xl sm:text-2xl font-bold text-darkGreen mb-4">
+                            Finding Your Perfect Match...
+                        </h2>
+                        <p className="text-gray-600 mb-6">
+                            We're analyzing farmers based on your preferences,
+                            location, and requirements.
+                        </p>
+                        <div className="flex items-center gap-2 text-normalGreen">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-normalGreen"></div>
+                            <span className="text-sm font-medium">
+                                Please wait...
                             </span>
                         </div>
                     </div>
-
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
-                        <Button
-                            variant="primary"
-                            size="lg"
-                            className="flex-1 sm:flex-none"
-                        >
-                            <MessageCircle className="w-4 h-4" />
-                            Start Trading
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="lg"
-                            className="flex-1 sm:flex-none"
-                            onClick={handleViewBestMatchProfile}
-                        >
-                            View Profile
-                        </Button>
+                ) : !hasBestMatch ? (
+                    /* No Match Found State - Removed Button */
+                    <div className="flex flex-col items-center max-w-lg mx-auto text-center">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-gray-200 rounded-full flex items-center justify-center mb-6">
+                            <Search className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
+                        </div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-700 mb-4">
+                            No Best Match Yet
+                        </h2>
+                        <p className="text-gray-600">
+                            Click "Find Now!" above to discover farmers that
+                            match your needs and preferences.
+                        </p>
                     </div>
-                </div>
+                ) : (
+                    /* Best Match Found State */
+                    <>
+                        <h2 className="text-lg sm:text-xl font-semibold text-darkGreen mb-4 sm:mb-6 text-center">
+                            Best Match for You!
+                        </h2>
+
+                        <div className="flex flex-col items-center max-w-lg mx-auto">
+                            <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-gradient-to-br from-normalGreen to-darkGreen rounded-full flex items-center justify-center text-white font-semibold mb-3 sm:mb-4 text-xl sm:text-2xl">
+                                {bestMatch.firstName?.charAt(0) || "J"}
+                                {bestMatch.lastName?.charAt(0) || "S"}
+                            </div>
+                            <h3 className="text-xl sm:text-2xl font-bold text-darkGreen text-center">
+                                {bestMatch.name}
+                            </h3>
+
+                            <p className="text-gray-600 mb-3 text-center text-sm sm:text-base">
+                                {bestMatch.type} • {bestMatch.location}
+                            </p>
+
+                            <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 text-gray-600 text-sm sm:text-base">
+                                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
+                                {bestMatch.rating}
+                                <span className="text-xs sm:text-sm text-gray-500">
+                                    •
+                                </span>
+                                <span className="text-xs sm:text-sm">
+                                    {bestMatch.trades} successful trades
+                                </span>
+                            </div>
+
+                            {/* Products Section - Show ALL Products */}
+                            <div className="mb-4 sm:mb-6 text-center">
+                                <p className="text-xs text-normalGreen mb-3 uppercase tracking-wide font-bold">
+                                    Currently Selling
+                                </p>
+                                <div className="flex flex-wrap justify-center gap-2 mb-3">
+                                    {bestMatch.products.map(
+                                        (product, index) => (
+                                            <span
+                                                key={index}
+                                                className="px-3 py-1 bg-lightGreen text-darkGreen text-sm font-medium rounded-full"
+                                            >
+                                                {product}
+                                            </span>
+                                        )
+                                    )}
+                                </div>
+
+                                {/* Product count */}
+                                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                                    <Package className="w-4 h-4" />
+                                    <span>
+                                        {bestMatch.products.length} products
+                                        available
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
+                                <Button
+                                    variant="primary"
+                                    size="lg"
+                                    className="flex-1 sm:flex-none"
+                                >
+                                    <MessageCircle className="w-4 h-4" />
+                                    Start Trading
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="flex-1 sm:flex-none"
+                                    onClick={handleViewBestMatchProfile}
+                                >
+                                    View Profile
+                                </Button>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* User Modal */}

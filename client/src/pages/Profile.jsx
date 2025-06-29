@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
     Edit3,
     Camera,
@@ -116,80 +116,20 @@ function InfoRow({ icon, label, value }) {
 }
 
 function Profile() {
-    const [profileData, setProfileData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [userType, setUserType] = useState("farmer");
     const [isEditing, setIsEditing] = useState(false);
 
-    // Get user info from localStorage
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = localStorage.getItem("token");
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-            if (!user || !token) {
-                setError("User not logged in.");
-                setLoading(false);
-                return;
-            }
-
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            };
-
-            const endpoint = `${API_BASE_URL}/profile/me`;
-
-            try {
-                const response = await axios.get(endpoint, config);
-                setProfileData(response.data);
-            } catch (err) {
-                console.error(
-                    "Failed to fetch profile:",
-                    err.response?.data || err.message
-                );
-                setError(
-                    err.response?.data?.message || "Failed to load profile."
-                );
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProfile();
-    }, [token]); // Only re-fetch if token changes, user object is derived from token
+    const profileData =
+        userType === "farmer" ? sampleFarmerProfile : sampleBuyerProfile;
 
     const handleEdit = () => {
         setIsEditing(true);
-        // In a real app, you'd open a modal or navigate to an an edit form
-        alert("Edit functionality to be implemented. Check console for data.");
-        console.log("Current Profile Data for Editing:", profileData);
+        console.log("Edit profile");
     };
 
     const handleImageUpload = () => {
-        alert("Image upload functionality to be implemented.");
         console.log("Upload new profile image");
     };
-
-    if (loading) {
-        return <div className="text-center p-8">Loading profile...</div>;
-    }
-
-    if (error) {
-        return (
-            <div className="text-center p-8 text-red-500">Error: {error}</div>
-        );
-    }
-
-    if (!profileData) {
-        return (
-            <div className="text-center p-8">No profile data available.</div>
-        );
-    }
-
-    // Determine userType for display based on fetched data's role
-    const userRole = profileData.role;
 
     return (
         <div className="flex flex-col w-full">
@@ -202,7 +142,18 @@ function Profile() {
                         </h1>
                     </div>
                     <div className="flex gap-2">
-                        {/* Removed role switch button as it's now based on logged-in user */}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                                setUserType(
+                                    userType === "farmer" ? "buyer" : "farmer"
+                                )
+                            }
+                        >
+                            Switch to{" "}
+                            {userType === "farmer" ? "Buyer" : "Farmer"} View
+                        </Button>
                         <Button
                             variant="primary"
                             size="sm"
@@ -242,7 +193,7 @@ function Profile() {
                                     {profileData.lastName}
                                 </h2>
                                 <p className="text-lg text-gray-600 mb-2 capitalize">
-                                    {userRole}
+                                    {profileData.userType}
                                 </p>
                                 <div className="flex items-center justify-center sm:justify-start gap-6 mb-4">
                                     <div className="flex items-center gap-1">
@@ -259,7 +210,7 @@ function Profile() {
                                 <div className="text-sm text-gray-600">
                                     Member since{" "}
                                     {new Date(
-                                        profileData.createdAt
+                                        profileData.joinDate
                                     ).toLocaleDateString()}
                                 </div>
                             </div>
@@ -271,17 +222,17 @@ function Profile() {
                         <ProfileCard
                             icon={<Package className="w-5 h-5 text-blue-600" />}
                             title={
-                                userRole === "Farmer"
+                                userType === "farmer"
                                     ? "Active Crops"
                                     : "Active Needs"
                             }
                             value={
-                                userRole === "Farmer"
+                                userType === "farmer"
                                     ? profileData.activeCrops
                                     : profileData.activeRequirements
                             }
                             subtitle={`${
-                                userRole === "Farmer"
+                                userType === "farmer"
                                     ? profileData.totalCrops
                                     : profileData.totalRequirements
                             } total`}

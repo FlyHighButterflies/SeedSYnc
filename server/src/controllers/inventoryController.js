@@ -2,6 +2,7 @@ import Inventory from '../models/InventoryModel.js';
 import User from '../models/UserModel.js';
 import { validateMongoId, validateRole, validateCropsArray } from '../utils/validation.js';
 import { hashUserId, hashCropKey } from '../utils/hash.js';
+import { getCachedUserProfile, cacheUserProfile, invalidateUserProfileCache } from '../utils/cacheUtils.js';
 
 function hashInventoryResponse(inventory) {
     return {
@@ -60,9 +61,14 @@ export const getInventoryByUserId = async (req, res) => {
     }
 
     try {
-        const inventory = await Inventory.findOne({ userId }).populate('crops');
+        // Try cache first
+        let inventory = await getCachedUserProfile(userId); // Reuse cache utils for inventory
         if (!inventory) {
-            return res.status(404).json({ message: 'Inventory not found for this user.' });
+            inventory = await Inventory.findOne({ userId }).populate('crops');
+            if (!inventory) {
+                return res.status(404).json({ message: 'Inventory not found for this user.' });
+            }
+            await cacheUserProfile(userId, inventory); // Cache inventory
         }
         res.status(200).json(hashInventoryResponse(inventory));
     } catch (error) {
@@ -95,6 +101,7 @@ export const updateInventory = async (req, res) => {
         if (crops) inventory.crops = crops;
 
         await inventory.save();
+        await invalidateUserProfileCache(userId); // Invalidate cache after update
         res.status(200).json(hashInventoryResponse(inventory));
     } catch (error) {
         res.status(500).json({ message: error.message });

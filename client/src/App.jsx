@@ -12,7 +12,6 @@ import {
     Inventory,
     Profile,
     OnboardingPage1,
-    OnboardingPage2,
     UserProfile,
     Messages,
 } from "@/pages";
@@ -38,10 +37,10 @@ function App() {
                     >
                         <Route path="/signup" element={<SignUp />} />
                         <Route path="/login" element={<Login />} />
-                        {/* <Route
-                            path="/Onboarding2"
-                            element={<OnboardingPage2 />}
-                        /> */}
+                        <Route
+                            path="/Onboarding1"
+                            element={<OnboardingPage1 />}
+                        />
                     </Route>
 
                     <Route

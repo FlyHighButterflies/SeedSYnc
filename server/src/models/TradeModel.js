@@ -33,7 +33,7 @@ const tradeSchema = new mongoose.Schema(
             min: 1,
         },
 
-        pricePerKg: {
+        pricePerUnit: {
             type: Number,
             required: true,
         },
@@ -65,7 +65,10 @@ const tradeSchema = new mongoose.Schema(
 
 tradeSchema.pre("validate", function (next) {
     if (this.farmerId && this.cropId) {
-        this.compositeKey = hashInventoryId(this.farmerId.toString(), this.cropId.toString());
+        this.compositeKey = hashInventoryId(
+            this.farmerId.toString(),
+            this.cropId.toString()
+        );
     }
     next();
 });

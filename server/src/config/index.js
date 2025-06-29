@@ -3,14 +3,15 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const config = {
-  PORT: process.env.PORT || 3000,
-  MONGODB_URI: process.env.MONGODB_URI || "mongodb://localhost:27017/seedsync",
-  JWT_SECRET: process.env.JWT_SECRET,
-  REDIS_URL: process.env.REDIS_URL || "redis://localhost:6379",
-  database: {
-    url: process.env.MONGODB_URI || "mongodb://localhost:27017/seedsync",
-    options: {},
-  },
+    PORT: process.env.PORT || 3000,
+    MONGODB_URI:
+        process.env.MONGODB_URI || "mongodb://localhost:27017/seedsync",
+    JWT_SECRET: process.env.JWT_SECRET,
+    REDIS_URL: process.env.REDIS_URL || "redis://redis:6379",
+    database: {
+        url: process.env.MONGODB_URI || "mongodb://localhost:27017/seedsync",
+        options: {},
+    },
 };
 
 export default config;

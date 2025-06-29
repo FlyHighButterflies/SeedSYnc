@@ -15,51 +15,67 @@ class ReviewController {
 
     async createReview(req, res) {
         try {
-            // Assuming req.body contains trade, reviewer, reviewee, rating, comment
-            const { trade, reviewer, reviewee, rating, comment } = req.body;
+            // The request body should contain the trade ID, reviewer ID, reviewee ID, rating, and comment.
+            const { tradeId, reviewerId, reviewedUserId, rating, comment } = req.body;
 
-            const reviewerUser = await User.findById(reviewer);
-            const revieweeUser = await User.findById(reviewee);
+            // Find the users to ensure they exist.
+            const reviewerUser = await User.findById(reviewerId);
+            const revieweeUser = await User.findById(reviewedUserId);
 
             if (!reviewerUser || !revieweeUser) {
                 return res
-                    .status(400)
+                    .status(404)
                     .json({ message: "Reviewer or Reviewee not found." });
             }
 
+            // Create a new review instance using the correct schema fields.
             const review = new Review({
-                trade,
-                reviewer,
-                reviewerType: reviewerUser.role,
-                reviewee,
-                revieweeType: revieweeUser.role,
+                reviewerId,
+                reviewedUserId,
                 rating,
                 comment,
             });
             await review.save();
 
-            // Emit real-time event to the reviewee
-            const revieweeId = review.reviewee.toString();
-            const recipientSocketId = userSockets.get(revieweeId);
+            // After saving, the review object has the generated compositeKey and _id.
 
+            // Emit a real-time event to the reviewed user.
+            const recipientSocketId = userSockets.get(reviewedUserId);
             if (recipientSocketId) {
-                io.to(recipientSocketId).emit("review:create", review);
+                // It's best to emit a consistent, hashed response.
+                const responseReview = {
+                    ...review.toObject(),
+                    reviewerId: hashUserId(review.reviewerId.toString()),
+                    reviewedUserId: hashUserId(review.reviewedUserId.toString()),
+                };
+                io.to(recipientSocketId).emit("review:create", responseReview);
             }
 
-            // Send push notification to the reviewee
+            // Send a push notification to the reviewed user.
             await sendPushNotification(
-                revieweeId,
+                reviewedUserId,
                 "New Review Received!",
-                `You have received a new ${review.rating}-star review.`,
+                `You have received a new ${rating}-star review.`,
                 {
                     type: "new_review",
                     reviewId: review._id.toString(),
-                    tradeId: review.trade.toString(),
+                    tradeId: tradeId, // Use tradeId from the request body.
                 }
             );
 
-            res.status(201).json(this.hashReviewResponse(review));
+            // Construct a hashed response to send back to the client who made the request.
+            const finalResponse = {
+                ...review.toObject(),
+                reviewerId: hashUserId(review.reviewerId.toString()),
+                reviewedUserId: hashUserId(review.reviewedUserId.toString()),
+            };
+
+            res.status(201).json(finalResponse);
         } catch (error) {
+            // If the error is a duplicate key error, it means a review already exists.
+            if (error.code === 11000) {
+                return res.status(409).json({ message: "You have already submitted a review for this user." });
+            }
             res.status(400).json({ message: error.message });
         }
     }

@@ -1,26 +1,33 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"
 
-const inventorySchema = new mongoose.Schema({
-  crop: { type: mongoose.Schema.Types.ObjectId, ref: "Crop", required: true },
-  farmer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  quantity: { type: Number, required: true, min: 0 },
-  unit: { type: String, required: true, enum: ['kg', 'lbs', 'piece', 'bunch', 'item'] },
-  price: { type: Number, required: true, min: 0 },
-  certifications: [{ type: String }],
-  location: {
-    type: {
-      type: String,
-      enum: ['Point'],
-      required: true
-    },
-    coordinates: {
-      type: [Number], // [longitude, latitude]
-      required: true
+const inventorySchema = new mongoose.Schema(
+    {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+            unique: true, // 1:1 relationship with user
+        },
+
+        role: {
+            type: String,
+            enum: ["farmer", "buyer"],
+            required: true,
+        },
+
+        crops: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Crop",
+            },
+        ],
+
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        },
     }
-  },
-}, { timestamps: true });
-
-inventorySchema.index({ location: '2dsphere' });
+);
 
 const Inventory = mongoose.model("Inventory", inventorySchema);
-export default Inventory;
+export default Inventory

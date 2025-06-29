@@ -19,6 +19,9 @@ server/.env
 client/.env
 server/.env
 
+# Firebase service account key
+server/src/config/seedsync-add23-firebase-adminsdk-fbsvc-be472c047a.json
+
 # IDE specific files
 .DS_Store
 .vscode/

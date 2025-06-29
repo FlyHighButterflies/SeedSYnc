@@ -1,21 +1,44 @@
 import { Button, ListingCard, UserModal } from "@/components";
 import { useUserModal } from "@/hooks";
-import { ChevronRight, Star, MessageCircle } from "lucide-react";
+import { ChevronRight, Star, MessageCircle, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function Home() {
     const { selectedUser, isModalOpen, openModal, closeModal } = useUserModal();
 
     const bestMatch = {
+        id: "1",
         name: "John Smith",
         type: "Farmer",
         location: "Texas",
         rating: 4.8,
         match: 95,
         trades: 120,
-        specialty: "Organic Vegetables",
-        description:
-            "John is a dedicated farmer specializing in organic vegetables. With over 10 years of experience, he ensures the highest quality produce for his customers.",
+        firstName: "John",
+        lastName: "Smith",
+        userType: "farmer",
+        city: "Austin",
+        province: "Texas",
+        email: "john.smith@example.com",
+        contactNumber: "+1 (555) 123-4567",
+        products: [
+            "Organic Tomatoes",
+            "Fresh Lettuce",
+            "Bell Peppers",
+            "Baby Carrots",
+            "Sweet Corn",
+            "Green Beans",
+        ],
+        certifications: "Organic", // Single value
+        totalTrades: 120,
+    };
+
+    const handleViewBestMatchProfile = () => {
+        window.open(
+            `/profile/${bestMatch.id}`,
+            "_blank",
+            "noopener,noreferrer"
+        );
     };
 
     return (
@@ -58,11 +81,20 @@ function Home() {
                             person={{
                                 id: index + 1,
                                 avatar: "A",
-                                name: "Jane Doe",
-                                type: "Farmer",
+                                firstName: "Jane",
+                                lastName: "Doe",
+                                userType: "farmer",
                                 trade: "Vegetables",
-                                location: "California",
+                                city: "Los Angeles",
+                                province: "California",
                                 rating: 4.5,
+                                products: [
+                                    "Fresh Tomatoes",
+                                    "Organic Lettuce",
+                                    "Sweet Corn",
+                                ],
+                                certifications: "Organic",
+                                totalTrades: 45,
                             }}
                             onClick={openModal}
                         />
@@ -77,17 +109,18 @@ function Home() {
                 </Link>
             </div>
 
-            {/* Best Match Section */}
-            <div className="flex flex-col items-center justify-center w-full min-h-[500px] sm:min-h-[550px] lg:h-[610px] bg-[#F7F7F7] p-4 sm:p-6 lg:p-8">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 text-center">
+            {/* Enhanced Best Match Section - Show ALL Products */}
+            <div className="flex flex-col items-center justify-center w-full min-h-[500px] sm:min-h-[550px] lg:h-[610px] bg-lighterGreen p-4 sm:p-6 lg:p-8">
+                <h2 className="text-lg sm:text-xl font-semibold text-darkGreen mb-4 sm:mb-6 text-center">
                     Best Match for You!
                 </h2>
 
-                <div className="flex flex-col items-center max-w-md mx-auto">
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold mb-3 sm:mb-4 text-xl sm:text-2xl">
-                        A
+                <div className="flex flex-col items-center max-w-lg mx-auto">
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-gradient-to-br from-normalGreen to-darkGreen rounded-full flex items-center justify-center text-white font-semibold mb-3 sm:mb-4 text-xl sm:text-2xl">
+                        {bestMatch.firstName?.charAt(0) || "J"}
+                        {bestMatch.lastName?.charAt(0) || "S"}
                     </div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">
+                    <h3 className="text-xl sm:text-2xl font-bold text-darkGreen text-center">
                         {bestMatch.name}
                     </h3>
 
@@ -96,7 +129,7 @@ function Home() {
                     </p>
 
                     <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 text-gray-600 text-sm sm:text-base">
-                        <Star className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
                         {bestMatch.rating}
                         <span className="text-xs sm:text-sm text-gray-500">
                             •
@@ -106,12 +139,30 @@ function Home() {
                         </span>
                     </div>
 
-                    <p className="font-medium text-gray-900 mb-1 text-center text-sm sm:text-base">
-                        Specialty:
-                    </p>
-                    <p className="text-gray-700 mb-4 sm:mb-6 text-center text-sm sm:text-base">
-                        {bestMatch.specialty}
-                    </p>
+                    {/* Products Section - Show ALL Products */}
+                    <div className="mb-4 sm:mb-6 text-center">
+                        <p className="text-xs text-normalGreen mb-3 uppercase tracking-wide font-bold">
+                            Currently Selling
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-2 mb-3">
+                            {bestMatch.products.map((product, index) => (
+                                <span
+                                    key={index}
+                                    className="px-3 py-1 bg-lightGreen text-darkGreen text-sm font-medium rounded-full"
+                                >
+                                    {product}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Product count */}
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                            <Package className="w-4 h-4" />
+                            <span>
+                                {bestMatch.products.length} products available
+                            </span>
+                        </div>
+                    </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
                         <Button
@@ -126,6 +177,7 @@ function Home() {
                             variant="outline"
                             size="lg"
                             className="flex-1 sm:flex-none"
+                            onClick={handleViewBestMatchProfile}
                         >
                             View Profile
                         </Button>

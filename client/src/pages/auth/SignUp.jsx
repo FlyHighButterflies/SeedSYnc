@@ -2,7 +2,10 @@ import { Button, Input, Dropdown } from "@/components";
 import { useState, useRef, useEffect } from "react";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
 
 function Step1({ register, errors }) {
     return (
@@ -86,6 +89,24 @@ function Step1({ register, errors }) {
                     type="text"
                     placeholder="Contact Number"
                     className={errors.contactNumber ? "border-red-500" : ""}
+                />
+            </div>
+
+            <div>
+                {errors.role && (
+                    <p className="text-red-500 text-sm">
+                        {errors.role.message}
+                    </p>
+                )}
+                <Dropdown
+                    {...register("role", { required: "Role is required" })}
+                    id="role"
+                    placeholder="Select Role"
+                    options={[
+                        { label: "Farmer", value: "farmer" },
+                        { label: "Buyer", value: "buyer" },
+                    ]}
+                    className={errors.role ? "border-red-500" : ""}
                 />
             </div>
         </>
@@ -236,117 +257,128 @@ function Step3({ register }) {
     );
 }
 
-function Step4({ register }) {
+function Step4({ register, userType, setUserType }) {
+    const handleUserTypeChange = (type) => {
+        setUserType(type);
+    };
+
     return (
         <>
-            <Input
-                {...register("productsNeeded")}
-                type="text"
-                placeholder="Products Needed"
-            />
-            <Input
-                {...register("quantityRange")}
-                type="text"
-                placeholder="Quantity Range"
-            />
-            <Dropdown
-                {...register("urgency")}
-                id="urgency"
-                placeholder="Urgency of Purchase"
-                options={[
-                    { label: "Immediate", value: "immediate" },
-                    { label: "Soon", value: "soon" },
-                    { label: "Flexible", value: "flexible" },
-                ]}
-            />
-            <Dropdown
-                {...register("qualityStandards")}
-                id="qualityStandards"
-                placeholder="Preferred Quality Standards"
-                options={[
-                    { label: "Organic", value: "organic" },
-                    { label: "Non-GMO", value: "non-gmo" },
-                    { label: "Fair-Trade", value: "fair-trade" },
-                ]}
-            />
-            <Dropdown
-                {...register("frequency")}
-                id="frequency"
-                placeholder="Frequency of Purchase"
-                options={[
-                    { label: "Weekly", value: "weekly" },
-                    { label: "Monthly", value: "monthly" },
-                    { label: "Quarterly", value: "quarterly" },
-                ]}
-            />
-            <Dropdown
-                {...register("inventoryStatus")}
-                id="inventoryStatus"
-                placeholder="Inventory Status"
-                options={[
-                    { label: "Low", value: "low" },
-                    { label: "Normal", value: "normal" },
-                    { label: "Sufficient", value: "sufficient" },
-                ]}
-            />
-        </>
+            {/* User Type Toggle */}
+            <div className="flex flex-col items-center mb-6">
+                <div className="flex bg-gray-100 rounded-lg p-1 w-full max-w-xs">
+                    <button
+                        type="button"
+                        onClick={() => handleUserTypeChange("farmer")}
+                        className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                            userType === "farmer"
+                                ? "bg-normalGreen text-white shadow-sm"
+                                : "text-gray-600 hover:text-gray-800"
+                        }`}
+                    >
+                        Farmer
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => handleUserTypeChange("buyer")}
+                        className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                            userType === "buyer"
+                                ? "bg-normalGreen text-white shadow-sm"
+                                : "text-gray-600 hover:text-gray-800"
+                        }`}
+                    >
+                        Buyer
+                    </button>
+                </div>
+            </div>
 
-        /* Seller fields kept for future use
-        <>
-            <Input 
-                {...register("cropsInPossession")}
-                type="text" 
-                placeholder="Crops in Possession" 
-            />
-            <Input 
-                {...register("availableProduct")}
-                type="text" 
-                placeholder="Available Product" 
-            />
-            <Dropdown
-                {...register("surplus")}
-                id="surplus"
-                placeholder="Surplus Available"
-                options={[
-                    { label: "Yes", value: "yes" },
-                    { label: "No", value: "no" },
-                ]}
-            />
-            <Input 
-                {...register("cropDiversityCount")}
-                type="text" 
-                placeholder="Crop Diversity Count" 
-            />
-            <Dropdown
-                {...register("certifications")}
-                id="certifications"
-                placeholder="Certifications"
-                options={[
-                    { label: "Organic", value: "organic" },
-                    { label: "Non-GMO", value: "non-gmo" },
-                    { label: "Fair-Trade", value: "fair-trade" },
-                    { label: "None", value: "none" },
-                ]}
-            />
-            <Dropdown
-                {...register("farmingPractices")}
-                id="farmingPractices"
-                placeholder="Farming Practices"
-                options={[
-                    { label: "Eco-friendly", value: "eco-friendly" },
-                    { label: "Water Efficient", value: "water-efficient" },
-                    { label: "Traditional", value: "traditional" },
-                    { label: "Sustainable", value: "sustainable" },
-                ]}
-            />
+            {/* Conditional Fields Based on User Type */}
+            {userType === "farmer" ? (
+                <>
+                    <Dropdown
+                        {...register("certifications")}
+                        id="certifications"
+                        placeholder="Certifications (Optional)"
+                        options={[
+                            { label: "Organic", value: "organic" },
+                            { label: "Non-GMO", value: "non-gmo" },
+                            { label: "Fair-Trade", value: "fair-trade" },
+                            { label: "None", value: "none" },
+                        ]}
+                    />
+                    <Dropdown
+                        {...register("farmingPractices")}
+                        id="farmingPractices"
+                        placeholder="Primary Farming Practice"
+                        options={[
+                            { label: "Sustainable", value: "sustainable" },
+                            { label: "Eco-friendly", value: "eco-friendly" },
+                            {
+                                label: "Water Efficient",
+                                value: "water-efficient",
+                            },
+                            { label: "Traditional", value: "traditional" },
+                        ]}
+                    />
+                    <div className="bg-lightGreen p-4 rounded-lg">
+                        <p className="text-sm text-darkGreen">
+                            <strong>Next Steps:</strong> After registration, you
+                            can add your specific crops, quantities, and prices
+                            in the Inventory page.
+                        </p>
+                    </div>
+                </>
+            ) : (
+                <>
+                    <Dropdown
+                        {...register("qualityStandards")}
+                        id="qualityStandards"
+                        placeholder="Preferred Quality Standards"
+                        options={[
+                            { label: "Organic", value: "organic" },
+                            { label: "Non-GMO", value: "non-gmo" },
+                            { label: "Fair-Trade", value: "fair-trade" },
+                            { label: "Any", value: "any" },
+                        ]}
+                    />
+                    <Dropdown
+                        {...register("frequency")}
+                        id="frequency"
+                        placeholder="General Purchase Frequency"
+                        options={[
+                            { label: "Weekly", value: "weekly" },
+                            { label: "Monthly", value: "monthly" },
+                            { label: "Quarterly", value: "quarterly" },
+                            { label: "As needed", value: "as-needed" },
+                        ]}
+                    />
+                    <div className="bg-lightGreen p-4 rounded-lg">
+                        <p className="text-sm text-darkGreen">
+                            <strong>Next Steps:</strong> After registration, you
+                            can specify your exact product needs, quantities,
+                            and budget in the Inventory page.
+                        </p>
+                    </div>
+                </>
+            )}
         </>
-        */
     );
 }
 
-function Step5({ register, errors }) {
+function Step5({ register, errors, userType }) {
     return (
         <div className="flex flex-col gap-8 text-justify">
+            <div className="bg-lightGreen p-4 rounded-lg">
+                <h3 className="font-semibold text-darkGreen mb-2">
+                    Registration Summary
+                </h3>
+                <p className="text-sm text-gray-700">
+                    You are registering as a{" "}
+                    <span className="font-semibold capitalize">{userType}</span>
+                    . Please review all your information before submitting.
+                </p>
+            </div>
+
             <p>
                 I hereby confirm that the information I have provided in this
                 form is true, complete, and accurate to the best of my
@@ -385,7 +417,9 @@ function Step5({ register, errors }) {
 
 function SignUp() {
     const [currentStep, setCurrentStep] = useState(1);
+    const [userType, setUserType] = useState("farmer"); // Default to farmer
     const totalSteps = 5;
+    const navigate = useNavigate();
 
     const {
         register,
@@ -394,7 +428,16 @@ function SignUp() {
         setValue,
         trigger,
         formState: { errors, isSubmitting },
-    } = useForm();
+    } = useForm({
+        defaultValues: {
+            userType: "farmer",
+        },
+    });
+
+    // Update form value when userType changes
+    useEffect(() => {
+        setValue("userType", userType);
+    }, [userType, setValue]);
 
     const steps = {
         1: {
@@ -405,15 +448,19 @@ function SignUp() {
                 "lastName",
                 "password",
                 "contactNumber",
+                "role", // Added role to validation
             ],
         },
-        2: { label: "Profile", fields: [] },
+        2: { label: "Profile Picture", fields: [] },
         3: { label: "Location & Logistics", fields: [] },
-        4: { label: "Inventory", fields: [] },
+        4: { label: "Business Information", fields: [] },
         5: { label: "Review Your Profile", fields: ["terms"] },
     };
 
     const handleBack = () => {
+        if (currentStep === 5) {
+            setValue("terms", false); // Reset the terms field when going back from Step 5
+        }
         if (currentStep > 1) {
             setCurrentStep(currentStep - 1);
         }
@@ -424,16 +471,22 @@ function SignUp() {
         const fieldsToValidate = steps[currentStep].fields;
         if (fieldsToValidate.length > 0) {
             const isStepValid = await trigger(fieldsToValidate);
-            if (!isStepValid) return;
+            if (!isStepValid) return; // Stop if validation fails
         }
 
+        // Only submit if on the last step
         if (currentStep < totalSteps) {
             setCurrentStep(currentStep + 1);
         }
     };
 
     const onSubmit = (data) => {
-        console.log("Form Data:", data);
+        // Include userType in the form data
+        const formData = {
+            ...data,
+            userType: userType,
+        };
+        console.log("Form Data:", formData);
         alert("Registration successful! Check console for data.");
     };
 
@@ -452,9 +505,21 @@ function SignUp() {
             case 3:
                 return <Step3 register={register} />;
             case 4:
-                return <Step4 register={register} />;
+                return (
+                    <Step4
+                        register={register}
+                        userType={userType}
+                        setUserType={setUserType}
+                    />
+                );
             case 5:
-                return <Step5 register={register} errors={errors} />;
+                return (
+                    <Step5
+                        register={register}
+                        errors={errors}
+                        userType={userType}
+                    />
+                );
             default:
                 return null;
         }
@@ -511,6 +576,12 @@ function SignUp() {
                                 <p className="text-2xl md:text-3xl font-bold">
                                     {steps[currentStep].label}
                                 </p>
+                                {currentStep === 4 && (
+                                    <p className="text-sm text-gray-600 mt-2 text-center">
+                                        Choose your role and provide relevant
+                                        information
+                                    </p>
+                                )}
                             </div>
                             <div className="flex flex-col gap-4 md:gap-6 w-full mx-auto">
                                 {renderStepContent(currentStep)}

@@ -5,7 +5,7 @@ import authMiddleware from '../middleware/auth.js';
 const router = express.Router();
 
 router.post('/', authMiddleware, chatLogController.createMessage);
-router.get('/:partnerId', authMiddleware, chatLogController.getChatHistory);
-router.patch('/:partnerId/read', authMiddleware, chatLogController.markMessagesAsRead);
+router.get('/:chatRoomId', authMiddleware, chatLogController.getChatHistory);
+router.patch('/:chatRoomId/read', authMiddleware, chatLogController.markMessagesAsRead);
 
 export default router;

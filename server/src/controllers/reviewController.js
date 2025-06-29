@@ -2,8 +2,17 @@ import { io, userSockets } from "../server.js";
 import Review from "../models/ReviewModel.js";
 import { sendPushNotification } from "../services/notificationService.js";
 import User from "../models/UserModel.js";
+import { hashUserId } from '../utils/hash.js';
 
 class ReviewController {
+    hashReviewResponse(review) {
+        return {
+            ...review.toObject(),
+            reviewer: review.reviewer ? hashUserId(review.reviewer.toString()) : null,
+            reviewee: review.reviewee ? hashUserId(review.reviewee.toString()) : null,
+        };
+    }
+
     async createReview(req, res) {
         try {
             // Assuming req.body contains trade, reviewer, reviewee, rating, comment
@@ -49,7 +58,7 @@ class ReviewController {
                 }
             );
 
-            res.status(201).json(review);
+            res.status(201).json(this.hashReviewResponse(review));
         } catch (error) {
             res.status(400).json({ message: error.message });
         }
@@ -70,7 +79,7 @@ class ReviewController {
                 .populate("reviewer")
                 .populate("reviewee");
 
-            res.status(200).json(reviews);
+            res.status(200).json(reviews.map(r => this.hashReviewResponse(r)));
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
@@ -93,7 +102,7 @@ class ReviewController {
                     message: "Review not found or not authorized to update",
                 });
             }
-            res.status(200).json(review);
+            res.status(200).json(this.hashReviewResponse(review));
         } catch (error) {
             res.status(400).json({ message: error.message });
         }

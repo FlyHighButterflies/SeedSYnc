@@ -1,6 +1,20 @@
 import Inventory from '../models/InventoryModel.js';
 import User from '../models/UserModel.js';
 import { validateMongoId, validateRole, validateCropsArray } from '../utils/validation.js';
+import { hashUserId, hashCropKey } from '../utils/hash.js';
+
+function hashInventoryResponse(inventory) {
+    return {
+        ...inventory.toObject(),
+        userId: hashUserId(inventory.userId.toString()),
+        crops: Array.isArray(inventory.crops)
+            ? inventory.crops.map(crop =>
+                crop && crop._id ? hashCropKey(inventory.userId.toString(), crop._id.toString()) : crop
+            )
+            : [],
+    };
+}
+
 // Create a new inventory
 export const createInventory = async (req, res) => {
     const { userId, role, crops } = req.body;
@@ -31,7 +45,7 @@ export const createInventory = async (req, res) => {
 
         const newInventory = new Inventory({ userId, role, crops });
         await newInventory.save();
-        res.status(201).json(newInventory);
+        res.status(201).json(hashInventoryResponse(newInventory));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -50,7 +64,7 @@ export const getInventoryByUserId = async (req, res) => {
         if (!inventory) {
             return res.status(404).json({ message: 'Inventory not found for this user.' });
         }
-        res.status(200).json(inventory);
+        res.status(200).json(hashInventoryResponse(inventory));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -81,7 +95,7 @@ export const updateInventory = async (req, res) => {
         if (crops) inventory.crops = crops;
 
         await inventory.save();
-        res.status(200).json(inventory);
+        res.status(200).json(hashInventoryResponse(inventory));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

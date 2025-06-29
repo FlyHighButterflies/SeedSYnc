@@ -1,24 +1,17 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
-const hashUserId = (userId) => {
+export const hashUserId = (userId) => {
     return crypto.createHash('sha256').update(userId).digest('hex');
 };
 
-const hashCropKey = (farmerId, cropId) => {
+export const hashCropKey = (farmerId, cropId) => {
     return crypto.createHash('sha256').update(`${farmerId}+${cropId}`).digest('hex');
 };
 
-const hashInventoryId = (farmerId, cropId) => {
+export const hashInventoryId = (farmerId, cropId) => {
     return crypto.createHash('sha256').update(`${farmerId}+${cropId}`).digest('hex');
 };
 
-const isCollision = (hash, existingHashes) => {
+export const isCollision = (hash, existingHashes) => {
     return existingHashes.includes(hash);
-};
-
-module.exports = {
-    hashUserId,
-    hashCropKey,
-    hashInventoryId,
-    isCollision
 };

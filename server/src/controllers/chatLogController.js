@@ -2,6 +2,7 @@ import ChatRoom from "../models/ChatRoomModel.js";
 import Message from "../models/MessageModel.js";
 import { io, userSockets } from "../server.js";
 import User from "../models/UserModel.js";
+import { hashUserId, hashInventoryId } from '../utils/hash.js';
 
 class ChatLogController {
     // POST /api/chatlogs/
@@ -50,7 +51,7 @@ class ChatLogController {
                 io.to(recipientSocketId).emit("message:new", message);
             }
 
-            res.status(201).json(message);
+            res.status(201).json(this.hashMessageResponse(message));
         } catch (error) {
             res.status(400).json({ message: error.message });
         }
@@ -69,7 +70,7 @@ class ChatLogController {
                 .populate("from.userId")
                 .populate("to.userId");
 
-            res.status(200).json(chatHistory);
+            res.status(200).json(chatHistory.map(msg => this.hashMessageResponse(msg)));
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
@@ -94,6 +95,24 @@ class ChatLogController {
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
+    }
+
+    hashMessageResponse(message) {
+        return {
+            ...message.toObject(),
+            chatRoomId: hashInventoryId(
+                message.from && message.from.userId ? message.from.userId.toString() : '',
+                message.chatRoomId ? message.chatRoomId.toString() : ''
+            ),
+            from: {
+                ...message.from,
+                userId: message.from && message.from.userId ? hashUserId(message.from.userId.toString()) : null,
+            },
+            to: {
+                ...message.to,
+                userId: message.to && message.to.userId ? hashUserId(message.to.userId.toString()) : null,
+            },
+        };
     }
 }
 

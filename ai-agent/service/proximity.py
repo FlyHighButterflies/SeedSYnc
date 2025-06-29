@@ -1,10 +1,13 @@
 import heapq
+from service.ph_graph import philippines_graph
 
 def heuristic(a, b):
     # Replace with actual geographic distance later (Haversine, etc.)
     return abs(ord(a[-1]) - ord(b[-1]))  # Dummy heuristic based on Region letter
 
-def a_star(graph, start, goal):
+def a_star(graph=None, start=None, goal=None):
+    if graph is None:
+        graph = philippines_graph
     queue = []
     heapq.heappush(queue, (0, start))
     came_from = {start: None}

@@ -12,6 +12,7 @@ import {
     Truck,
     Settings,
     MessageCircle,
+    X,
 } from "lucide-react";
 import Button from "@/components/Button";
 
@@ -85,11 +86,156 @@ function InfoRow({ icon, label, value }) {
     );
 }
 
+function RatingModal({ isOpen, onClose, userName, onSubmit }) {
+    const [rating, setRating] = useState(0);
+    const [hoveredRating, setHoveredRating] = useState(0);
+    const [reviewDescription, setReviewDescription] = useState("");
+
+    const handleBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (rating === 0) return;
+
+        onSubmit({
+            rating,
+            description: reviewDescription.trim(),
+        });
+
+        // Reset form
+        setRating(0);
+        setReviewDescription("");
+        onClose();
+    };
+
+    const handleClose = () => {
+        setRating(0);
+        setReviewDescription("");
+        onClose();
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div
+            className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+            onClick={handleBackdropClick}
+        >
+            <div
+                className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Close X button */}
+                <button
+                    onClick={handleClose}
+                    className="absolute top-4 right-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                    <X className="w-5 h-5 text-gray-600" />
+                </button>
+
+                <div className="p-6">
+                    <form onSubmit={handleSubmit}>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                            Write a Review
+                        </h3>
+                        <p className="text-gray-600 mb-6">
+                            Share your experience working with {userName}
+                        </p>
+
+                        {/* Star Rating */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-3">
+                                Rating *
+                            </label>
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        type="button"
+                                        onClick={() => setRating(star)}
+                                        onMouseEnter={() =>
+                                            setHoveredRating(star)
+                                        }
+                                        onMouseLeave={() =>
+                                            setHoveredRating(0)
+                                        }
+                                        className="transition-colors"
+                                    >
+                                        <Star
+                                            className={`w-10 h-10 ${
+                                                star <=
+                                                (hoveredRating || rating)
+                                                    ? "text-yellow-400 fill-current"
+                                                    : "text-gray-300"
+                                            }`}
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                            {rating > 0 && (
+                                <div className="text-center text-sm text-gray-600">
+                                    {rating} star{rating > 1 ? "s" : ""}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Review Description */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Review (Optional)
+                            </label>
+                            <textarea
+                                value={reviewDescription}
+                                onChange={(e) =>
+                                    setReviewDescription(e.target.value)
+                                }
+                                placeholder="Share your experience working with this user..."
+                                className="w-full p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-normalGreen focus:border-transparent"
+                                rows="4"
+                                maxLength="500"
+                            />
+                            <div className="text-xs text-gray-500 mt-1">
+                                {reviewDescription.length}/500 characters
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                size="md"
+                                disabled={rating === 0}
+                                className="flex-1"
+                            >
+                                Submit Review
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="md"
+                                onClick={handleClose}
+                                className="flex-1"
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function UserProfile() {
     const { userId } = useParams();
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showRatingModal, setShowRatingModal] = useState(false);
 
     // Mock user data - replace with API call
     useEffect(() => {
@@ -113,6 +259,25 @@ function UserProfile() {
 
     const handleGoBack = () => {
         navigate(-1);
+    };
+
+    const handleOpenRatingModal = () => {
+        setShowRatingModal(true);
+    };
+
+    const handleCloseRatingModal = () => {
+        setShowRatingModal(false);
+    };
+
+    const handleSubmitReview = (reviewData) => {
+        const fullReviewData = {
+            userId: userData.id || userId,
+            ...reviewData,
+            timestamp: new Date(),
+        };
+
+        console.log("Review submitted:", fullReviewData);
+        // TODO: Add API call to submit review
     };
 
     if (loading) {
@@ -262,7 +427,7 @@ function UserProfile() {
                             </div>
                         </InfoSection>
 
-                        {/* Location Information - Separate Fields to Match SignUp */}
+                        {/* Location Information */}
                         <InfoSection title="Location & Logistics">
                             <div className="space-y-3">
                                 <InfoRow
@@ -374,31 +539,36 @@ function UserProfile() {
                             </InfoSection>
                         )}
 
-                        {/* Products/Inventory Section */}
-                        {/* <InfoSection
-                            title={
-                                userData.userType === "farmer"
-                                    ? "Crop Management"
-                                    : "Requirements Management"
-                            }
-                        >
+                        {/* Rate User Section */}
+                        <InfoSection title="Rate This User">
                             <div className="space-y-3">
                                 <div className="text-center py-8">
-                                    <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                    <Star className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
                                     <p className="text-gray-600 mb-4">
-                                        {userData.userType === "farmer"
-                                            ? "View their crops and inventory"
-                                            : "View their product requirements"}
+                                        Share your experience working with this user
                                     </p>
-                                    <Button variant="primary" size="sm">
-                                        View Inventory
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={handleOpenRatingModal}
+                                    >
+                                        <Star className="w-4 h-4" />
+                                        Write Review
                                     </Button>
                                 </div>
                             </div>
-                        </InfoSection> */}
+                        </InfoSection>
                     </div>
                 </div>
             </div>
+
+            {/* Rating Modal */}
+            <RatingModal
+                isOpen={showRatingModal}
+                onClose={handleCloseRatingModal}
+                userName={`${userData.firstName} ${userData.lastName}`}
+                onSubmit={handleSubmitReview}
+            />
         </div>
     );
 }

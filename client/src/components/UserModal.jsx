@@ -38,6 +38,7 @@ function UserModal({ user, isOpen, onClose }) {
     const [showRatingForm, setShowRatingForm] = useState(false);
     const [rating, setRating] = useState(0);
     const [hoveredRating, setHoveredRating] = useState(0);
+    const [reviewDescription, setReviewDescription] = useState("");
 
     if (!isOpen) return null;
 
@@ -51,17 +52,19 @@ function UserModal({ user, isOpen, onClose }) {
         e.preventDefault();
         if (rating === 0) return;
 
-        const ratingData = {
+        const reviewData = {
             userId: user.id,
             rating,
+            description: reviewDescription.trim(),
             timestamp: new Date(),
         };
 
-        console.log("Rating submitted:", ratingData);
-        // TODO: Add API call to submit rating
+        console.log("Review submitted:", reviewData);
+        // TODO: Add API call to submit review
 
         // Reset form and close
         setRating(0);
+        setReviewDescription("");
         setShowRatingForm(false);
         onClose();
     };
@@ -73,6 +76,12 @@ function UserModal({ user, isOpen, onClose }) {
 
     const handleRateUser = () => {
         setShowRatingForm(true);
+    };
+
+    const handleCancelRating = () => {
+        setRating(0);
+        setReviewDescription("");
+        setShowRatingForm(false);
     };
 
     return (
@@ -247,40 +256,69 @@ function UserModal({ user, isOpen, onClose }) {
                             )}
                         </div>
 
-                        {/* Rating Form */}
+                        {/* Enhanced Rating Form with Description */}
                         {showRatingForm ? (
                             <form
                                 onSubmit={handleSubmitRating}
                                 className="mb-6 p-4 bg-gray-50 rounded-lg"
                             >
                                 <h5 className="font-medium text-gray-900 mb-3">
-                                    Rate this user
+                                    Write a Review
                                 </h5>
-                                <div className="flex items-center gap-2 mb-4">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <button
-                                            key={star}
-                                            type="button"
-                                            onClick={() => setRating(star)}
-                                            onMouseEnter={() =>
-                                                setHoveredRating(star)
-                                            }
-                                            onMouseLeave={() =>
-                                                setHoveredRating(0)
-                                            }
-                                            className="transition-colors"
-                                        >
-                                            <Star
-                                                className={`w-6 h-6 ${
-                                                    star <=
-                                                    (hoveredRating || rating)
-                                                        ? "text-yellow-400 fill-current"
-                                                        : "text-gray-300"
-                                                }`}
-                                            />
-                                        </button>
-                                    ))}
+                                
+                                {/* Star Rating */}
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Rating *
+                                    </label>
+                                    <div className="flex items-center gap-2">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                onClick={() => setRating(star)}
+                                                onMouseEnter={() =>
+                                                    setHoveredRating(star)
+                                                }
+                                                onMouseLeave={() =>
+                                                    setHoveredRating(0)
+                                                }
+                                                className="transition-colors"
+                                            >
+                                                <Star
+                                                    className={`w-6 h-6 ${
+                                                        star <=
+                                                        (hoveredRating || rating)
+                                                            ? "text-yellow-400 fill-current"
+                                                            : "text-gray-300"
+                                                    }`}
+                                                />
+                                            </button>
+                                        ))}
+                                        <span className="ml-2 text-sm text-gray-600">
+                                            {rating > 0 && `${rating} star${rating > 1 ? 's' : ''}`}
+                                        </span>
+                                    </div>
                                 </div>
+
+                                {/* Review Description */}
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Review (Optional)
+                                    </label>
+                                    <textarea
+                                        value={reviewDescription}
+                                        onChange={(e) => setReviewDescription(e.target.value)}
+                                        placeholder="Share your experience working with this user..."
+                                        className="w-full p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-normalGreen focus:border-transparent"
+                                        rows="4"
+                                        maxLength="500"
+                                    />
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        {reviewDescription.length}/500 characters
+                                    </div>
+                                </div>
+
                                 <div className="flex gap-2">
                                     <Button
                                         type="submit"
@@ -288,13 +326,13 @@ function UserModal({ user, isOpen, onClose }) {
                                         size="sm"
                                         disabled={rating === 0}
                                     >
-                                        Submit Rating
+                                        Submit Review
                                     </Button>
                                     <Button
                                         type="button"
                                         variant="secondary"
                                         size="sm"
-                                        onClick={() => setShowRatingForm(false)}
+                                        onClick={handleCancelRating}
                                     >
                                         Cancel
                                     </Button>
@@ -327,7 +365,8 @@ function UserModal({ user, isOpen, onClose }) {
                                     className="w-full"
                                     onClick={handleRateUser}
                                 >
-                                    Rate User
+                                    <Star className="w-4 h-4" />
+                                    Write Review
                                 </Button>
                             </div>
                         )}

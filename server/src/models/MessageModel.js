@@ -8,19 +8,49 @@ const messageSchema = new mongoose.Schema({
     },
 
     from: {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        role: { type: String, enum: ["buyer", "farmer"], required: true },
+        userId: { 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: "User" 
+        },
+
+        role: { 
+            type: String, 
+            enum: ["buyer", "farmer"], 
+            required: true 
+        },
     },
 
     to: {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        role: { type: String, enum: ["buyer", "farmer"], required: true },
+        userId: { 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: "User" 
+        },
+
+        role: { 
+            type: String, 
+            enum: ["buyer", "farmer"], 
+            required: true 
+        },
     },
 
-    text: { type: String, required: true },
-    fromMe: { type: Boolean },
-    isRead: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
+    text: { 
+        type: String, 
+        required: true 
+    },
+    
+    fromMe: { 
+        type: Boolean 
+    },
+
+    isRead: { 
+        type: Boolean, 
+        default: false 
+    },
+    
+    createdAt: { 
+        type: Date, 
+        default: Date.now 
+    },
 });
 
 const Message = mongoose.model("Message", messageSchema);

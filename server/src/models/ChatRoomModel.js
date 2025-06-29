@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { hashUserId } from "../utils/hash.js";
 
 const chatRoomSchema = new mongoose.Schema({
     participants: [
@@ -16,6 +17,12 @@ const chatRoomSchema = new mongoose.Schema({
         },
     ],
 
+    compositeKey: {
+        type: String,
+        unique: true,
+        required: true,
+    },
+
     name: { 
         type: String 
     },
@@ -32,6 +39,14 @@ const chatRoomSchema = new mongoose.Schema({
         type: Date, 
         default: Date.now 
     },
+});
+
+chatRoomSchema.pre("validate", function (next) {
+    if (this.participants && this.participants.length > 0) {
+        const ids = this.participants.map(p => p.userId.toString()).sort().join('+');
+        this.compositeKey = hashUserId(ids);
+    }
+    next();
 });
 
 const ChatRoom = mongoose.model("ChatRoom", chatRoomSchema);

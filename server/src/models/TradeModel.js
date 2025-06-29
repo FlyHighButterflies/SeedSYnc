@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { hashInventoryId } from "../utils/hash.js";
 
 const tradeSchema = new mongoose.Schema(
     {
@@ -17,6 +18,12 @@ const tradeSchema = new mongoose.Schema(
         farmerId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
+            required: true,
+        },
+
+        compositeKey: {
+            type: String,
+            unique: true,
             required: true,
         },
 
@@ -55,6 +62,13 @@ const tradeSchema = new mongoose.Schema(
         timestamps: true, // Adds createdAt and updatedAt
     }
 );
+
+tradeSchema.pre("validate", function (next) {
+    if (this.farmerId && this.cropId) {
+        this.compositeKey = hashInventoryId(this.farmerId.toString(), this.cropId.toString());
+    }
+    next();
+});
 
 const Trade = mongoose.model("Trade", tradeSchema);
 export default Trade;

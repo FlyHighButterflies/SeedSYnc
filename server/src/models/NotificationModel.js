@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { hashUserId } from "../utils/hash.js";
 
 const notificationSchema = new mongoose.Schema({
     userId: {
@@ -18,6 +19,12 @@ const notificationSchema = new mongoose.Schema({
         required: true,
     },
 
+    compositeKey: {
+        type: String,
+        unique: true,
+        required: true,
+    },
+
     body: {
         type: String,
         required: true,
@@ -32,6 +39,13 @@ const notificationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+});
+
+notificationSchema.pre("validate", function (next) {
+    if (this.userId && this.type && this.title) {
+        this.compositeKey = hashUserId(`${this.userId}+${this.type}+${this.title}`);
+    }
+    next();
 });
 
 const Notification = mongoose.model("Notification", notificationSchema);

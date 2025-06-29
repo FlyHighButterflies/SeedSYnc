@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { hashUserId } from "../utils/hash.js";
 
 const matchSchema = new mongoose.Schema(
     {
@@ -20,6 +21,12 @@ const matchSchema = new mongoose.Schema(
             required: true,
         },
 
+        compositeKey: {
+            type: String,
+            unique: true,
+            required: true,
+        },
+
         matchScore: { 
             type: Number, 
             min: 0, 
@@ -36,6 +43,13 @@ const matchSchema = new mongoose.Schema(
     matchedAt: { type: Date, default: Date.now },
     }
 );
+
+matchSchema.pre("validate", function (next) {
+    if (this.buyerId && this.farmerId && this.cropId) {
+        this.compositeKey = hashUserId(`${this.buyerId}+${this.farmerId}+${this.cropId}`);
+    }
+    next();
+});
 
 const Match = mongoose.model("Match", matchSchema);
 export default Match;

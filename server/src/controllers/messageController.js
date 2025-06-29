@@ -1,7 +1,7 @@
-import { io, userSockets } from '../server.js';
-import Message from '../models/MessageModel.js';
-import { sendPushNotification } from '../services/notificationService.js';
-import Account from '../models/AccountModel.js';
+import { io, userSockets } from "../server.js";
+import Message from "../models/MessageModel.js";
+import { sendPushNotification } from "../services/notificationService.js";
+import User from "../models/UserModel.js";
 
 class MessageController {
     async createMessage(req, res) {
@@ -10,9 +10,11 @@ class MessageController {
             const senderId = req.user._id; // Authenticated user's ID
             const senderType = req.user.role; // 'Farmer' or 'Buyer'
 
-            const recipientUser = await Account.findById(recipientId);
+            const recipientUser = await User.findById(recipientId);
             if (!recipientUser) {
-                return res.status(404).json({ message: 'Recipient not found.' });
+                return res
+                    .status(404)
+                    .json({ message: "Recipient not found." });
             }
             const recipientType = recipientUser.role;
 
@@ -29,7 +31,7 @@ class MessageController {
             // Emit real-time event to the recipient
             const recipientSocketId = userSockets.get(recipientId);
             if (recipientSocketId) {
-                io.to(recipientSocketId).emit('message:new', chatLog);
+                io.to(recipientSocketId).emit("message:new", chatLog);
             }
 
             // Send push notification
@@ -37,7 +39,11 @@ class MessageController {
                 recipientId,
                 `New Message from ${req.user.firstName}`,
                 message,
-                { type: 'new_message', senderId: senderId.toString(), messageId: chatLog._id.toString() }
+                {
+                    type: "new_message",
+                    senderId: senderId.toString(),
+                    messageId: chatLog._id.toString(),
+                }
             );
 
             res.status(201).json(chatLog);

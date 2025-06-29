@@ -1,6 +1,6 @@
-import ChatLog from '../models/ChatLogModel.js';
-import { io, userSockets } from '../server.js';
-import Account from '../models/AccountModel.js';
+import ChatLog from "../models/ChatRoomModel.js";
+import { io, userSockets } from "../server.js";
+import User from "../models/UserModel.js";
 
 class ChatLogController {
     async createMessage(req, res) {
@@ -9,9 +9,11 @@ class ChatLogController {
             const senderId = req.user._id; // Authenticated user's ID
             const senderType = req.user.role; // 'Farmer' or 'Buyer'
 
-            const recipientUser = await Account.findById(recipientId);
+            const recipientUser = await User.findById(recipientId);
             if (!recipientUser) {
-                return res.status(404).json({ message: 'Recipient not found.' });
+                return res
+                    .status(404)
+                    .json({ message: "Recipient not found." });
             }
             const recipientType = recipientUser.role;
 
@@ -28,7 +30,7 @@ class ChatLogController {
             // Emit real-time event to the recipient
             const recipientSocketId = userSockets.get(recipientId);
             if (recipientSocketId) {
-                io.to(recipientSocketId).emit('message:new', chatLog);
+                io.to(recipientSocketId).emit("message:new", chatLog);
             }
 
             res.status(201).json(chatLog);
@@ -46,15 +48,23 @@ class ChatLogController {
 
             const chatHistory = await ChatLog.find({
                 $or: [
-                    { sender: userId, senderType: userType, recipient: partnerId },
-                    { recipient: userId, recipientType: userType, sender: partnerId },
+                    {
+                        sender: userId,
+                        senderType: userType,
+                        recipient: partnerId,
+                    },
+                    {
+                        recipient: userId,
+                        recipientType: userType,
+                        sender: partnerId,
+                    },
                 ],
             })
-            .sort({ createdAt: 1 })
-            .skip(parseInt(offset))
-            .limit(parseInt(limit))
-            .populate('sender') // Populate sender details
-            .populate('recipient'); // Populate recipient details
+                .sort({ createdAt: 1 })
+                .skip(parseInt(offset))
+                .limit(parseInt(limit))
+                .populate("sender") // Populate sender details
+                .populate("recipient"); // Populate recipient details
 
             res.status(200).json(chatHistory);
         } catch (error) {
@@ -69,11 +79,16 @@ class ChatLogController {
             const userType = req.user.role; // Authenticated user's role
 
             await ChatLog.updateMany(
-                { sender: partnerId, recipient: userId, recipientType: userType, read: false },
+                {
+                    sender: partnerId,
+                    recipient: userId,
+                    recipientType: userType,
+                    read: false,
+                },
                 { $set: { read: true } }
             );
 
-            res.status(200).json({ message: 'Messages marked as read' });
+            res.status(200).json({ message: "Messages marked as read" });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }

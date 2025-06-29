@@ -1,13 +1,13 @@
-import Account from '../models/AccountModel.js';
+import User from "../models/UserModel.js";
 
 class ProfileController {
     async getMyProfile(req, res) {
         try {
             // req.user is populated by authMiddleware
-            const user = await Account.findById(req.user._id).select('-password');
+            const user = await User.findById(req.user._id).select("-password");
 
             if (!user) {
-                return res.status(404).json({ message: 'Profile not found.' });
+                return res.status(404).json({ message: "Profile not found." });
             }
 
             res.status(200).json(user);
@@ -25,10 +25,14 @@ class ProfileController {
             delete updates.password;
             delete updates.role;
 
-            const updatedUser = await Account.findByIdAndUpdate(req.user._id, updates, { new: true, runValidators: true }).select('-password');
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user._id,
+                updates,
+                { new: true, runValidators: true }
+            ).select("-password");
 
             if (!updatedUser) {
-                return res.status(404).json({ message: 'Profile not found.' });
+                return res.status(404).json({ message: "Profile not found." });
             }
 
             res.status(200).json(updatedUser);

@@ -1,10 +1,9 @@
-import { Button, Input, Dropdown } from "@/components";
+import { Button, Input, Dropdown, SearchableSelect } from "@/components";
 import { useState, useRef, useEffect } from "react";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { usePhLocation } from "@/hooks";
-import SearchableSelect from "@/components/SearchableSelect";
+import { usePhLocation, useAuth } from "@/hooks";
 
 function Step1({ register, errors }) {
     return (
@@ -254,7 +253,8 @@ function Step3({ register, setValue, watch }) {
 
         // Find region name and set form value
         const region = regions.find((r) => r.id === regionId);
-        setValue("province", region ? region.name : "");
+        setValue("region", region ? region.name : "");
+        setValue("province", "");
         setValue("city", "");
     };
 
@@ -304,7 +304,7 @@ function Step3({ register, setValue, watch }) {
 
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
-                    Province/Region
+                    Province
                 </label>
                 <SearchableSelect
                     options={provinceOptions}
@@ -322,7 +322,7 @@ function Step3({ register, setValue, watch }) {
 
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
-                    City/Town
+                    City/Municipality
                 </label>
                 <SearchableSelect
                     options={cityOptions}
@@ -340,12 +340,12 @@ function Step3({ register, setValue, watch }) {
 
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">
-                    Address
+                    Street Address
                 </label>
                 <Input
                     {...register("address")}
                     type="text"
-                    placeholder="Address"
+                    placeholder="House/Building Number, Street Name"
                 />
             </div>
 
@@ -356,7 +356,7 @@ function Step3({ register, setValue, watch }) {
                 <Input
                     {...register("landmarks")}
                     type="text"
-                    placeholder="Nearby Landmarks"
+                    placeholder="Nearby Landmarks (Optional)"
                 />
             </div>
 
@@ -447,31 +447,44 @@ function Step4({ register, userType, setUserType }) {
             {/* Conditional Fields Based on User Type */}
             {userType === "farmer" ? (
                 <>
-                    <Dropdown
-                        {...register("certifications")}
-                        id="certifications"
-                        placeholder="Certifications (Optional)"
-                        options={[
-                            { label: "Organic", value: "organic" },
-                            { label: "Non-GMO", value: "non-gmo" },
-                            { label: "Fair-Trade", value: "fair-trade" },
-                            { label: "None", value: "none" },
-                        ]}
-                    />
-                    <Dropdown
-                        {...register("farmingPractices")}
-                        id="farmingPractices"
-                        placeholder="Primary Farming Practice"
-                        options={[
-                            { label: "Sustainable", value: "sustainable" },
-                            { label: "Eco-friendly", value: "eco-friendly" },
-                            {
-                                label: "Water Efficient",
-                                value: "water-efficient",
-                            },
-                            { label: "Traditional", value: "traditional" },
-                        ]}
-                    />
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">
+                            Certifications (Optional)
+                        </label>
+                        <Dropdown
+                            {...register("certifications")}
+                            id="certifications"
+                            placeholder="Select Certification"
+                            options={[
+                                { label: "Organic", value: "organic" },
+                                { label: "Non-GMO", value: "non-gmo" },
+                                { label: "Fair-Trade", value: "fair-trade" },
+                                { label: "None", value: "" },
+                            ]}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">
+                            Primary Farming Practice
+                        </label>
+                        <Dropdown
+                            {...register("farmingPractices")}
+                            id="farmingPractices"
+                            placeholder="Select Farming Practice"
+                            options={[
+                                { label: "Sustainable", value: "sustainable" },
+                                {
+                                    label: "Eco-friendly",
+                                    value: "eco-friendly",
+                                },
+                                {
+                                    label: "Water Efficient",
+                                    value: "water-efficient",
+                                },
+                                { label: "Traditional", value: "traditional" },
+                            ]}
+                        />
+                    </div>
                     <div className="bg-lightGreen p-4 rounded-lg">
                         <p className="text-sm text-darkGreen">
                             <strong>Next Steps:</strong> After registration, you
@@ -482,28 +495,37 @@ function Step4({ register, userType, setUserType }) {
                 </>
             ) : (
                 <>
-                    <Dropdown
-                        {...register("qualityStandards")}
-                        id="qualityStandards"
-                        placeholder="Preferred Quality Standards"
-                        options={[
-                            { label: "Organic", value: "organic" },
-                            { label: "Non-GMO", value: "non-gmo" },
-                            { label: "Fair-Trade", value: "fair-trade" },
-                            { label: "Any", value: "any" },
-                        ]}
-                    />
-                    <Dropdown
-                        {...register("frequency")}
-                        id="frequency"
-                        placeholder="General Purchase Frequency"
-                        options={[
-                            { label: "Weekly", value: "weekly" },
-                            { label: "Monthly", value: "monthly" },
-                            { label: "Quarterly", value: "quarterly" },
-                            { label: "As needed", value: "as-needed" },
-                        ]}
-                    />
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">
+                            Preferred Quality Standards
+                        </label>
+                        <Dropdown
+                            {...register("qualityStandards")}
+                            id="qualityStandards"
+                            placeholder="Select Quality Standards"
+                            options={[
+                                { label: "Organic", value: "organic" },
+                                { label: "Non-GMO", value: "non-gmo" },
+                                { label: "Fair-Trade", value: "fair-trade" },
+                                { label: "Any", value: "any" },
+                            ]}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">
+                            Purchase Frequency
+                        </label>
+                        <Dropdown
+                            {...register("frequency")}
+                            id="frequency"
+                            placeholder="Select Purchase Frequency"
+                            options={[
+                                { label: "Daily", value: "daily" },
+                                { label: "Weekly", value: "weekly" },
+                                { label: "Monthly", value: "monthly" },
+                            ]}
+                        />
+                    </div>
                     <div className="bg-lightGreen p-4 rounded-lg">
                         <p className="text-sm text-darkGreen">
                             <strong>Next Steps:</strong> After registration, you
@@ -572,6 +594,7 @@ function SignUp() {
     const [userType, setUserType] = useState("farmer"); // Default to farmer
     const totalSteps = 5;
     const navigate = useNavigate();
+    const { register: registerUser } = useAuth();
 
     const {
         register,
@@ -631,14 +654,41 @@ function SignUp() {
         }
     };
 
+    // Update the onSubmit function to transform data to match backend schema
     const onSubmit = (data) => {
-        // Include userType in the form data
+        // Transform form data to match backend schema
         const formData = {
-            ...data,
-            userType: userType,
+            email: data.email,
+            fullName: `${data.firstName} ${data.lastName}`,
+            passwordHash: data.password,
+            contactNumber: data.contactNumber,
+            profilePicture: data.profileImage || "",
+            address: `${data.address || ""}, ${data.city || ""}, ${
+                data.province || ""
+            }, ${data.country || ""}`.replace(/^,\s*|,\s*$/g, ""),
+            role: userType === "farmer" ? "Farmer" : "Buyer", // Capitalized for backend
+
+            ...(userType === "farmer" && {
+                farmerInfo: {
+                    certification: data.certifications || "",
+                    farmingPractices: data.farmingPractices || "",
+                },
+            }),
+
+            ...(userType === "buyer" && {
+                buyerInfo: {
+                    urgency: "medium",
+                    frequency: data.frequency || "weekly",
+                    qualityStandards: data.qualityStandards || "",
+                },
+            }),
+
+            fcmToken: "",
+            birthday: null,
         };
-        console.log("Form Data:", formData);
-        alert("Registration successful! Check console for data.");
+
+        console.log("Form data being sent:", formData);
+        registerUser.mutate(formData);
     };
 
     const renderStepContent = (step) => {
@@ -740,6 +790,23 @@ function SignUp() {
                                     </p>
                                 )}
                             </div>
+
+                            {/* Display registration error */}
+                            {registerUser.error && (
+                                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+                                    {registerUser.error.message ||
+                                        "Registration failed. Please try again."}
+                                </div>
+                            )}
+
+                            {/* Display success message */}
+                            {registerUser.isSuccess && (
+                                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+                                    Registration successful! Redirecting to
+                                    login...
+                                </div>
+                            )}
+
                             <div className="flex flex-col gap-4 md:gap-6 w-full mx-auto">
                                 {renderStepContent(currentStep)}
                             </div>
@@ -749,7 +816,10 @@ function SignUp() {
                                     variant="secondary"
                                     size="lg"
                                     onClick={handleBack}
-                                    disabled={currentStep === 1}
+                                    disabled={
+                                        currentStep === 1 ||
+                                        registerUser.isPending
+                                    }
                                 >
                                     Back
                                 </Button>
@@ -758,9 +828,12 @@ function SignUp() {
                                         type="submit"
                                         variant="primary"
                                         size="lg"
-                                        disabled={isSubmitting}
+                                        disabled={
+                                            isSubmitting ||
+                                            registerUser.isPending
+                                        }
                                     >
-                                        {isSubmitting
+                                        {isSubmitting || registerUser.isPending
                                             ? "Submitting..."
                                             : "Submit"}
                                     </Button>
@@ -770,6 +843,7 @@ function SignUp() {
                                         variant="primary"
                                         size="lg"
                                         onClick={handleNext}
+                                        disabled={registerUser.isPending}
                                     >
                                         Next
                                     </Button>

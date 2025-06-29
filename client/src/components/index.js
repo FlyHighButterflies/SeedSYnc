@@ -15,3 +15,4 @@ export { default as AddItemModal } from "./AddItemModal";
 export { default as EditItemModal } from "./EditItemModal";
 export { default as DeleteItemModal } from "./DeleteItemModal";
 export { default as ChatbotWidget } from "./ChatbotWidget";
+export { default as SearchableSelect } from "./SearchableSelect";

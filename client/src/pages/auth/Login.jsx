@@ -1,8 +1,10 @@
 import { Button, Input } from "@/components";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks";
 
 function Login() {
+    const { login } = useAuth();
     const {
         register,
         handleSubmit,
@@ -10,8 +12,7 @@ function Login() {
     } = useForm();
 
     const onSubmit = (data) => {
-        console.log("Login Data:", data);
-        alert("Login attempt successful! Check the console for data.");
+        login.mutate(data);
     };
 
     return (
@@ -46,8 +47,19 @@ function Login() {
 
                             <p className="text-2xl font-bold">Sign In</p>
 
+                            {/* Display login error */}
+                            {login.error && (
+                                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                                    {login.error.message ||
+                                        "Login failed. Please try again."}
+                                </div>
+                            )}
+
                             <div className="flex flex-col justify-center gap-4 md:gap-6 w-full h-[320px] mx-auto p-8 rounded-xl bg-white">
                                 <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1">
+                                        Email
+                                    </label>
                                     {errors.email && (
                                         <p className="text-red-500 text-sm">
                                             {errors.email.message}
@@ -56,6 +68,11 @@ function Login() {
                                     <Input
                                         {...register("email", {
                                             required: "Email is required",
+                                            pattern: {
+                                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                                message:
+                                                    "Please enter a valid email address",
+                                            },
                                         })}
                                         type="email"
                                         placeholder="Email"
@@ -65,6 +82,9 @@ function Login() {
                                     />
                                 </div>
                                 <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1">
+                                        Password
+                                    </label>
                                     {errors.password && (
                                         <p className="text-red-500 text-sm">
                                             {errors.password.message}
@@ -88,21 +108,26 @@ function Login() {
                                         type="submit"
                                         variant="primary"
                                         size="lg"
-                                        disabled={isSubmitting}
+                                        disabled={
+                                            isSubmitting || login.isPending
+                                        }
                                         className="w-full"
                                     >
-                                        {isSubmitting
+                                        {isSubmitting || login.isPending
                                             ? "Signing In..."
                                             : "Sign In"}
                                     </Button>
-                                    <p className="pt-3 font-bold cursor-pointer">
+                                    <p className="pt-3 font-bold cursor-pointer hover:text-normalGreen transition-colors">
                                         Forgot password?
                                     </p>
                                 </div>
                             </div>
                             <div className="flex justify-center gap-2">
                                 <p>New to SeedSync?</p>
-                                <Link to="/signup" className="font-bold">
+                                <Link
+                                    to="/signup"
+                                    className="font-bold hover:text-normalGreen transition-colors"
+                                >
                                     Sign up
                                 </Link>
                             </div>

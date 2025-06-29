@@ -1,5 +1,6 @@
 import Inventory from '../models/InventoryModel.js';
 import User from '../models/UserModel.js';
+import Crop from '../models/CropModel.js';
 import { validateMongoId, validateRole, validateCropsArray } from '../utils/validation.js';
 import { hashUserId, hashCropKey } from '../utils/hash.js';
 import { getCachedUserProfile, cacheUserProfile, invalidateUserProfileCache } from '../utils/cacheUtils.js';
@@ -42,6 +43,14 @@ export const createInventory = async (req, res) => {
         const existingInventory = await Inventory.findOne({ userId });
         if (existingInventory) {
             return res.status(409).json({ message: 'Inventory already exists for this user.' });
+        }
+
+        // Verify that all crop IDs are valid
+        if (crops && crops.length > 0) {
+            const foundCrops = await Crop.find({ '_id': { $in: crops } });
+            if (foundCrops.length !== crops.length) {
+                return res.status(400).json({ message: 'One or more crop IDs are invalid.' });
+            }
         }
 
         const newInventory = new Inventory({ userId, role, crops });
@@ -95,6 +104,14 @@ export const updateInventory = async (req, res) => {
         const inventory = await Inventory.findOne({ userId });
         if (!inventory) {
             return res.status(404).json({ message: 'Inventory not found for this user.' });
+        }
+
+        // Verify that all crop IDs are valid
+        if (crops && crops.length > 0) {
+            const foundCrops = await Crop.find({ '_id': { $in: crops } });
+            if (foundCrops.length !== crops.length) {
+                return res.status(400).json({ message: 'One or more crop IDs are invalid.' });
+            }
         }
 
         if (role) inventory.role = role;

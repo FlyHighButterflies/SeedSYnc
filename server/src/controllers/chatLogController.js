@@ -28,6 +28,16 @@ class ChatLogController {
                     .json({ message: "Recipient not found in chat room." });
             }
 
+            // Check if the sender is a participant in the chat room
+            const isSenderParticipant = chatRoom.participants.some(
+                (p) => p.userId.toString() === senderId.toString()
+            );
+            if (!isSenderParticipant) {
+                return res
+                    .status(403)
+                    .json({ message: "Sender is not a participant in this chat room." });
+            }
+
             // Create message
             const message = new Message({
                 chatRoomId,

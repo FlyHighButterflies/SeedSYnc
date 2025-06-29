@@ -83,17 +83,15 @@ class ReviewController {
     async getReviews(req, res) {
         try {
             const userId = req.user._id; // Authenticated user's ID
-            const userRole = req.user.role; // Authenticated user's role
 
             const reviews = await Review.find({
                 $or: [
-                    { reviewer: userId, reviewerType: userRole },
-                    { reviewee: userId, revieweeType: userRole },
+                    { reviewerId: userId },
+                    { reviewedUserId: userId },
                 ],
             })
-                .populate("trade")
-                .populate("reviewer")
-                .populate("reviewee");
+                .populate("reviewerId", "firstName lastName")
+                .populate("reviewedUserId", "firstName lastName");
 
             res.status(200).json(reviews.map(r => this.hashReviewResponse(r)));
         } catch (error) {
@@ -105,10 +103,9 @@ class ReviewController {
         try {
             const { id } = req.params;
             const userId = req.user._id; // Authenticated user's ID
-            const userRole = req.user.role; // Authenticated user's role
 
             const review = await Review.findOneAndUpdate(
-                { _id: id, reviewer: userId, reviewerType: userRole }, // Only allow the reviewer to update their review
+                { _id: id, reviewerId: userId }, // Only allow the reviewer to update their review
                 req.body,
                 { new: true }
             );
@@ -128,12 +125,10 @@ class ReviewController {
         try {
             const { id } = req.params;
             const userId = req.user._id; // Authenticated user's ID
-            const userRole = req.user.role; // Authenticated user's role
 
             const review = await Review.findOneAndDelete({
                 _id: id,
-                reviewer: userId,
-                reviewerType: userRole,
+                reviewerId: userId,
             }); // Only allow the reviewer to delete their review
 
             if (!review) {

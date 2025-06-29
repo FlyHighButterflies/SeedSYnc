@@ -1,4 +1,6 @@
 import { hashUserId, hashCropKey } from '../utils/hash.js';
+import User from '../models/UserModel.js';
+import Crop from '../models/CropModel.js';
 
 class TradeController {
     constructor(TradeModel) {
@@ -17,8 +19,18 @@ class TradeController {
 
     async createTrade(req, res) {
         try {
-            const tradeData = req.body;
-            const newTrade = await this.TradeModel.create(tradeData);
+            const { buyerId, sellerId, cropId, ...tradeData } = req.body;
+
+            // Validate that buyer, seller, and crop exist
+            const buyer = await User.findById(buyerId);
+            const seller = await User.findById(sellerId);
+            const crop = await Crop.findById(cropId);
+
+            if (!buyer || !seller || !crop) {
+                return res.status(404).json({ message: 'Buyer, seller, or crop not found.' });
+            }
+
+            const newTrade = await this.TradeModel.create({ buyerId, sellerId, cropId, ...tradeData });
             res.status(201).json(this.hashTradeResponse(newTrade));
         } catch (error) {
             res.status(500).json({ message: 'Error creating trade', error });

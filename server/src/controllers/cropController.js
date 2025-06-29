@@ -37,11 +37,21 @@ class CropController {
     async updateCrop(req, res) {
         try {
             const { id } = req.params;
-            const crop = await this.CropModel.findByIdAndUpdate(id, req.body, { new: true });
+            const userId = req.user._id;
+
+            const crop = await this.CropModel.findById(id);
+
             if (!crop) {
                 return res.status(404).json({ message: 'Crop not found' });
             }
-            res.status(200).json(this.hashCropResponse(crop));
+
+            if (crop.farmerId.toString() !== userId.toString()) {
+                return res.status(403).json({ message: 'You are not authorized to update this crop.' });
+            }
+
+            const updatedCrop = await this.CropModel.findByIdAndUpdate(id, req.body, { new: true });
+
+            res.status(200).json(this.hashCropResponse(updatedCrop));
         } catch (error) {
             res.status(400).json({ message: error.message });
         }
@@ -50,10 +60,20 @@ class CropController {
     async deleteCrop(req, res) {
         try {
             const { id } = req.params;
-            const crop = await this.CropModel.findByIdAndDelete(id);
+            const userId = req.user._id;
+
+            const crop = await this.CropModel.findById(id);
+
             if (!crop) {
                 return res.status(404).json({ message: 'Crop not found' });
             }
+
+            if (crop.farmerId.toString() !== userId.toString()) {
+                return res.status(403).json({ message: 'You are not authorized to delete this crop.' });
+            }
+
+            await this.CropModel.findByIdAndDelete(id);
+
             res.status(204).send();
         } catch (error) {
             res.status(500).json({ message: error.message });

@@ -5,27 +5,39 @@ import User from "../models/UserModel.js";
 class AuthController {
     async register(req, res) {
         try {
-            const { role, email, password, ...profileData } = req.body;
+            let { role, email, password, location, ...profileData } = req.body;
 
-            if (!role || !["Farmer", "Buyer"].includes(role)) {
+            // Ensure role is lower case and valid
+            if (!role || !["farmer", "buyer"].includes(role.toLowerCase())) {
                 return res
                     .status(400)
                     .json({ message: "Invalid user role specified." });
+            }
+            role = role.toLowerCase();
+
+            // Ensure location.address is provided
+            if (!location || !location.address) {
+                return res
+                    .status(400)
+                    .json({ message: "Location address is required." });
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
             const newUser = new User({
                 email,
-                password: hashedPassword,
+                passwordHash: hashedPassword,
                 role,
+                location,
                 ...profileData,
             });
 
             await newUser.save();
 
             res.status(201).json({
-                message: `${role} registered successfully.`,
+                message: `${
+                    role.charAt(0).toUpperCase() + role.slice(1)
+                } registered successfully.`,
             });
         } catch (error) {
             if (error.code === 11000) {
@@ -39,13 +51,14 @@ class AuthController {
 
     async login(req, res) {
         try {
-            const { email, password, role } = req.body;
+            let { email, password, role } = req.body;
 
-            if (!role || !["Farmer", "Buyer"].includes(role)) {
+            if (!role || !["farmer", "buyer"].includes(role.toLowerCase())) {
                 return res
                     .status(400)
                     .json({ message: "Invalid user role specified." });
             }
+            role = role.toLowerCase();
 
             const user = await User.findOne({ email, role });
 
@@ -55,7 +68,7 @@ class AuthController {
                     .json({ message: "Invalid credentials." });
             }
 
-            const isMatch = await bcrypt.compare(password, user.password);
+            const isMatch = await bcrypt.compare(password, user.passwordHash);
             if (!isMatch) {
                 return res
                     .status(400)

@@ -1,4 +1,4 @@
-from service.proximity import a_star
+from service.proximity import haversine_distance
 from service.branch_and_bound import branch_and_bound
 from service.string_search import bmhs
 from service.hashing import HashTable
@@ -6,24 +6,27 @@ from service.hashing import HashTable
 def calculate_score(farmer, buyer, options, graph):
     score = 0
 
-    # A* Proximity
-    if options.get("use_astar"):
-        path = a_star(graph, farmer["location"], buyer["location"])
-        proximity_score = 1 / len(path) if path else 0.1
+    # A* Proximity or Location Match
+    if options.get("use_astar") and graph:
+        from service.proximity import a_star
+        coords = {node["id"]: (node["latitude"], node["longitude"]) for node in [farmer, buyer]}
+        path = a_star(graph, farmer["id"], buyer["id"], coords)
+        path_length = len(path) - 1 if path else 999
+        proximity_score = max(1 - (path_length / 10), 0)  # Normalize: shorter paths = higher score
         score += 0.3 * proximity_score
     else:
-        score += 0.3 * (1.0 if farmer["location"] == buyer["location"] else 0.5)
+        score += 0.3 * (1.0 if farmer.get("location") == buyer.get("location") else 0.5)
 
     # Inventory Score
-    product = buyer["product"]
-    inventory_score = min(farmer["inventory"].get(product, 0) / 100, 1.0)
+    product = buyer.get("product")
+    inventory_score = min(farmer.get("inventory", {}).get(product, 0) / 100, 1.0)
     score += 0.3 * inventory_score
 
-    # Review Score
-    review_score = farmer.get("review", 3.0) / 5.0
-    score += 0.2 * review_score
+    # Rating Score
+    rating_score = farmer.get("rating", 3.0) / 5.0
+    score += 0.2 * rating_score
 
-    # Sustainability
+    # Sustainability Score
     if farmer.get("sustainability"):
         score += 0.2
 
@@ -34,7 +37,7 @@ def calculate_score(farmer, buyer, options, graph):
         if bmhs(desc.lower(), keyword.lower()) != -1:
             score += 0.1
 
-    return score
+    return min(score, 1.0)  # Ensure max score is 1.0
 
 
 def apply_branch_and_bound_if_enabled(farmers, buyer, options):

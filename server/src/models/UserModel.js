@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+// Dummy geocode function (replace with real geocoding service)
+async function geocodeAddress(address) {
+    // Example: returns fixed coordinates for demonstration
+    return { latitude: 0, longitude: 0 };
+}
+
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -25,9 +31,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
-    address: {
-        type: String,
-        required: true,
+    // Location object with address, latitude, longitude
+    location: {
+        address: {
+            type: String,
+            required: true,
+        },
+        latitude: {
+            type: Number,
+        },
+        longitude: {
+            type: Number,
+        },
     },
     role: {
         type: String,
@@ -83,6 +98,16 @@ const userSchema = new mongoose.Schema({
             default: "",
         },
     },
+});
+
+// Pre-save hook to geocode address if changed
+userSchema.pre("save", async function (next) {
+    if (this.isModified("location.address")) {
+        const coords = await geocodeAddress(this.location.address);
+        this.location.latitude = coords.latitude;
+        this.location.longitude = coords.longitude;
+    }
+    next();
 });
 
 const User = mongoose.model("User", userSchema);

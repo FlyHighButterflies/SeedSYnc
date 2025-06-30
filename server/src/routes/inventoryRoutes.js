@@ -1,18 +1,24 @@
-import express from 'express';
-import { createInventory, getInventoryByUserId, updateInventory, deleteInventory } from '../controllers/inventoryController.js';
+import express from "express";
+import {
+    createInventory,
+    getInventoryByUserId,
+    updateInventory,
+    deleteInventory,
+} from "../controllers/inventoryController.js";
+import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
 // Create inventory
-router.post('/', createInventory);
+router.post("/", authMiddleware, createInventory);
 
-// Get inventory by user ID
-router.get('/:userId', getInventoryByUserId);
+// Get inventory for authenticated user
+router.get("/", authMiddleware, getInventoryByUserId);
 
 // Update inventory
-router.put('/:userId', updateInventory);
+router.put("/:userId", authMiddleware, updateInventory);
 
 // Delete inventory
-router.delete('/:userId', deleteInventory);
+router.delete("/:userId", authMiddleware, deleteInventory);
 
 export default router;

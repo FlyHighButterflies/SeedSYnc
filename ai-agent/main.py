@@ -31,8 +31,11 @@ def match():
     for farmer in selected_farmers:
         score = calculate_score(farmer, buyer)
         results.append({
-            "farmer_id": farmer.get("_id") or farmer.get("id"),
-            "score": round(score, 3)
+            "farmer_id": farmer.get("farmer_id") or farmer.get("_id") or farmer.get("id"),
+            "score": round(score, 3),
+            "matchedCrops": farmer.get("matchedCrops", []),
+            "inventory": farmer.get("inventory", []),
+            "score_breakdown": farmer.get("score_breakdown", {}),  # Include breakdown
         })
 
     results = sorted(results, key=lambda x: x["score"], reverse=True)

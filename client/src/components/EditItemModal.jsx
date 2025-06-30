@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { X, Edit3 } from "lucide-react";
+import { X, Edit3, Loader2 } from "lucide-react";
 import Button from "./Button";
 import Input from "./Input";
+import { useCrops } from "@/hooks";
 
 function EditItemModal({ isOpen, onClose, userType, item }) {
     const [formData, setFormData] = useState({
@@ -17,6 +18,8 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
         BudgetPerUnit: "",
         dateNeeded: "",
     });
+
+    const { updateCrop } = useCrops();
 
     useEffect(() => {
         if (item && isOpen) {
@@ -57,8 +60,9 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
         // Prepare data for backend - exactly matching CropModel
         let payload;
         if (userType === "farmer") {
@@ -79,9 +83,17 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                 expiryDate: formData.expiryDate,
             };
         }
-        console.log("Edit item:", { ...item, ...payload });
-        // TODO: Handle actual submission when backend is ready
-        onClose();
+
+        try {
+            await updateCrop.mutateAsync({
+                id: item._id,
+                cropData: payload,
+            });
+            onClose();
+        } catch (error) {
+            // Error handling is done in the hook
+            console.error("Failed to update crop:", error);
+        }
     };
 
     const handleInputChange = (field, value) => {
@@ -89,6 +101,12 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
             ...prev,
             [field]: value,
         }));
+    };
+
+    const handleClose = () => {
+        if (!updateCrop.isPending) {
+            onClose();
+        }
     };
 
     return (
@@ -109,8 +127,9 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={onClose}
+                                onClick={handleClose}
                                 className="p-1 rounded-full"
+                                disabled={updateCrop.isPending}
                             >
                                 <X className="w-5 h-5" />
                             </Button>
@@ -134,6 +153,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -151,6 +171,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -168,6 +189,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -186,6 +208,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -203,6 +226,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -220,6 +244,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                 </>
@@ -240,6 +265,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -257,6 +283,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -275,6 +302,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -292,6 +320,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -309,6 +338,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                                 )
                                             }
                                             required
+                                            disabled={updateCrop.isPending}
                                         />
                                     </div>
                                 </>
@@ -319,8 +349,9 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                     type="button"
                                     variant="secondary"
                                     size="md"
-                                    onClick={onClose}
+                                    onClick={handleClose}
                                     className="flex-1"
+                                    disabled={updateCrop.isPending}
                                 >
                                     Cancel
                                 </Button>
@@ -329,9 +360,16 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                     variant="primary"
                                     size="md"
                                     className="flex-1"
+                                    disabled={updateCrop.isPending}
                                 >
-                                    <Edit3 className="w-4 h-4" />
-                                    Save Changes
+                                    {updateCrop.isPending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Edit3 className="w-4 h-4" />
+                                    )}
+                                    {updateCrop.isPending
+                                        ? "Saving..."
+                                        : "Save Changes"}
                                 </Button>
                             </div>
                         </form>

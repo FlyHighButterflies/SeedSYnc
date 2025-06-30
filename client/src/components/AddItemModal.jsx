@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Loader2 } from "lucide-react";
 import Button from "./Button";
 import Input from "./Input";
+import { useCrops } from "@/hooks";
 
 function AddItemModal({ isOpen, onClose, userType }) {
     const [formData, setFormData] = useState({
@@ -18,6 +19,8 @@ function AddItemModal({ isOpen, onClose, userType }) {
         dateNeeded: "",
     });
 
+    const { createCrop } = useCrops();
+
     if (!isOpen) return null;
 
     const handleBackdropClick = (e) => {
@@ -26,8 +29,23 @@ function AddItemModal({ isOpen, onClose, userType }) {
         }
     };
 
-    const handleSubmit = (e) => {
+    const resetForm = () => {
+        setFormData({
+            name: "",
+            initialWeight: "",
+            currentWeight: "",
+            pricePerUnit: "",
+            harvestDate: "",
+            expiryDate: "",
+            weightNedeed: "",
+            BudgetPerUnit: "",
+            dateNeeded: "",
+        });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
         // Prepare data for backend - exactly matching CropModel
         let payload;
         if (userType === "farmer") {
@@ -48,9 +66,15 @@ function AddItemModal({ isOpen, onClose, userType }) {
                 expiryDate: formData.expiryDate,
             };
         }
-        console.log("Add item:", payload);
-        // TODO: Handle actual submission when backend is ready
-        onClose();
+
+        try {
+            await createCrop.mutateAsync(payload);
+            resetForm();
+            onClose();
+        } catch (error) {
+            // Error handling is done in the hook
+            console.error("Failed to create crop:", error);
+        }
     };
 
     const handleInputChange = (field, value) => {
@@ -58,6 +82,13 @@ function AddItemModal({ isOpen, onClose, userType }) {
             ...prev,
             [field]: value,
         }));
+    };
+
+    const handleClose = () => {
+        if (!createCrop.isPending) {
+            resetForm();
+            onClose();
+        }
     };
 
     return (
@@ -79,8 +110,9 @@ function AddItemModal({ isOpen, onClose, userType }) {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={onClose}
+                                onClick={handleClose}
                                 className="p-1 rounded-full"
+                                disabled={createCrop.isPending}
                             >
                                 <X className="w-5 h-5" />
                             </Button>
@@ -104,6 +136,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -121,6 +154,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -138,6 +172,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -156,6 +191,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -173,6 +209,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -190,6 +227,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                 </>
@@ -210,6 +248,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -227,6 +266,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -245,6 +285,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -262,6 +303,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                     <div>
@@ -279,6 +321,7 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                                 )
                                             }
                                             required
+                                            disabled={createCrop.isPending}
                                         />
                                     </div>
                                 </>
@@ -289,8 +332,9 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                     type="button"
                                     variant="secondary"
                                     size="md"
-                                    onClick={onClose}
+                                    onClick={handleClose}
                                     className="flex-1"
+                                    disabled={createCrop.isPending}
                                 >
                                     Cancel
                                 </Button>
@@ -299,12 +343,20 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                     variant="primary"
                                     size="md"
                                     className="flex-1"
+                                    disabled={createCrop.isPending}
                                 >
-                                    <Plus className="w-4 h-4" />
-                                    Add{" "}
-                                    {userType === "farmer"
-                                        ? "Crop"
-                                        : "Requirement"}
+                                    {createCrop.isPending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Plus className="w-4 h-4" />
+                                    )}
+                                    {createCrop.isPending
+                                        ? "Adding..."
+                                        : `Add ${
+                                              userType === "farmer"
+                                                  ? "Crop"
+                                                  : "Requirement"
+                                          }`}
                                 </Button>
                             </div>
                         </form>

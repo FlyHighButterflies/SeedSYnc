@@ -1,7 +1,10 @@
-import { Trash2, AlertTriangle } from "lucide-react";
+import { Trash2, AlertTriangle, Loader2 } from "lucide-react";
 import Button from "./Button";
+import { useCrops } from "@/hooks";
 
 function DeleteItemModal({ isOpen, onClose, userType, item, onConfirm }) {
+    const { deleteCrop } = useCrops();
+
     if (!isOpen) return null;
 
     const handleBackdropClick = (e) => {
@@ -10,11 +13,21 @@ function DeleteItemModal({ isOpen, onClose, userType, item, onConfirm }) {
         }
     };
 
-    const handleDelete = () => {
-        console.log("Delete item:", item);
-        // TODO: Handle actual deletion when backend is ready
-        onConfirm?.(item);
-        onClose();
+    const handleDelete = async () => {
+        try {
+            await deleteCrop.mutateAsync(item._id);
+            onConfirm?.(item);
+            onClose();
+        } catch (error) {
+            // Error handling is done in the hook
+            console.error("Failed to delete crop:", error);
+        }
+    };
+
+    const handleClose = () => {
+        if (!deleteCrop.isPending) {
+            onClose();
+        }
     };
 
     // Use correct name field for both types
@@ -114,8 +127,9 @@ function DeleteItemModal({ isOpen, onClose, userType, item, onConfirm }) {
                                 type="button"
                                 variant="secondary"
                                 size="md"
-                                onClick={onClose}
+                                onClick={handleClose}
                                 className="flex-1"
+                                disabled={deleteCrop.isPending}
                             >
                                 Cancel
                             </Button>
@@ -125,9 +139,16 @@ function DeleteItemModal({ isOpen, onClose, userType, item, onConfirm }) {
                                 size="md"
                                 onClick={handleDelete}
                                 className="flex-1"
+                                disabled={deleteCrop.isPending}
                             >
-                                <Trash2 className="w-4 h-4" />
-                                Delete
+                                {deleteCrop.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Trash2 className="w-4 h-4" />
+                                )}
+                                {deleteCrop.isPending
+                                    ? "Deleting..."
+                                    : "Delete"}
                             </Button>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-import { Button, Input } from "@/components";
+import { Button, Input, Dropdown } from "@/components";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks";
@@ -12,6 +12,7 @@ function Login() {
     } = useForm();
 
     const onSubmit = (data) => {
+        console.log("Login data:", data);
         login.mutate(data);
     };
 
@@ -50,12 +51,13 @@ function Login() {
                             {/* Display login error */}
                             {login.error && (
                                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                                    {login.error.message ||
-                                        "Login failed. Please try again."}
+                                    {login.error?.response?.data?.message ||
+                                     login.error?.message ||
+                                     "Login failed. Please try again."}
                                 </div>
                             )}
 
-                            <div className="flex flex-col justify-center gap-4 md:gap-6 w-full h-[320px] mx-auto p-8 rounded-xl bg-white">
+                            <div className="flex flex-col justify-center gap-4 md:gap-6 w-full h-[380px] mx-auto p-8 rounded-xl bg-white">
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">
                                         Email
@@ -81,6 +83,7 @@ function Login() {
                                         }
                                     />
                                 </div>
+
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">
                                         Password
@@ -103,6 +106,33 @@ function Login() {
                                         }
                                     />
                                 </div>
+
+                                {/* Add role selection */}
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1">
+                                        Login as
+                                    </label>
+                                    <Dropdown
+                                        {...register("role", {
+                                            required: "Please select your role",
+                                        })}
+                                        id="role"
+                                        placeholder="Select Role"
+                                        options={[
+                                            { label: "Farmer", value: "farmer" },
+                                            { label: "Buyer", value: "buyer" },
+                                        ]}
+                                        className={
+                                            errors.role ? "border-red-500" : ""
+                                        }
+                                    />
+                                    {errors.role && (
+                                        <p className="text-red-500 text-sm">
+                                            {errors.role.message}
+                                        </p>
+                                    )}
+                                </div>
+
                                 <div className="flex flex-col pt-2">
                                     <Button
                                         type="submit"

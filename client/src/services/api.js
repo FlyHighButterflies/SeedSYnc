@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
+    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api",
     withCredentials: true, // Allows sending cookies with cross-origin requests
 });
 
@@ -53,7 +53,7 @@ axiosClient.interceptors.response.use(
             } catch (refreshError) {
                 // If the token refresh fails, reject all queued requests
                 processQueue(refreshError);
-                
+
                 // Redirect to the login page as the session is no longer valid
                 window.location.href = "/login";
                 return Promise.reject(refreshError);

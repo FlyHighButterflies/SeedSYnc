@@ -656,16 +656,25 @@ function SignUp() {
 
     // Update the onSubmit function to transform data to match backend schema
     const onSubmit = (data) => {
+        // ✅ Correctly format the address into a single string as the model expects
+        const fullAddress = [
+            data.address, // Street address
+            data.city,
+            data.province,
+            data.region,
+            data.country,
+        ]
+            .filter(Boolean) // Remove any empty or null parts
+            .join(", "); // Join with a comma and space
+
         // Transform form data to match backend schema
         const formData = {
             email: data.email,
             fullName: `${data.firstName} ${data.lastName}`,
-            passwordHash: data.password,
+            password: data.password,
             contactNumber: data.contactNumber,
             profilePicture: data.profileImage || "",
-            address: `${data.address || ""}, ${data.city || ""}, ${
-                data.province || ""
-            }, ${data.country || ""}`.replace(/^,\s*|,\s*$/g, ""),
+            address: fullAddress, // ✅ Use the correctly formatted address string
             role: userType,
 
             ...(userType === "farmer" && {
@@ -677,17 +686,18 @@ function SignUp() {
 
             ...(userType === "buyer" && {
                 buyerInfo: {
-                    urgency: "medium",
+                    // ✅ Make sure to include all fields from the form
+                    urgency: data.urgency || "medium",
                     frequency: data.frequency || "weekly",
                     qualityStandards: data.qualityStandards || "",
                 },
             }),
 
-            fcmToken: "",
-            birthday: null,
+            fcmToken: "", // This can be set later
+            birthday: data.birthday || null, // Ensure birthday is handled if collected
         };
 
-        console.log("Form data being sent:", formData);
+        console.log("Form data being sent:", JSON.stringify(formData, null, 2));
         registerUser.mutate(formData);
     };
 

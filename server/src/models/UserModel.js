@@ -70,12 +70,12 @@ const userSchema = new mongoose.Schema({
     buyerInfo: {
         urgency: {
             type: String,
-            enum: ["low", "medium", "high"],
+            enum: ["low", "medium", "high", ""],
             default: "",
         },
         frequency: {
             type: String,
-            enum: ["daily", "weekly", "monthly"],
+            enum: ["daily", "weekly", "monthly", ""],
             default: "",
         },
         qualityStandards: {

@@ -1,6 +1,11 @@
 import express from 'express';
 import messageController from '../controllers/messageController.js';
 import authMiddleware from "../middleware/auth.js";
+import { 
+    validateMessageCreation,
+    handleValidationErrors,
+    sanitizeInputs
+} from "../validators/index.js";
 
 const router = express.Router();
 
@@ -8,6 +13,11 @@ const router = express.Router();
 router.use(authMiddleware);
 
 // Create message - authenticated users only
-router.post('/', messageController.createMessage);
+router.post('/', 
+    validateMessageCreation,
+    handleValidationErrors,
+    sanitizeInputs,
+    messageController.createMessage
+);
 
 export default router;

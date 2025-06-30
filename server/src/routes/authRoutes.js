@@ -1,7 +1,12 @@
 import express from 'express';
 import authController from '../controllers/authController.js';
 import { authRateLimit, accountLockout } from '../middleware/security.js';
-import { validateUserRegistration, validateUser, sanitizeInputMiddleware } from '../middleware/validation.js';
+import { 
+    validateUserRegistration, 
+    validateUserLogin, 
+    handleValidationErrors,
+    sanitizeInputs 
+} from '../validators/index.js';
 
 const router = express.Router();
 
@@ -11,14 +16,17 @@ router.use(accountLockout);
 
 // Registration with comprehensive validation
 router.post('/register', 
-    sanitizeInputMiddleware,
     validateUserRegistration,
+    handleValidationErrors,
+    sanitizeInputs,
     authController.register
 );
 
-// Login with basic validation and security
+// Login with validation
 router.post('/login', 
-    sanitizeInputMiddleware,
+    validateUserLogin,
+    handleValidationErrors,
+    sanitizeInputs,
     authController.login
 );
 

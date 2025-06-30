@@ -10,7 +10,7 @@ import {
     securityLogger,
     apiRateLimit
 } from "./middleware/security.js";
-import { sanitizeInputMiddleware } from "./middleware/validation.js";
+import { sanitizeInputs } from "./validators/index.js";
 
 const app = express();
 

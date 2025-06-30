@@ -1,7 +1,11 @@
 import express from 'express';
 import inventoryController from '../controllers/inventoryController.js';
 import authMiddleware, { authorizeRoles, checkOwnership } from "../middleware/auth.js";
-import { validateObjectId } from "../middleware/validation.js";
+import { 
+    validateFarmerId, 
+    validateObjectId,
+    handleValidationErrors 
+} from "../validators/index.js";
 
 const router = express.Router();
 
@@ -15,7 +19,8 @@ router.use(authMiddleware);
 
 // Get comprehensive analytics for a specific farmer - farmers can only access their own data
 router.get('/analytics/:farmerId', 
-    validateObjectId('farmerId'),
+    validateFarmerId,
+    handleValidationErrors,
     authorizeRoles('farmer'),
     checkOwnership('farmerId'),
     inventoryController.getFarmerAnalytics
@@ -23,7 +28,8 @@ router.get('/analytics/:farmerId',
 
 // Get all alerts for a farmer - farmers can only access their own alerts
 router.get('/alerts/:farmerId', 
-    validateObjectId('farmerId'),
+    validateFarmerId,
+    handleValidationErrors,
     authorizeRoles('farmer'),
     checkOwnership('farmerId'),
     inventoryController.getAllFarmerAlerts
@@ -44,6 +50,7 @@ router.get('/alerts/surplus',
 // Update crop weight - farmers only, own crops only
 router.put('/crops/:cropId/weight', 
     validateObjectId('cropId'),
+    handleValidationErrors,
     authorizeRoles('farmer'),
     inventoryController.updateCropWeight
 );

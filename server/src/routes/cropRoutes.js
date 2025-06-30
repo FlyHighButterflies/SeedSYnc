@@ -2,7 +2,13 @@ import express from "express";
 import CropController from "../controllers/cropController.js";
 import Crop from "../models/CropModel.js";
 import authMiddleware, { authorizeRoles, checkOwnership } from "../middleware/auth.js";
-import { validateCrop, validateObjectId } from "../middleware/validation.js";
+import { 
+    validateCropCreation, 
+    validateCropUpdate, 
+    validateCropId,
+    handleValidationErrors,
+    sanitizeInputs
+} from "../validators/index.js";
 
 const router = express.Router();
 const cropController = new CropController(Crop);
@@ -13,7 +19,9 @@ router.use(authMiddleware);
 // Create crop - farmers only
 router.post("/", 
     authorizeRoles('farmer'),
-    validateCrop,
+    validateCropCreation,
+    handleValidationErrors,
+    sanitizeInputs,
     cropController.createCrop.bind(cropController)
 );
 
@@ -24,16 +32,20 @@ router.get("/",
 
 // Update crop - farmers only, own crops only
 router.put("/:id", 
-    validateObjectId('id'),
+    validateCropId,
+    handleValidationErrors,
     authorizeRoles('farmer'),
-    validateCrop,
+    validateCropUpdate,
+    handleValidationErrors,
+    sanitizeInputs,
     checkOwnership('farmerId'),
     cropController.updateCrop.bind(cropController)
 );
 
 // Delete crop - farmers only, own crops only
 router.delete("/:id", 
-    validateObjectId('id'),
+    validateCropId,
+    handleValidationErrors,
     authorizeRoles('farmer'),
     checkOwnership('farmerId'),
     cropController.deleteCrop.bind(cropController)

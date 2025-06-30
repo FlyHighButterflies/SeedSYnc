@@ -7,7 +7,10 @@ class AuthController {
         try {
             const { role, email, password, ...profileData } = req.body;
 
-            if (!role || !["Farmer", "Buyer"].includes(role)) {
+            // Normalize role to lowercase to match model and frontend
+            const normalizedRole = role?.toLowerCase();
+
+            if (!normalizedRole || !["farmer", "buyer"].includes(normalizedRole)) {
                 return res
                     .status(400)
                     .json({ message: "Invalid user role specified." });
@@ -18,14 +21,14 @@ class AuthController {
             const newUser = new User({
                 email,
                 password: hashedPassword,
-                role,
+                role: normalizedRole,
                 ...profileData,
             });
 
             await newUser.save();
 
             res.status(201).json({
-                message: `${role} registered successfully.`,
+                message: `${normalizedRole.charAt(0).toUpperCase() + normalizedRole.slice(1)} registered successfully.`,
             });
         } catch (error) {
             if (error.code === 11000) {
@@ -41,13 +44,16 @@ class AuthController {
         try {
             const { email, password, role } = req.body;
 
-            if (!role || !["Farmer", "Buyer"].includes(role)) {
+            // Normalize role to lowercase to match model and frontend
+            const normalizedRole = role?.toLowerCase();
+
+            if (!normalizedRole || !["farmer", "buyer"].includes(normalizedRole)) {
                 return res
                     .status(400)
                     .json({ message: "Invalid user role specified." });
             }
 
-            const user = await User.findOne({ email, role });
+            const user = await User.findOne({ email, role: normalizedRole });
 
             if (!user) {
                 return res

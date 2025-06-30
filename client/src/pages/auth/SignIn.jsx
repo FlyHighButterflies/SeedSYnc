@@ -21,9 +21,9 @@ function SignIn() {
             localStorage.setItem("user", JSON.stringify(response.data.user));
             alert("Login successful!");
             // Redirect based on role or to a dashboard
-            if (response.data.user.role === "Farmer") {
+            if (response.data.user.role === "farmer") {
                 navigate("/farmer-dashboard"); // Example redirect
-            } else if (response.data.user.role === "Buyer") {
+            } else if (response.data.user.role === "buyer") {
                 navigate("/buyer-dashboard"); // Example redirect
             } else {
                 navigate("/"); // Default redirect

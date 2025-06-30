@@ -26,6 +26,24 @@ const cropSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
+// Performance optimization indexes for search functionality
+cropSchema.index({ name: 'text' }); // Text index for name search
+cropSchema.index({ status: 1, name: 1 }); // Compound index for status + name searches
+cropSchema.index({ farmerId: 1, status: 1 }); // Farmer-specific searches
+cropSchema.index({ buyerId: 1, status: 1 }); // Buyer-specific searches
+cropSchema.index({ pricePerKg: 1, status: 1 }); // Price-based searches
+cropSchema.index({ budgetPerKg: 1, status: 1 }); // Budget-based searches
+cropSchema.index({ createdAt: -1 }); // Recent crops first
+cropSchema.index({ expiryDate: 1, status: 1 }); // Expiry-based filtering
+
+// Compound index for comprehensive search optimization
+cropSchema.index({ 
+    status: 1, 
+    name: 1, 
+    farmerId: 1, 
+    pricePerKg: 1 
+});
+
 // Pre-save middleware to set currentWeightKg to initialWeightKg if not provided
 cropSchema.pre('save', function(next) {
     if (this.isNew && this.initialWeightKg && !this.currentWeightKg) {

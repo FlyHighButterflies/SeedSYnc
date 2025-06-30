@@ -32,4 +32,10 @@ router.get('/search_suggestions',
     searchController.getSearchSuggestions
 );
 
+// Search statistics endpoint - for monitoring and analytics
+router.get('/search_stats',
+    optionalAuth,
+    searchController.getSearchStats
+);
+
 export default router;

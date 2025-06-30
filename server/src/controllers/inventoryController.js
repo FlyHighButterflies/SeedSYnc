@@ -13,26 +13,81 @@ import {
     invalidateUserProfileCache,
 } from "../utils/cacheUtils.js";
 
+function buildCropDetails(crop, role) {
+    // Always include these fields
+    const base = {
+        cropId: crop._id,
+        name: crop.name,
+        status: crop.status,
+        farmerId: crop.farmerId,
+        initialWeight: crop.initialWeight,
+        currentWeight: crop.currentWeight,
+        createdAt: crop.createdAt,
+        expiryDate: crop.expiryDate,
+    };
+    if (role === "farmer") {
+        return {
+            ...base,
+            pricePerUnit: crop.pricePerUnit,
+            harvestDate: crop.harvestDate,
+        };
+    } else if (role === "buyer") {
+        return {
+            ...base,
+            buyerId: crop.buyerId,
+            weightNedeed: crop.weightNedeed,
+            BudgetPerUnit: crop.BudgetPerUnit,
+            dateNeeded: crop.dateNeeded,
+        };
+    }
+    return base;
+}
+
 function hashInventoryResponse(inventory) {
+    const invObj =
+        typeof inventory.toObject === "function"
+            ? inventory.toObject()
+            : inventory;
     return {
-        ...inventory.toObject(),
-        userId: hashUserId(inventory.userId.toString()),
-        crops: Array.isArray(inventory.crops)
-            ? inventory.crops.map((crop) =>
-                  crop && crop._id
-                      ? hashCropKey(
-                            inventory.userId.toString(),
-                            crop._id.toString()
-                        )
-                      : crop
-              )
+        ...invObj,
+        userId: hashUserId(invObj.userId.toString()),
+        crops: Array.isArray(invObj.crops)
+            ? invObj.crops
+                  .filter(
+                      (crop) =>
+                          crop &&
+                          typeof crop === "object" &&
+                          !(
+                              crop instanceof Buffer ||
+                              (crop._bsontype && crop._bsontype === "ObjectID")
+                          )
+                  )
+                  .map((crop) => {
+                      const cropId = crop.cropId
+                          ? hashCropKey(
+                                invObj.userId.toString(),
+                                crop.cropId.toString()
+                            )
+                          : crop.cropId;
+                      const farmerId = crop.farmerId
+                          ? hashUserId(crop.farmerId.toString())
+                          : undefined;
+                      const buyerId = crop.buyerId
+                          ? hashUserId(crop.buyerId.toString())
+                          : undefined;
+                      return {
+                          ...crop,
+                          cropId,
+                          ...(farmerId && { farmerId }),
+                          ...(buyerId && { buyerId }),
+                      };
+                  })
             : [],
     };
 }
 
 // Create a new inventory
 export const createInventory = async (req, res) => {
-    // Use authenticated user
     const userId = req.user._id;
     const role = req.user.role;
     let { crops } = req.body;
@@ -56,7 +111,7 @@ export const createInventory = async (req, res) => {
             } else if (role === "buyer") {
                 cropQuery.buyerId = userId;
             }
-            const userCrops = await Crop.find(cropQuery).select("_id");
+            const userCrops = await Crop.find(cropQuery);
             crops = userCrops.map((c) => c._id);
         }
 
@@ -75,9 +130,10 @@ export const createInventory = async (req, res) => {
                 .json({ message: "Inventory already exists for this user." });
         }
 
-        // Verify that all crop IDs are valid
+        // Always fetch full crop docs for the given crop IDs
+        let foundCrops = [];
         if (crops && crops.length > 0) {
-            const foundCrops = await Crop.find({ _id: { $in: crops } });
+            foundCrops = await Crop.find({ _id: { $in: crops } });
             if (foundCrops.length !== crops.length) {
                 return res
                     .status(400)
@@ -85,7 +141,16 @@ export const createInventory = async (req, res) => {
             }
         }
 
-        const newInventory = new Inventory({ userId, role, crops });
+        // Store full crop details in inventory
+        const cropsDetails = foundCrops.map((crop) =>
+            buildCropDetails(crop, role)
+        );
+
+        const newInventory = new Inventory({
+            userId,
+            role,
+            crops: cropsDetails,
+        });
         await newInventory.save();
         res.status(201).json(hashInventoryResponse(newInventory));
     } catch (error) {
@@ -97,9 +162,6 @@ export const createInventory = async (req, res) => {
 export const getInventoryByUserId = async (req, res) => {
     const userId = req.user._id.toString();
 
-    // Only allow user to get their own inventory (param is ignored)
-    // No need to check req.params.userId
-
     if (!validateMongoId(userId)) {
         return res.status(400).json({ message: "Invalid userId." });
     }
@@ -107,7 +169,7 @@ export const getInventoryByUserId = async (req, res) => {
     try {
         let inventory = await getCachedUserProfile(userId);
         if (!inventory) {
-            inventory = await Inventory.findOne({ userId }).populate("crops");
+            inventory = await Inventory.findOne({ userId });
             if (!inventory) {
                 return res
                     .status(404)
@@ -115,7 +177,29 @@ export const getInventoryByUserId = async (req, res) => {
             }
             await cacheUserProfile(userId, inventory);
         }
-        res.status(200).json(hashInventoryResponse(inventory));
+
+        let invObj =
+            typeof inventory.toObject === "function"
+                ? inventory.toObject()
+                : inventory;
+
+        // If crops are ObjectIds, migrate to full crop objects for response
+        if (
+            Array.isArray(invObj.crops) &&
+            invObj.crops.length > 0 &&
+            (invObj.crops[0]._bsontype === "ObjectID" ||
+                invObj.crops[0] instanceof Buffer)
+        ) {
+            const cropIds = invObj.crops.map((c) =>
+                c.toString ? c.toString() : c
+            );
+            const foundCrops = await Crop.find({ _id: { $in: cropIds } });
+            invObj.crops = foundCrops.map((crop) =>
+                buildCropDetails(crop, invObj.role)
+            );
+        }
+
+        res.status(200).json(hashInventoryResponse(invObj));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -151,9 +235,10 @@ export const updateInventory = async (req, res) => {
                 .json({ message: "Inventory not found for this user." });
         }
 
-        // Verify that all crop IDs are valid
+        // Always fetch full crop docs for the given crop IDs
+        let foundCrops = [];
         if (crops && crops.length > 0) {
-            const foundCrops = await Crop.find({ _id: { $in: crops } });
+            foundCrops = await Crop.find({ _id: { $in: crops } });
             if (foundCrops.length !== crops.length) {
                 return res
                     .status(400)
@@ -162,7 +247,11 @@ export const updateInventory = async (req, res) => {
         }
 
         inventory.role = role;
-        if (crops) inventory.crops = crops;
+        if (crops) {
+            inventory.crops = foundCrops.map((crop) =>
+                buildCropDetails(crop, role)
+            );
+        }
 
         await inventory.save();
         await invalidateUserProfileCache(userId);

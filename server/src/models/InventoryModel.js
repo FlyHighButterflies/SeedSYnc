@@ -1,33 +1,58 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-const inventorySchema = new mongoose.Schema(
+const cropDetailsSchema = new mongoose.Schema(
     {
-        userId: {
+        cropId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Crop",
+            required: true,
+        },
+        name: String,
+        status: String,
+        farmerId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
-            unique: true, // 1:1 relationship with user
         },
-
-        role: {
-            type: String,
-            enum: ["farmer", "buyer"],
-            required: true,
+        buyerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
         },
-
-        crops: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Crop",
-            },
-        ],
-
-        createdAt: {
-            type: Date,
-            default: Date.now,
-        },
-    }
+        initialWeight: Number,
+        currentWeight: Number,
+        createdAt: Date,
+        expiryDate: Date,
+        // Farmer-specific
+        pricePerUnit: Number,
+        harvestDate: Date,
+        // Buyer-specific
+        weightNedeed: Number,
+        BudgetPerUnit: Number,
+        dateNeeded: Date,
+    },
+    { _id: false }
 );
 
+const inventorySchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        unique: true, // 1:1 relationship with user
+    },
+
+    role: {
+        type: String,
+        enum: ["farmer", "buyer"],
+        required: true,
+    },
+
+    crops: [cropDetailsSchema],
+
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+});
+
 const Inventory = mongoose.model("Inventory", inventorySchema);
-export default Inventory
+export default Inventory;

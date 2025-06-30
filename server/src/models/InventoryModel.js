@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const inventorySchema = new mongoose.Schema(
   {
     userId: {
@@ -26,3 +28,7 @@ const inventorySchema = new mongoose.Schema(
     }
   }
 );
+
+const Inventory = mongoose.model("Inventory", inventorySchema);
+
+export default Inventory;

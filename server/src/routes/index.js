@@ -10,11 +10,18 @@ import notificationRoutes from "./notificationRoutes.js";
 import reviewRoutes from "./reviewRoutes.js";
 import tradeRoutes from "./tradeRoutes.js";
 import searchRoutes from "./searchRoutes.js";
+import healthRoutes from "./healthRoutes.js";
 
 const router = express.Router();
 
+// Health check (no auth required)
+router.use("/", healthRoutes);
+
+// Authentication routes (public)
 router.use("/auth", authRoutes);
-router.use("/profile", profileRoutes); // New unified profile route
+
+// Protected routes (require authentication)
+router.use("/profile", profileRoutes);
 router.use("/crops", cropRoutes);
 router.use("/inventory", inventoryRoutes);
 router.use("/reviews", reviewRoutes);
@@ -23,6 +30,8 @@ router.use("/matches", matchRoutes);
 router.use("/messages", messageRoutes);
 router.use("/chatlogs", chatLogRoutes);
 router.use("/notifications", notificationRoutes);
+
+// Search routes (public with optional auth)
 router.use("/", searchRoutes);
 
 export default router;

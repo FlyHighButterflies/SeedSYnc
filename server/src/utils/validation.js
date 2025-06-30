@@ -287,7 +287,7 @@ const validateRegistrationData = (registrationData) => {
     return errors;
 };
 
-module.exports = {
+export {
     validateEmail,
     validateUsername,
     validatePassword,

@@ -6,3 +6,4 @@ export { useCrops } from "./useCrops";
 // export { useStock } from "./useStock";
 // export { useListings } from "./useListings";
 // export { useProfile } from "./useProfile";
+export { useInventory } from "./useInventory";

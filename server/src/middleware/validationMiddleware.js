@@ -1,4 +1,5 @@
 import { validationResult } from 'express-validator';
+import validator from 'validator';
 
 /**
  * Express-validator error handling middleware
@@ -32,11 +33,34 @@ export const handleValidationErrors = (req, res, next) => {
  * This runs after validation to ensure data is properly sanitized
  */
 export const sanitizeInputs = (req, res, next) => {
-    // Additional custom sanitization if needed
-    // The express-validator already handles most sanitization
+    const sanitizeValue = (obj) => {
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (typeof obj[key] === 'string') {
+                    // Remove dangerous script tags and event handlers
+                    let sanitized = obj[key]
+                        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '[removed]')
+                        .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '[removed]')
+                        .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '[removed]')
+                        .replace(/<embed[^>]*>/gi, '[removed]')
+                        .replace(/<img[^>]*onerror[^>]*>/gi, '[removed]')
+                        .replace(/javascript:/gi, '')
+                        .replace(/on\w+\s*=/gi, '');
+                    
+                    // Don't completely remove content, just sanitize it
+                    obj[key] = sanitized.trim();
+                } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                    sanitizeValue(obj[key]);
+                }
+            }
+        }
+    };
     
-    // Remove any null or undefined values from body
+    // Sanitize request body
     if (req.body && typeof req.body === 'object') {
+        sanitizeValue(req.body);
+        
+        // Remove empty values (null, undefined, empty strings)
         Object.keys(req.body).forEach(key => {
             if (req.body[key] === null || req.body[key] === undefined || req.body[key] === '') {
                 delete req.body[key];

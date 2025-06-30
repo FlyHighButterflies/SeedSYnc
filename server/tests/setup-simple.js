@@ -1,51 +1,59 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
-// Test database setup - Use Docker MongoDB instance
-const MONGODB_URI = process.env.MONGODB_URI_TEST || 'mongodb://localhost:27017/seedsync_test';
+// Simplified test setup that works with or without database
+let isConnected = false;
 
 beforeAll(async () => {
   try {
-    // Close any existing connections
+    // Use test database for safety - can use same MongoDB instance but different DB
+    const MONGODB_URI = process.env.MONGODB_URI_TEST || 'mongodb://localhost:27017/seedsync_test';
+    
     if (mongoose.connection.readyState !== 0) {
       await mongoose.connection.close();
     }
     
     await mongoose.connect(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
       bufferCommands: false, // Disable mongoose buffering
       bufferMaxEntries: 0 // Disable mongoose buffering
     });
     
-    console.log('Connected to test database');
+    isConnected = true;
+    console.log('✅ Connected to test database');
   } catch (error) {
-    console.error('Failed to connect to test database:', error);
-    // Don't throw error if DB connection fails - let individual tests handle it
+    console.warn('⚠️ No database connection - running limited tests:', error.message);
+    isConnected = false;
   }
-}, 30000); // 30 second timeout for beforeAll
+}, 10000);
 
 afterAll(async () => {
-  try {
-    // Clean up test database
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.connection.db.dropDatabase();
+  if (isConnected && mongoose.connection.readyState !== 0) {
+    try {
       await mongoose.connection.close();
+    } catch (error) {
+      console.error('Error closing database connection:', error);
     }
-  } catch (error) {
-    console.error('Error during test cleanup:', error);
   }
-}, 30000); // 30 second timeout for afterAll
+}, 10000);
 
 beforeEach(async () => {
-  // Clear all collections before each test
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    const collection = collections[key];
-    await collection.deleteMany({});
+  if (isConnected) {
+    // Clear all collections before each test
+    const collections = mongoose.connection.collections;
+    for (const key in collections) {
+      const collection = collections[key];
+      await collection.deleteMany({});
+    }
   }
 });
+
+// Helper function to skip database tests if not connected
+export const skipIfNoDatabase = () => {
+  if (!isConnected) {
+    pending('Database not available - skipping test');
+  }
+};
 
 // Helper function to generate JWT tokens for testing
 export const generateTestToken = (userId = '60d5ecb74b24b123456789ab', role = 'farmer') => {
@@ -75,3 +83,6 @@ export const mockAuth = (req, res, next) => {
   req.user = createTestUser();
   next();
 };
+
+// Export connection status for conditional tests
+export { isConnected };

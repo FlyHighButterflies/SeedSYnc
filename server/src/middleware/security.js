@@ -73,8 +73,19 @@ export const sanitizeInput = (req, res, next) => {
         for (let key in obj) {
             if (obj.hasOwnProperty(key)) {
                 if (typeof obj[key] === 'string') {
-                    // Basic XSS protection
-                    obj[key] = validator.escape(obj[key].trim());
+                    // Basic XSS protection - remove script tags and dangerous HTML
+                    obj[key] = obj[key]
+                        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                        .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+                        .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+                        .replace(/<embed[^>]*>/gi, '')
+                        .replace(/<img[^>]*onerror[^>]*>/gi, '')
+                        .replace(/javascript:/gi, '')
+                        .replace(/on\w+\s*=/gi, '')
+                        .trim();
+                    
+                    // Then escape remaining HTML entities
+                    obj[key] = validator.escape(obj[key]);
                 } else if (typeof obj[key] === 'object' && obj[key] !== null) {
                     sanitizeValue(obj[key]);
                 }

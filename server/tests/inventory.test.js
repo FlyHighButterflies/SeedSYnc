@@ -1,6 +1,6 @@
 import request from 'supertest';
 import app from '../src/app.js';
-import InventoryModel from '../src/models/inventoryModel.js';
+import InventoryModel from '../src/models/InventoryModel.js';
 import { generateTestToken, createTestUser } from './setup.js';
 
 describe('Inventory API', () => {

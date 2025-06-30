@@ -5,6 +5,7 @@ import routes from "./routes/index.js";
 import {
     securityHeaders,
     mongoSanitizeMiddleware,
+    sanitizeInput,
     corsOptions,
     requestSizeLimit,
     securityLogger,
@@ -60,7 +61,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Input sanitization
-app.use(sanitizeInputMiddleware);
+app.use(sanitizeInput);
 
 // Request logging middleware (development only)
 if (process.env.NODE_ENV === "development") {
@@ -89,7 +90,7 @@ app.use((err, req, res, next) => {
 });
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use((req, res) => {
     res.status(404).json({
         success: false,
         message: 'API endpoint not found'

@@ -102,7 +102,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                             {userType === "farmer" ? (
                                 <>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Product Name
                                         </label>
                                         <Input
@@ -119,7 +119,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Quantity & Unit
                                         </label>
                                         <div className="flex gap-2">
@@ -150,7 +150,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Price per Unit
                                         </label>
                                         <Input
@@ -168,7 +168,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Harvest Date
                                         </label>
                                         <Input
@@ -185,7 +185,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Expiry Date
                                         </label>
                                         <Input
@@ -205,7 +205,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                             ) : (
                                 <>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Product Name
                                         </label>
                                         <Input
@@ -222,7 +222,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Quantity Needed & Unit
                                         </label>
                                         <div className="flex gap-2">
@@ -253,7 +253,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Budget per Unit
                                         </label>
                                         <Input
@@ -271,7 +271,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Needed By
                                         </label>
                                         <Input
@@ -288,7 +288,7 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
                                             Expiry Date
                                         </label>
                                         <Input

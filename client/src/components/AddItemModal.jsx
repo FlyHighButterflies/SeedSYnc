@@ -2,24 +2,20 @@ import { useState } from "react";
 import { X, Plus } from "lucide-react";
 import Button from "./Button";
 import Input from "./Input";
-import Dropdown from "./Dropdown";
 
 function AddItemModal({ isOpen, onClose, userType }) {
     const [formData, setFormData] = useState({
         // Farmer fields
         name: "",
-        quantity: "",
-        unit: "kg",
-        price: "",
-        status: "Available",
+        initialWeight: "",
+        currentWeight: "",
+        pricePerUnit: "",
         harvestDate: "",
         expiryDate: "",
         // Buyer fields
-        productName: "",
-        quantityNeeded: "",
-        budgetPerUnit: "",
-        neededBy: "",
-        urgency: "Medium",
+        weightNedeed: "",
+        BudgetPerUnit: "",
+        dateNeeded: "",
     });
 
     if (!isOpen) return null;
@@ -32,7 +28,27 @@ function AddItemModal({ isOpen, onClose, userType }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Add item:", formData);
+        // Prepare data for backend - exactly matching CropModel
+        let payload;
+        if (userType === "farmer") {
+            payload = {
+                name: formData.name,
+                initialWeight: Number(formData.initialWeight),
+                currentWeight: Number(formData.currentWeight),
+                pricePerUnit: Number(formData.pricePerUnit),
+                harvestDate: formData.harvestDate,
+                expiryDate: formData.expiryDate,
+            };
+        } else {
+            payload = {
+                name: formData.name,
+                weightNedeed: Number(formData.weightNedeed),
+                BudgetPerUnit: Number(formData.BudgetPerUnit),
+                dateNeeded: formData.dateNeeded,
+                expiryDate: formData.expiryDate,
+            };
+        }
+        console.log("Add item:", payload);
         // TODO: Handle actual submission when backend is ready
         onClose();
     };
@@ -43,25 +59,6 @@ function AddItemModal({ isOpen, onClose, userType }) {
             [field]: value,
         }));
     };
-
-    const unitOptions = [
-        { label: "kg", value: "kg" },
-        { label: "lbs", value: "lbs" },
-        { label: "tons", value: "tons" },
-        { label: "pieces", value: "pieces" },
-    ];
-
-    const statusOptions = [
-        { label: "Available", value: "Available" },
-        { label: "Low Stock", value: "Low Stock" },
-        { label: "Out of Stock", value: "Out of Stock" },
-    ];
-
-    const urgencyOptions = [
-        { label: "High", value: "High" },
-        { label: "Medium", value: "Medium" },
-        { label: "Low", value: "Low" },
-    ];
 
     return (
         <>
@@ -111,47 +108,50 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Quantity & Unit
+                                            Initial Weight (kg)
                                         </label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="number"
-                                                placeholder="Quantity"
-                                                value={formData.quantity}
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        "quantity",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="flex-1"
-                                                required
-                                            />
-                                            <Dropdown
-                                                value={formData.unit}
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        "unit",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                options={unitOptions}
-                                                className="w-24"
-                                            />
-                                        </div>
+                                        <Input
+                                            type="number"
+                                            placeholder="Initial Weight in kg"
+                                            value={formData.initialWeight}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    "initialWeight",
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Price per Unit
+                                            Current Weight (kg)
+                                        </label>
+                                        <Input
+                                            type="number"
+                                            placeholder="Current Weight in kg"
+                                            value={formData.currentWeight}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    "currentWeight",
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
+                                            Price per Unit (₱/kg)
                                         </label>
                                         <Input
                                             type="number"
                                             step="0.01"
-                                            placeholder="Price per unit"
-                                            value={formData.price}
+                                            placeholder="Price per kg"
+                                            value={formData.pricePerUnit}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "price",
+                                                    "pricePerUnit",
                                                     e.target.value
                                                 )
                                             }
@@ -202,10 +202,10 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                         <Input
                                             type="text"
                                             placeholder="Product Name"
-                                            value={formData.productName}
+                                            value={formData.name}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "productName",
+                                                    "name",
                                                     e.target.value
                                                 )
                                             }
@@ -214,47 +214,33 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Quantity Needed & Unit
+                                            Weight Needed (kg)
                                         </label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="number"
-                                                placeholder="Quantity Needed"
-                                                value={formData.quantityNeeded}
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        "quantityNeeded",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="flex-1"
-                                                required
-                                            />
-                                            <Dropdown
-                                                value={formData.unit}
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        "unit",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                options={unitOptions}
-                                                className="w-24"
-                                            />
-                                        </div>
+                                        <Input
+                                            type="number"
+                                            placeholder="Weight Needed in kg"
+                                            value={formData.weightNedeed}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    "weightNedeed",
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Budget per Unit
+                                            Budget per Unit (₱/kg)
                                         </label>
                                         <Input
                                             type="number"
                                             step="0.01"
-                                            placeholder="Budget per unit"
-                                            value={formData.budgetPerUnit}
+                                            placeholder="Budget per kg"
+                                            value={formData.BudgetPerUnit}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "budgetPerUnit",
+                                                    "BudgetPerUnit",
                                                     e.target.value
                                                 )
                                             }
@@ -263,15 +249,32 @@ function AddItemModal({ isOpen, onClose, userType }) {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Needed By
+                                            Date Needed
                                         </label>
                                         <Input
                                             type="date"
-                                            placeholder="Needed By"
-                                            value={formData.neededBy}
+                                            placeholder="Date Needed"
+                                            value={formData.dateNeeded}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "neededBy",
+                                                    "dateNeeded",
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
+                                            Expiry Date
+                                        </label>
+                                        <Input
+                                            type="date"
+                                            placeholder="Expiry Date"
+                                            value={formData.expiryDate}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    "expiryDate",
                                                     e.target.value
                                                 )
                                             }

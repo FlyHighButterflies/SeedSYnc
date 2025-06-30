@@ -17,7 +17,8 @@ function DeleteItemModal({ isOpen, onClose, userType, item, onConfirm }) {
         onClose();
     };
 
-    const itemName = userType === "farmer" ? item?.name : item?.productName;
+    // Use correct name field for both types
+    const itemName = item?.name;
 
     return (
         <>
@@ -59,15 +60,16 @@ function DeleteItemModal({ isOpen, onClose, userType, item, onConfirm }) {
                                     <div className="text-sm text-gray-600">
                                         <p>
                                             <span className="font-medium">
-                                                Quantity:
+                                                Current/Initial Weight:
                                             </span>{" "}
-                                            {item?.quantity} {item?.unit}
+                                            {item?.currentWeight} /{" "}
+                                            {item?.initialWeight} kg
                                         </p>
                                         <p>
                                             <span className="font-medium">
                                                 Price:
                                             </span>{" "}
-                                            ₱{item?.price}/{item?.unit}
+                                            ₱{item?.pricePerUnit}/kg
                                         </p>
                                         <p>
                                             <span className="font-medium">
@@ -82,21 +84,25 @@ function DeleteItemModal({ isOpen, onClose, userType, item, onConfirm }) {
                                     <div className="text-sm text-gray-600">
                                         <p>
                                             <span className="font-medium">
-                                                Quantity Needed:
+                                                Weight Needed:
                                             </span>{" "}
-                                            {item?.quantityNeeded} {item?.unit}
+                                            {item?.weightNedeed} kg
                                         </p>
                                         <p>
                                             <span className="font-medium">
                                                 Budget:
                                             </span>{" "}
-                                            ₱{item?.budgetPerUnit}/{item?.unit}
+                                            ₱{item?.BudgetPerUnit}/kg
                                         </p>
                                         <p>
                                             <span className="font-medium">
-                                                Urgency:
+                                                Date Needed:
                                             </span>{" "}
-                                            {item?.urgency}
+                                            {item?.dateNeeded
+                                                ? new Date(
+                                                      item.dateNeeded
+                                                  ).toLocaleDateString()
+                                                : ""}
                                         </p>
                                     </div>
                                 </div>

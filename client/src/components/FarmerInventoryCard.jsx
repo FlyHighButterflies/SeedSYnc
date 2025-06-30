@@ -4,11 +4,13 @@ import Button from "./Button";
 function FarmerInventoryCard({ item, onEdit, onDelete }) {
     const getStatusColor = (status) => {
         switch (status) {
-            case "Available":
+            case "available":
                 return "text-green-600 bg-green-100";
-            case "Low Stock":
-                return "text-yellow-600 bg-yellow-100";
-            case "Out of Stock":
+            case "matched":
+                return "text-blue-600 bg-blue-100";
+            case "sold":
+                return "text-gray-600 bg-gray-100";
+            case "expired":
                 return "text-red-600 bg-red-100";
             default:
                 return "text-gray-600 bg-gray-100";
@@ -23,7 +25,7 @@ function FarmerInventoryCard({ item, onEdit, onDelete }) {
                     {item.name.charAt(0)}
                 </div>
                 <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
                         item.status
                     )}`}
                 >
@@ -41,21 +43,31 @@ function FarmerInventoryCard({ item, onEdit, onDelete }) {
                 <div className="flex items-center gap-2">
                     <Package className="w-4 h-4" />
                     <span>
-                        {item.quantity} {item.unit}
+                        {item.currentWeight} / {item.initialWeight} kg
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4" />
-                    <span>
-                        ₱{item.price}/{item.unit}
-                    </span>
+                    <span>₱{item.pricePerUnit}/kg</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span>
-                        Exp: {new Date(item.expiryDate).toLocaleDateString()}
-                    </span>
-                </div>
+                {item.harvestDate && (
+                    <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        <span>
+                            Harvested:{" "}
+                            {new Date(item.harvestDate).toLocaleDateString()}
+                        </span>
+                    </div>
+                )}
+                {item.expiryDate && (
+                    <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        <span>
+                            Expires:{" "}
+                            {new Date(item.expiryDate).toLocaleDateString()}
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Actions */}

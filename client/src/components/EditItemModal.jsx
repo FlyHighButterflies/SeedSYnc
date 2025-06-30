@@ -2,22 +2,20 @@ import { useState, useEffect } from "react";
 import { X, Edit3 } from "lucide-react";
 import Button from "./Button";
 import Input from "./Input";
-import Dropdown from "./Dropdown";
 
 function EditItemModal({ isOpen, onClose, userType, item }) {
     const [formData, setFormData] = useState({
         // Farmer fields
         name: "",
-        quantity: "",
-        unit: "kg",
-        price: "",
+        initialWeight: "",
+        currentWeight: "",
+        pricePerUnit: "",
         harvestDate: "",
         expiryDate: "",
         // Buyer fields
-        productName: "",
-        quantityNeeded: "",
-        budgetPerUnit: "",
-        neededBy: "",
+        weightNedeed: "",
+        BudgetPerUnit: "",
+        dateNeeded: "",
     });
 
     useEffect(() => {
@@ -25,20 +23,27 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
             if (userType === "farmer") {
                 setFormData({
                     name: item.name || "",
-                    quantity: item.quantity || "",
-                    unit: item.unit || "kg",
-                    price: item.price || "",
-                    harvestDate: item.harvestDate || "",
-                    expiryDate: item.expiryDate || "",
+                    initialWeight: item.initialWeight || "",
+                    currentWeight: item.currentWeight || "",
+                    pricePerUnit: item.pricePerUnit || "",
+                    harvestDate: item.harvestDate
+                        ? item.harvestDate.slice(0, 10)
+                        : "",
+                    expiryDate: item.expiryDate
+                        ? item.expiryDate.slice(0, 10)
+                        : "",
                 });
             } else {
                 setFormData({
-                    productName: item.productName || "",
-                    quantityNeeded: item.quantityNeeded || "",
-                    unit: item.unit || "kg",
-                    budgetPerUnit: item.budgetPerUnit || "",
-                    neededBy: item.neededBy || "",
-                    expiryDate: item.expiryDate || "",
+                    name: item.name || "",
+                    weightNedeed: item.weightNedeed || "",
+                    BudgetPerUnit: item.BudgetPerUnit || "",
+                    dateNeeded: item.dateNeeded
+                        ? item.dateNeeded.slice(0, 10)
+                        : "",
+                    expiryDate: item.expiryDate
+                        ? item.expiryDate.slice(0, 10)
+                        : "",
                 });
             }
         }
@@ -54,7 +59,27 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Edit item:", { ...item, ...formData });
+        // Prepare data for backend - exactly matching CropModel
+        let payload;
+        if (userType === "farmer") {
+            payload = {
+                name: formData.name,
+                initialWeight: Number(formData.initialWeight),
+                currentWeight: Number(formData.currentWeight),
+                pricePerUnit: Number(formData.pricePerUnit),
+                harvestDate: formData.harvestDate,
+                expiryDate: formData.expiryDate,
+            };
+        } else {
+            payload = {
+                name: formData.name,
+                weightNedeed: Number(formData.weightNedeed),
+                BudgetPerUnit: Number(formData.BudgetPerUnit),
+                dateNeeded: formData.dateNeeded,
+                expiryDate: formData.expiryDate,
+            };
+        }
+        console.log("Edit item:", { ...item, ...payload });
         // TODO: Handle actual submission when backend is ready
         onClose();
     };
@@ -65,13 +90,6 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
             [field]: value,
         }));
     };
-
-    const unitOptions = [
-        { label: "kg", value: "kg" },
-        { label: "lbs", value: "lbs" },
-        { label: "tons", value: "tons" },
-        { label: "pieces", value: "pieces" },
-    ];
 
     return (
         <>
@@ -120,47 +138,50 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Quantity & Unit
+                                            Initial Weight (kg)
                                         </label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="number"
-                                                placeholder="Quantity"
-                                                value={formData.quantity}
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        "quantity",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="flex-1"
-                                                required
-                                            />
-                                            <Dropdown
-                                                value={formData.unit}
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        "unit",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                options={unitOptions}
-                                                className="w-24"
-                                            />
-                                        </div>
+                                        <Input
+                                            type="number"
+                                            placeholder="Initial Weight in kg"
+                                            value={formData.initialWeight}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    "initialWeight",
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Price per Unit
+                                            Current Weight (kg)
+                                        </label>
+                                        <Input
+                                            type="number"
+                                            placeholder="Current Weight in kg"
+                                            value={formData.currentWeight}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    "currentWeight",
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">
+                                            Price per Unit (₱/kg)
                                         </label>
                                         <Input
                                             type="number"
                                             step="0.01"
-                                            placeholder="Price per unit"
-                                            value={formData.price}
+                                            placeholder="Price per kg"
+                                            value={formData.pricePerUnit}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "price",
+                                                    "pricePerUnit",
                                                     e.target.value
                                                 )
                                             }
@@ -211,10 +232,10 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                         <Input
                                             type="text"
                                             placeholder="Product Name"
-                                            value={formData.productName}
+                                            value={formData.name}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "productName",
+                                                    "name",
                                                     e.target.value
                                                 )
                                             }
@@ -223,47 +244,33 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Quantity Needed & Unit
+                                            Weight Needed (kg)
                                         </label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="number"
-                                                placeholder="Quantity Needed"
-                                                value={formData.quantityNeeded}
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        "quantityNeeded",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="flex-1"
-                                                required
-                                            />
-                                            <Dropdown
-                                                value={formData.unit}
-                                                onChange={(e) =>
-                                                    handleInputChange(
-                                                        "unit",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                options={unitOptions}
-                                                className="w-24"
-                                            />
-                                        </div>
+                                        <Input
+                                            type="number"
+                                            placeholder="Weight Needed in kg"
+                                            value={formData.weightNedeed}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    "weightNedeed",
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Budget per Unit
+                                            Budget per Unit (₱/kg)
                                         </label>
                                         <Input
                                             type="number"
                                             step="0.01"
-                                            placeholder="Budget per unit"
-                                            value={formData.budgetPerUnit}
+                                            placeholder="Budget per kg"
+                                            value={formData.BudgetPerUnit}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "budgetPerUnit",
+                                                    "BudgetPerUnit",
                                                     e.target.value
                                                 )
                                             }
@@ -272,15 +279,15 @@ function EditItemModal({ isOpen, onClose, userType, item }) {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                                            Needed By
+                                            Date Needed
                                         </label>
                                         <Input
                                             type="date"
-                                            placeholder="Needed By"
-                                            value={formData.neededBy}
+                                            placeholder="Date Needed"
+                                            value={formData.dateNeeded}
                                             onChange={(e) =>
                                                 handleInputChange(
-                                                    "neededBy",
+                                                    "dateNeeded",
                                                     e.target.value
                                                 )
                                             }

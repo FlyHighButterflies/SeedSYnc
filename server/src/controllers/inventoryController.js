@@ -13,8 +13,7 @@ import {
     invalidateUserProfileCache,
 } from "../utils/cacheUtils.js";
 
-function buildCropDetails(crop, role) {
-    // Always include these fields
+export function buildCropDetails(crop, role) {
     const base = {
         cropId: crop._id,
         name: crop.name,
@@ -35,9 +34,9 @@ function buildCropDetails(crop, role) {
         return {
             ...base,
             buyerId: crop.buyerId,
-            weightNedeed: crop.weightNedeed,
-            BudgetPerUnit: crop.BudgetPerUnit,
-            dateNeeded: crop.dateNeeded,
+            weightNeeded: crop.weightNeeded ?? null, // fixed spelling
+            budgetPerUnit: crop.budgetPerUnit ?? null, // fixed casing
+            dateNeeded: crop.dateNeeded ?? null,
         };
     }
     return base;
@@ -161,43 +160,44 @@ export const createInventory = async (req, res) => {
 // Get inventory for authenticated user
 export const getInventoryByUserId = async (req, res) => {
     const userId = req.user._id.toString();
+    const role = req.user.role;
 
     if (!validateMongoId(userId)) {
         return res.status(400).json({ message: "Invalid userId." });
     }
 
     try {
-        let inventory = await getCachedUserProfile(userId);
+        // Always fetch all crops for the user
+        let cropQuery = {};
+        if (role === "farmer") {
+            cropQuery.farmerId = userId;
+        } else if (role === "buyer") {
+            cropQuery.buyerId = userId;
+        }
+        const foundCrops = await Crop.find(cropQuery);
+        const cropsDetails = foundCrops.map((crop) =>
+            buildCropDetails(crop, role)
+        );
+
+        // Get or create inventory meta (for _id, createdAt, etc.)
+        let inventory = await Inventory.findOne({ userId }).sort({
+            createdAt: -1,
+        });
         if (!inventory) {
-            inventory = await Inventory.findOne({ userId });
-            if (!inventory) {
-                return res
-                    .status(404)
-                    .json({ message: "Inventory not found for this user." });
-            }
-            await cacheUserProfile(userId, inventory);
+            inventory = new Inventory({
+                userId,
+                role,
+                crops: [],
+            });
         }
 
-        let invObj =
-            typeof inventory.toObject === "function"
+        // Build response with latest crops
+        const invObj = {
+            ...(typeof inventory.toObject === "function"
                 ? inventory.toObject()
-                : inventory;
-
-        // If crops are ObjectIds, migrate to full crop objects for response
-        if (
-            Array.isArray(invObj.crops) &&
-            invObj.crops.length > 0 &&
-            (invObj.crops[0]._bsontype === "ObjectID" ||
-                invObj.crops[0] instanceof Buffer)
-        ) {
-            const cropIds = invObj.crops.map((c) =>
-                c.toString ? c.toString() : c
-            );
-            const foundCrops = await Crop.find({ _id: { $in: cropIds } });
-            invObj.crops = foundCrops.map((crop) =>
-                buildCropDetails(crop, invObj.role)
-            );
-        }
+                : inventory),
+            crops: cropsDetails,
+        };
 
         res.status(200).json(hashInventoryResponse(invObj));
     } catch (error) {

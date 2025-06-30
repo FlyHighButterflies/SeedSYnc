@@ -19,19 +19,25 @@ class MatchController {
             const farmerIds = farmers.map((f) => f._id || f.id);
             console.debug("[MatchController] Farmer IDs:", farmerIds);
 
+            // Always get the latest inventory for each farmer
             const inventories = await Inventory.find({
                 userId: { $in: farmerIds },
-            }).lean();
-            console.debug("[MatchController] Inventories found:", inventories);
+            })
+                .sort({ createdAt: -1 })
+                .lean();
 
+            // If you want only the latest per user:
             const inventoryMap = new Map();
             inventories.forEach((inv) => {
-                inventoryMap.set(
-                    String(inv.userId),
-                    inv.crops.map((c) => String(c))
-                );
+                // Only keep the latest inventory per userId
+                if (!inventoryMap.has(String(inv.userId))) {
+                    inventoryMap.set(String(inv.userId), inv.crops);
+                }
             });
 
+            console.debug("[MatchController] Inventories found:", inventories);
+
+            // Map userId to full crop objects, not just IDs
             // Prepare farmers payload for AI agent
             const farmersWithInventory = farmers.map((farmer) => ({
                 _id: farmer._id || farmer.id,

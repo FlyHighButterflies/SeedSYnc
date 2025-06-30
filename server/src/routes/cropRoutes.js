@@ -11,7 +11,7 @@ router.post(
     authMiddleware,
     cropController.createCrop.bind(cropController)
 );
-router.get("/", cropController.getCrops.bind(cropController));
+router.get("/", authMiddleware, cropController.getCrops.bind(cropController));
 router.put(
     "/:id",
     authMiddleware,

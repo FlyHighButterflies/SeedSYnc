@@ -71,7 +71,14 @@ class CropController {
     async getCrops(req, res) {
         console.log("getCrops called");
         try {
-            const crops = await this.CropModel.find();
+            // Only return crops belonging to the authenticated user
+            let query = {};
+            if (req.user && req.user.role === "farmer") {
+                query.farmerId = req.user._id;
+            } else if (req.user && req.user.role === "buyer") {
+                query.buyerId = req.user._id;
+            }
+            const crops = await this.CropModel.find(query);
             console.log("Fetched crops:", crops.length);
             res.status(200).json(
                 crops.map((crop) => this.hashCropResponse(crop))

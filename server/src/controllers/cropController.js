@@ -1,4 +1,6 @@
 import { hashUserId, hashCropKey } from "../utils/hash.js";
+import Inventory from "../models/InventoryModel.js";
+import Crop from "../models/CropModel.js";
 
 class CropController {
     constructor(CropModel) {
@@ -7,8 +9,9 @@ class CropController {
 
     // Helper to hash crop response
     hashCropResponse(crop) {
+        const obj = crop.toObject();
         return {
-            ...crop.toObject(),
+            ...obj,
             _id: hashCropKey(
                 crop.farmerId ? crop.farmerId.toString() : "",
                 crop._id.toString()
@@ -17,6 +20,9 @@ class CropController {
                 ? hashUserId(crop.farmerId.toString())
                 : null,
             buyerId: crop.buyerId ? hashUserId(crop.buyerId.toString()) : null,
+            weightNeeded: obj.weightNeeded ?? null,
+            budgetPerUnit: obj.budgetPerUnit ?? null,
+            dateNeeded: obj.dateNeeded ?? null,
         };
     }
 
@@ -54,12 +60,44 @@ class CropController {
                 cropData.farmerId = req.user._id;
             } else if (req.user.role === "buyer") {
                 cropData.buyerId = req.user._id;
+                // Accept buyer-specific fields
+                cropData.weightNeeded = req.body.weightNeeded;
+                cropData.budgetPerUnit = req.body.budgetPerUnit;
+                cropData.dateNeeded = req.body.dateNeeded;
             }
             console.log("Constructed cropData:", cropData);
 
             const crop = new this.CropModel(cropData);
             await crop.save();
             console.log("Crop saved:", crop);
+
+            // --- Update inventory after crop creation ---
+            // Find all crops for this user
+            let cropQuery = {};
+            if (req.user.role === "farmer") {
+                cropQuery.farmerId = req.user._id;
+            } else if (req.user.role === "buyer") {
+                cropQuery.buyerId = req.user._id;
+            }
+            const allCrops = await Crop.find(cropQuery);
+            // Build crop details for inventory
+            const { buildCropDetails } = await import(
+                "./inventoryController.js"
+            );
+            const cropsDetails = allCrops.map((c) =>
+                buildCropDetails(c, req.user.role)
+            );
+            // Upsert inventory
+            await Inventory.findOneAndUpdate(
+                { userId: req.user._id },
+                {
+                    userId: req.user._id,
+                    role: req.user.role,
+                    crops: cropsDetails,
+                },
+                { upsert: true, new: true }
+            );
+            // --- End inventory update ---
 
             res.status(201).json(this.hashCropResponse(crop));
         } catch (error) {
@@ -129,6 +167,31 @@ class CropController {
             );
             console.log("Updated crop:", updatedCrop);
 
+            // --- Update inventory after crop update ---
+            let cropQuery = {};
+            if (req.user.role === "farmer") {
+                cropQuery.farmerId = req.user._id;
+            } else if (req.user.role === "buyer") {
+                cropQuery.buyerId = req.user._id;
+            }
+            const allCrops = await Crop.find(cropQuery);
+            const { buildCropDetails } = await import(
+                "./inventoryController.js"
+            );
+            const cropsDetails = allCrops.map((c) =>
+                buildCropDetails(c, req.user.role)
+            );
+            await Inventory.findOneAndUpdate(
+                { userId: req.user._id },
+                {
+                    userId: req.user._id,
+                    role: req.user.role,
+                    crops: cropsDetails,
+                },
+                { upsert: true, new: true }
+            );
+            // --- End inventory update ---
+
             res.status(200).json(this.hashCropResponse(updatedCrop));
         } catch (error) {
             console.error("Error in updateCrop:", error);
@@ -159,6 +222,31 @@ class CropController {
 
             await this.CropModel.findByIdAndDelete(id);
             console.log("Crop deleted:", id);
+
+            // --- Update inventory after crop deletion ---
+            let cropQuery = {};
+            if (req.user.role === "farmer") {
+                cropQuery.farmerId = req.user._id;
+            } else if (req.user.role === "buyer") {
+                cropQuery.buyerId = req.user._id;
+            }
+            const allCrops = await Crop.find(cropQuery);
+            const { buildCropDetails } = await import(
+                "./inventoryController.js"
+            );
+            const cropsDetails = allCrops.map((c) =>
+                buildCropDetails(c, req.user.role)
+            );
+            await Inventory.findOneAndUpdate(
+                { userId: req.user._id },
+                {
+                    userId: req.user._id,
+                    role: req.user.role,
+                    crops: cropsDetails,
+                },
+                { upsert: true, new: true }
+            );
+            // --- End inventory update ---
 
             res.status(204).send();
         } catch (error) {

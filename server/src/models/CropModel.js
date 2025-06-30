@@ -24,6 +24,12 @@ const cropSchema = new mongoose.Schema({
 
     expiryDate: { type: Date },
     createdAt: { type: Date, default: Date.now },
+
+    // Inventory alert info (auto-triggered)
+    alert: {
+        type: Object,
+        default: null
+    }
 });
 
 // Performance optimization indexes for search functionality

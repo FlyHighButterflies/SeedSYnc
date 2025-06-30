@@ -666,7 +666,7 @@ function SignUp() {
             address: `${data.address || ""}, ${data.city || ""}, ${
                 data.province || ""
             }, ${data.country || ""}`.replace(/^,\s*|,\s*$/g, ""),
-            role: userType === "farmer" ? "Farmer" : "Buyer", // Capitalized for backend
+            role: userType,
 
             ...(userType === "farmer" && {
                 farmerInfo: {

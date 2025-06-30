@@ -11,13 +11,22 @@ function Step1({ register, errors }) {
     return (
         <>
             <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Email
+                </label>
                 {errors.email && (
                     <p className="text-red-500 text-sm">
                         {errors.email.message}
                     </p>
                 )}
                 <Input
-                    {...register("email", { required: "Email is required" })}
+                    {...register("email", {
+                        required: "Email is required",
+                        pattern: {
+                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                            message: "Please enter a valid email address",
+                        },
+                    })}
                     type="email"
                     placeholder="Email"
                     className={errors.email ? "border-red-500" : ""}
@@ -25,6 +34,9 @@ function Step1({ register, errors }) {
             </div>
 
             <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    First Name
+                </label>
                 {errors.firstName && (
                     <p className="text-red-500 text-sm">
                         {errors.firstName.message}
@@ -41,6 +53,9 @@ function Step1({ register, errors }) {
             </div>
 
             <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Last Name
+                </label>
                 {errors.lastName && (
                     <p className="text-red-500 text-sm">
                         {errors.lastName.message}
@@ -57,6 +72,9 @@ function Step1({ register, errors }) {
             </div>
 
             <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Password
+                </label>
                 {errors.password && (
                     <p className="text-red-500 text-sm">
                         {errors.password.message}
@@ -77,6 +95,9 @@ function Step1({ register, errors }) {
             </div>
 
             <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Contact Number
+                </label>
                 {errors.contactNumber && (
                     <p className="text-red-500 text-sm">
                         {errors.contactNumber.message}
@@ -85,8 +106,14 @@ function Step1({ register, errors }) {
                 <Input
                     {...register("contactNumber", {
                         required: "Contact number is required",
+                        pattern: {
+                            value: /^[0-9]+$/,
+                            message: "Contact number must be numbers only",
+                        },
                     })}
-                    type="text"
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="Contact Number"
                     className={errors.contactNumber ? "border-red-500" : ""}
                 />
@@ -212,47 +239,99 @@ function Step2({ register, setValue, watch }) {
 function Step3({ register }) {
     return (
         <>
-            <Input {...register("country")} type="text" placeholder="Country" />
-            <Input
-                {...register("province")}
-                type="text"
-                placeholder="Province/Region"
-            />
-            <Input {...register("city")} type="text" placeholder="City/Town" />
-            <Input {...register("address")} type="text" placeholder="Address" />
-            <Input
-                {...register("landmarks")}
-                type="text"
-                placeholder="Nearby Landmarks"
-            />
-            <Dropdown
-                {...register("highway")}
-                id="highway"
-                placeholder="Major Highway"
-                options={[
-                    { label: "Yes", value: "yes" },
-                    { label: "No", value: "no" },
-                ]}
-            />
-            <Dropdown
-                {...register("port")}
-                id="port"
-                placeholder="Port/Hub"
-                options={[
-                    { label: "Yes", value: "yes" },
-                    { label: "No", value: "no" },
-                ]}
-            />
-            <Dropdown
-                {...register("transportation")}
-                id="transportation"
-                placeholder="Transportation Mode"
-                options={[
-                    { label: "Boat", value: "boat" },
-                    { label: "Truck", value: "truck" },
-                    { label: "On foot", value: "on-foot" },
-                ]}
-            />
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Country
+                </label>
+                <Input
+                    {...register("country")}
+                    type="text"
+                    placeholder="Country"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Province/Region
+                </label>
+                <Input
+                    {...register("province")}
+                    type="text"
+                    placeholder="Province/Region"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    City/Town
+                </label>
+                <Input
+                    {...register("city")}
+                    type="text"
+                    placeholder="City/Town"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Address
+                </label>
+                <Input
+                    {...register("address")}
+                    type="text"
+                    placeholder="Address"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Nearby Landmarks
+                </label>
+                <Input
+                    {...register("landmarks")}
+                    type="text"
+                    placeholder="Nearby Landmarks"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Major Highway
+                </label>
+                <Dropdown
+                    {...register("highway")}
+                    id="highway"
+                    placeholder="Major Highway"
+                    options={[
+                        { label: "Yes", value: "yes" },
+                        { label: "No", value: "no" },
+                    ]}
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Port/Hub
+                </label>
+                <Dropdown
+                    {...register("port")}
+                    id="port"
+                    placeholder="Port/Hub"
+                    options={[
+                        { label: "Yes", value: "yes" },
+                        { label: "No", value: "no" },
+                    ]}
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                    Transportation Mode
+                </label>
+                <Dropdown
+                    {...register("transportation")}
+                    id="transportation"
+                    placeholder="Transportation Mode"
+                    options={[
+                        { label: "Boat", value: "boat" },
+                        { label: "Truck", value: "truck" },
+                        { label: "On foot", value: "on-foot" },
+                    ]}
+                />
+            </div>
         </>
     );
 }

@@ -47,7 +47,7 @@ function Home() {
             <div
                 className="flex items-center justify-center w-full h-[400px] sm:h-[500px] lg:h-[610px] px-4"
                 style={{
-                    backgroundImage: 'url("/images/dashboard-image.jpg")',
+                    backgroundImage: 'url("/images/dashboard-image.webp")',
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                 }}

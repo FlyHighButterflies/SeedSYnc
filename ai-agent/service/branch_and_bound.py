@@ -1,18 +1,18 @@
+def bound(farmer, buyer):
+    # Check if buyer's cropId is in farmer's inventory (list)
+    return int(buyer["cropId"] in farmer["inventory"])
+
 def branch_and_bound(farmers, buyer):
-    best_score = -1
-    best_farmer = None
-
-    def bound(farmer):
-        return farmer["inventory"].get(buyer["product"], 0)
-
+    best = None
+    best_score = float('-inf')
     for farmer in farmers:
-        if bound(farmer) < 10:  # cutoff: not enough crop
+        if bound(farmer, buyer) < 1:  # cutoff: not enough crop
             continue
         score = (
-            bound(farmer) * (farmer["review"] / 5.0)
+            bound(farmer, buyer) * (farmer.get("rating", 0) / 5.0)
         )
         if score > best_score:
             best_score = score
-            best_farmer = farmer
+            best = farmer
 
-    return best_farmer
+    return best

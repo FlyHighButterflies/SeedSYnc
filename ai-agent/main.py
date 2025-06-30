@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from service.scoring_rules import (
     calculate_score,
-    apply_branch_and_bound_if_enabled,
-    hash_farmers_if_enabled,
+    apply_branch_and_bound,
+    hash_farmers,
 )
 
 app = Flask(__name__)
@@ -17,22 +17,21 @@ def match():
     buyer = data.get("buyer", {})
     farmers = data.get("farmers", [])
     options = data.get("options", {})
-    graph = data.get("graph", {})  # Optional A* routing graph
 
-    # Optional: Branch and Bound override
-    selected_farmers = apply_branch_and_bound_if_enabled(farmers, buyer, options)
+    # Always use Branch and Bound
+    selected_farmers = apply_branch_and_bound(farmers, buyer, options)
     if not selected_farmers:
         return jsonify([])
 
-    # Optional: Hash farmers (for fast ID lookup if needed)
-    htable = hash_farmers_if_enabled(selected_farmers, options)
+    # Always use Hash farmers (for fast ID lookup if needed)
+    htable = hash_farmers(selected_farmers)
 
     # Scoring
     results = []
     for farmer in selected_farmers:
-        score = calculate_score(farmer, buyer, options, graph)
+        score = calculate_score(farmer, buyer)
         results.append({
-            "farmer_id": farmer["id"],
+            "farmer_id": farmer.get("_id") or farmer.get("id"),
             "score": round(score, 3)
         })
 

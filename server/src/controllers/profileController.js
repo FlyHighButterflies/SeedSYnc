@@ -1,15 +1,19 @@
 import User from "../models/UserModel.js";
+import { getCachedUserProfile, cacheUserProfile, invalidateUserProfileCache } from '../utils/cacheUtils.js';
 
 class ProfileController {
     async getMyProfile(req, res) {
         try {
             // req.user is populated by authMiddleware
-            const user = await User.findById(req.user._id).select("-password");
-
+            // Try cache first
+            let user = await getCachedUserProfile(req.user._id);
             if (!user) {
-                return res.status(404).json({ message: "Profile not found." });
+                user = await User.findById(req.user._id).select("-password");
+                if (!user) {
+                    return res.status(404).json({ message: "Profile not found." });
+                }
+                await cacheUserProfile(req.user._id, user);
             }
-
             res.status(200).json(user);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -35,6 +39,8 @@ class ProfileController {
                 return res.status(404).json({ message: "Profile not found." });
             }
 
+            // Invalidate cache after update
+            await invalidateUserProfileCache(req.user._id);
             res.status(200).json(updatedUser);
         } catch (error) {
             res.status(400).json({ message: error.message });

@@ -28,6 +28,11 @@ services:
     env_file:
       - ./server/.env
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
   ai-agent:
     build:
       context: ./ai-agent

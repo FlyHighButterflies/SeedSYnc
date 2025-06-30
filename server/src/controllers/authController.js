@@ -7,7 +7,7 @@ class AuthController {
         try {
             const { role, email, password, ...profileData } = req.body;
 
-            if (!role || !["Farmer", "Buyer"].includes(role)) {
+            if (!role || !["farmer", "buyer"].includes(role)) {
                 return res
                     .status(400)
                     .json({ message: "Invalid user role specified." });
@@ -17,7 +17,7 @@ class AuthController {
 
             const newUser = new User({
                 email,
-                password: hashedPassword,
+                passwordHash: hashedPassword,
                 role,
                 ...profileData,
             });
@@ -41,7 +41,7 @@ class AuthController {
         try {
             const { email, password, role } = req.body;
 
-            if (!role || !["Farmer", "Buyer"].includes(role)) {
+            if (!role || !["farmer", "buyer"].includes(role)) {
                 return res
                     .status(400)
                     .json({ message: "Invalid user role specified." });
@@ -55,7 +55,7 @@ class AuthController {
                     .json({ message: "Invalid credentials." });
             }
 
-            const isMatch = await bcrypt.compare(password, user.password);
+            const isMatch = await bcrypt.compare(password, user.passwordHash);
             if (!isMatch) {
                 return res
                     .status(400)

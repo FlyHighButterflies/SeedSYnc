@@ -71,12 +71,12 @@ const userSchema = new mongoose.Schema({
         urgency: {
             type: String,
             enum: ["low", "medium", "high"],
-            default: "medium",
+            default: "",
         },
         frequency: {
             type: String,
             enum: ["daily", "weekly", "monthly"],
-            default: "weekly",
+            default: "",
         },
         qualityStandards: {
             type: String,

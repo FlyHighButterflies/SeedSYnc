@@ -1,11 +1,23 @@
 import { io, userSockets } from '../server.js';
 import Match from '../models/MatchModel.js';
 import { sendPushNotification } from '../services/notificationService.js';
+import User from '../models/UserModel.js';
+import Inventory from '../models/InventoryModel.js';
 
 class MatchController {
     async createMatch(req, res) {
         try {
-            const match = new Match(req.body);
+            const { buyer, inventory, ...matchData } = req.body;
+
+            // Validate that buyer and inventory exist
+            const buyerExists = await User.findById(buyer);
+            const inventoryExists = await Inventory.findById(inventory);
+
+            if (!buyerExists || !inventoryExists) {
+                return res.status(404).json({ message: 'Buyer or inventory not found.' });
+            }
+
+            const match = new Match({ buyer, inventory, ...matchData });
             await match.save();
 
             // Emit real-time event via Socket.IO

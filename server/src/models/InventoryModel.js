@@ -25,8 +25,8 @@ const cropDetailsSchema = new mongoose.Schema(
         pricePerUnit: Number,
         harvestDate: Date,
         // Buyer-specific
-        weightNedeed: Number,
-        BudgetPerUnit: Number,
+        weightNeeded: Number, // fixed spelling
+        budgetPerUnit: Number, // fixed casing
         dateNeeded: Date,
     },
     { _id: false }

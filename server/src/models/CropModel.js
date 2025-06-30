@@ -40,11 +40,13 @@ const cropSchema = new mongoose.Schema({
         ref: "User",
     },
 
-    weightNedeed: {
+    weightNeeded: {
+        // fixed spelling
         type: Number,
     },
 
-    BudgetPerUnit: {
+    budgetPerUnit: {
+        // fixed casing
         type: Number,
     },
 

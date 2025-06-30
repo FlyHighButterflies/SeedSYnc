@@ -17,20 +17,11 @@ export const useAuth = () => {
     // Login mutation
     const login = useMutation({
         mutationFn: (credentials) => authService.login(credentials),
-        onSuccess: (response) => {
-            // Backend returns: { token, user: { id, email, role } }
-            console.log("Login response:", response.data);
+        onSuccess: (data) => {
+            console.log("Login response:", data);
 
-            // Pass the response data to context (only user data will be saved)
-            setAuthUser(response.data);
-
-            // Navigate based on user role
-            const userRole = response.data.user.role;
-            if (userRole === "farmer" || userRole === "buyer") {
-                navigate("/home");
-            } else {
-                navigate("/dashboard");
-            }
+            setAuthUser(data);
+            navigate("/home");
         },
         onError: (error) => {
             console.error("Login failed:", error);

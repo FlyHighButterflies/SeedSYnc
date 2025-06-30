@@ -6,10 +6,9 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const login = (loginResponse) => {
+    const login = (userData) => {
         // Backend returns: { token, user: { id, email, role } }
         // Just save the user data in state, token is handled by cookies
-        const { user: userData } = loginResponse;
         setUser(userData);
     };
 

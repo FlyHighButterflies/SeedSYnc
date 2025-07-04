@@ -2,43 +2,109 @@ import { Button, ListingCard, UserModal } from "@/components";
 import { useUserModal } from "@/hooks";
 import { ChevronRight, Star, MessageCircle, Package } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "@/services/api";
 
 function Home() {
     const { selectedUser, isModalOpen, openModal, closeModal } = useUserModal();
 
-    const bestMatch = {
-        id: "1",
-        name: "John Smith",
-        type: "Farmer",
-        location: "Texas",
-        rating: 4.8,
-        match: 95,
-        trades: 120,
-        firstName: "John",
-        lastName: "Smith",
-        userType: "farmer",
-        city: "Austin",
-        province: "Texas",
-        email: "john.smith@example.com",
-        contactNumber: "+1 (555) 123-4567",
-        products: [
-            "Organic Tomatoes",
-            "Fresh Lettuce",
-            "Bell Peppers",
-            "Baby Carrots",
-            "Sweet Corn",
-            "Green Beans",
-        ],
-        certifications: "Organic", // Single value
-        totalTrades: 120,
+    // State for recommendations and best match
+    const [recommendations, setRecommendations] = useState([]);
+    const [bestMatch, setBestMatch] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const fetchRecommendations = () => {
+        // Use POST to always recompute recommendations (AI agent)
+        api.get("/matches/recommendations", {})
+            .then((res) => {
+                const recs = res.data?.recommendations || [];
+                setRecommendations(recs);
+
+                // Pick best match (highest score)
+                if (recs.length > 0) {
+                    const sorted = [...recs].sort(
+                        (a, b) =>
+                            (b.matchScore || b.score || 0) -
+                            (a.matchScore || a.score || 0)
+                    );
+                    setBestMatch(sorted[0]);
+                } else {
+                    setBestMatch(null);
+                }
+            })
+            .catch(() => {
+                setRecommendations([]);
+                setBestMatch(null);
+            });
+    };
+
+    useEffect(() => {
+        fetchRecommendations();
+    }, []);
+
+    const handleFindNow = async () => {
+        setLoading(true);
+        try {
+            await api.post("/matches/match", {}); // POST to create match
+            fetchRecommendations(); // Refresh recommendations
+        } catch (err) {
+            // Optionally show error
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Helper to extract crop names from inventory.crops
+    const getProductNamesFromInventory = (inventory) => {
+        if (!inventory || !Array.isArray(inventory.crops)) return [];
+        return inventory.crops.map(
+            (crop) => crop.name || crop.cropId?.name || "Crop"
+        );
+    };
+
+    // Map server farmer/user to ListingCard props
+    const mapFarmerToCard = (match) => {
+        const farmer = match.farmerId || match.farmer || {};
+        const products = getProductNamesFromInventory(farmer.inventory);
+
+        return {
+            id: farmer._id,
+            avatar: farmer.fullName
+                ? farmer.fullName
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                : "F",
+            firstName: farmer.fullName?.split(" ")[0] || "",
+            lastName: farmer.fullName?.split(" ")[1] || "",
+            userType: farmer.role || "farmer",
+            trade: match.cropName || "Crops",
+            // Extract region and country from address (assumes "street, city, region, country")
+            address: farmer.address
+                ? (() => {
+                      const parts = farmer.address
+                          .split(",")
+                          .map((s) => s.trim());
+                      if (parts.length >= 2) {
+                          // Get last two parts as region and country
+                          return parts.slice(-2).join(", ");
+                      }
+                      return farmer.address;
+                  })()
+                : "Location not specified",
+            rating: typeof farmer.rating === "number" ? farmer.rating : 0,
+            products,
+            certifications: farmer.farmerInfo?.certification || "",
+            totalTrades: typeof farmer.trades === "number" ? farmer.trades : 0,
+            contact: farmer.contactNumber || "Contact not available",
+            email: farmer.email || "Email not available",
+        };
     };
 
     const handleViewBestMatchProfile = () => {
-        window.open(
-            `/profile/${bestMatch.id}`,
-            "_blank",
-            "noopener,noreferrer"
-        );
+        if (!bestMatch) return;
+        const farmer = bestMatch.farmerId || bestMatch.farmer || {};
+        window.open(`/profile/${farmer._id}`, "_blank", "noopener,noreferrer");
     };
 
     return (
@@ -63,8 +129,10 @@ function Home() {
                         variant="primary"
                         size="lg"
                         className="w-full sm:w-auto"
+                        onClick={handleFindNow}
+                        disabled={loading}
                     >
-                        Find Now!
+                        {loading ? "Finding..." : "Find Now!"}
                     </Button>
                 </div>
             </div>
@@ -75,30 +143,27 @@ function Home() {
                     Suggestions for you
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 justify-items-center w-full max-w-7xl">
-                    {[1, 2, 3, 4, 5, 6].map((item, index) => (
-                        <ListingCard
-                            key={item}
-                            person={{
-                                id: index + 1,
-                                avatar: "A",
-                                firstName: "Jane",
-                                lastName: "Doe",
-                                userType: "farmer",
-                                trade: "Vegetables",
-                                city: "Los Angeles",
-                                province: "California",
-                                rating: 4.5,
-                                products: [
-                                    "Fresh Tomatoes",
-                                    "Organic Lettuce",
-                                    "Sweet Corn",
-                                ],
-                                certifications: "Organic",
-                                totalTrades: 45,
-                            }}
-                            onClick={openModal}
-                        />
-                    ))}
+                    {recommendations.length === 0
+                        ? Array.from({ length: 6 }).map((_, index) => (
+                              <div
+                                  key={index}
+                                  className="w-full h-48 bg-gray-100 rounded-lg animate-pulse"
+                              />
+                          ))
+                        : recommendations.slice(0, 6).map((match, index) => (
+                              <ListingCard
+                                  key={match._id || index}
+                                  person={mapFarmerToCard(match)}
+                                  onClick={() =>
+                                      openModal(mapFarmerToCard(match))
+                                  }
+                              >
+                                  <span className="text-sm text-gray-600 truncate">
+                                      {mapFarmerToCard(match).address ||
+                                          "Location not specified"}
+                                  </span>
+                              </ListingCard>
+                          ))}
                 </div>
                 <Link
                     to="/listings"
@@ -115,74 +180,91 @@ function Home() {
                     Best Match for You!
                 </h2>
 
-                <div className="flex flex-col items-center max-w-lg mx-auto">
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-gradient-to-br from-normalGreen to-darkGreen rounded-full flex items-center justify-center text-white font-semibold mb-3 sm:mb-4 text-xl sm:text-2xl">
-                        {bestMatch.firstName?.charAt(0) || "J"}
-                        {bestMatch.lastName?.charAt(0) || "S"}
+                {bestMatch ? (
+                    (() => {
+                        const farmer =
+                            bestMatch.farmerId || bestMatch.farmer || {};
+                        const products =
+                            farmer.inventory ||
+                            bestMatch.matchedCrops ||
+                            bestMatch.products ||
+                            [];
+                        return (
+                            <div className="flex flex-col items-center max-w-lg mx-auto">
+                                <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-gradient-to-br from-normalGreen to-darkGreen rounded-full flex items-center justify-center text-white font-semibold mb-3 sm:mb-4 text-xl sm:text-2xl">
+                                    {farmer.fullName
+                                        ? farmer.fullName
+                                              .split(" ")
+                                              .map((n) => n[0])
+                                              .join("")
+                                        : "F"}
+                                </div>
+                                <h3 className="text-xl sm:text-2xl font-bold text-darkGreen text-center">
+                                    {farmer.fullName || "Farmer"}
+                                </h3>
+                                <p className="text-gray-600 mb-3 text-center text-sm sm:text-base">
+                                    {farmer.role || "Farmer"} •{" "}
+                                    {farmer.address || ""}
+                                </p>
+                                <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 text-gray-600 text-sm sm:text-base">
+                                    <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
+                                    {farmer.rating || 0}
+                                    <span className="text-xs sm:text-sm text-gray-500">
+                                        •
+                                    </span>
+                                    <span className="text-xs sm:text-sm">
+                                        {farmer.trades || 0} successful trades
+                                    </span>
+                                </div>
+                                {/* Products Section - Show ALL Products */}
+                                <div className="mb-4 sm:mb-6 text-center">
+                                    <p className="text-xs text-normalGreen mb-3 uppercase tracking-wide font-bold">
+                                        Currently Selling
+                                    </p>
+                                    <div className="flex flex-wrap justify-center gap-2 mb-3">
+                                        {products.map((product, index) => (
+                                            <span
+                                                key={index}
+                                                className="px-3 py-1 bg-lightGreen text-darkGreen text-sm font-medium rounded-full"
+                                            >
+                                                {product}
+                                            </span>
+                                        ))}
+                                    </div>
+                                    {/* Product count */}
+                                    <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                                        <Package className="w-4 h-4" />
+                                        <span>
+                                            {products.length} products available
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
+                                    <Button
+                                        variant="primary"
+                                        size="lg"
+                                        className="flex-1 sm:flex-none"
+                                    >
+                                        <MessageCircle className="w-4 h-4" />
+                                        Start Trading
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="lg"
+                                        className="flex-1 sm:flex-none"
+                                        onClick={handleViewBestMatchProfile}
+                                    >
+                                        View Profile
+                                    </Button>
+                                </div>
+                            </div>
+                        );
+                    })()
+                ) : (
+                    <div className="text-gray-500 text-center">
+                        No best match found.
                     </div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-darkGreen text-center">
-                        {bestMatch.name}
-                    </h3>
-
-                    <p className="text-gray-600 mb-3 text-center text-sm sm:text-base">
-                        {bestMatch.type} • {bestMatch.location}
-                    </p>
-
-                    <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 text-gray-600 text-sm sm:text-base">
-                        <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
-                        {bestMatch.rating}
-                        <span className="text-xs sm:text-sm text-gray-500">
-                            •
-                        </span>
-                        <span className="text-xs sm:text-sm">
-                            {bestMatch.trades} successful trades
-                        </span>
-                    </div>
-
-                    {/* Products Section - Show ALL Products */}
-                    <div className="mb-4 sm:mb-6 text-center">
-                        <p className="text-xs text-normalGreen mb-3 uppercase tracking-wide font-bold">
-                            Currently Selling
-                        </p>
-                        <div className="flex flex-wrap justify-center gap-2 mb-3">
-                            {bestMatch.products.map((product, index) => (
-                                <span
-                                    key={index}
-                                    className="px-3 py-1 bg-lightGreen text-darkGreen text-sm font-medium rounded-full"
-                                >
-                                    {product}
-                                </span>
-                            ))}
-                        </div>
-
-                        {/* Product count */}
-                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                            <Package className="w-4 h-4" />
-                            <span>
-                                {bestMatch.products.length} products available
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
-                        <Button
-                            variant="primary"
-                            size="lg"
-                            className="flex-1 sm:flex-none"
-                        >
-                            <MessageCircle className="w-4 h-4" />
-                            Start Trading
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="lg"
-                            className="flex-1 sm:flex-none"
-                            onClick={handleViewBestMatchProfile}
-                        >
-                            View Profile
-                        </Button>
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* User Modal */}

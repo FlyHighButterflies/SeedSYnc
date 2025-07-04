@@ -7,7 +7,7 @@ import {
     LogOut,
     ArrowLeftFromLine,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks";
 
 const SidebarLink = ({ icon, text, to, onClick }) => (
@@ -28,10 +28,16 @@ const SidebarLink = ({ icon, text, to, onClick }) => (
 );
 
 function Sidebar({ isOpen, onClose }) {
-    const { logout } = useAuth();
+    const { logout, logout: { mutate } = {}, ...authContext } = useAuth();
+    const navigate = useNavigate();
 
     const handleLogout = () => {
-        logout();
+        // Fallback: clear user session and redirect, don't call backend
+        if (authContext.logout) {
+            authContext.logout(); // This is clearAuthUser from context
+        }
+        localStorage.removeItem("token");
+        navigate("/login");
         onClose();
     };
 

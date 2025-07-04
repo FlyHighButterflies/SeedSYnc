@@ -1,6 +1,8 @@
 import { Button, Input } from "@/components";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 function Login() {
     const {
@@ -8,10 +10,20 @@ function Login() {
         handleSubmit,
         formState: { errors, isSubmitting },
     } = useForm();
+    const { login } = useAuth();
+    const [errorMsg, setErrorMsg] = useState("");
 
     const onSubmit = (data) => {
-        console.log("Login Data:", data);
-        alert("Login attempt successful! Check the console for data.");
+        setErrorMsg("");
+        login.mutate(data, {
+            onError: (error) => {
+                const msg =
+                    error?.response?.data?.message ||
+                    error?.message ||
+                    "Login failed. Please try again.";
+                setErrorMsg(msg);
+            },
+        });
     };
 
     return (
@@ -45,6 +57,12 @@ function Login() {
                             </div>
 
                             <p className="text-2xl font-bold">Sign In</p>
+
+                            {errorMsg && (
+                                <div className="text-red-600 text-center font-semibold">
+                                    {errorMsg}
+                                </div>
+                            )}
 
                             <div className="flex flex-col justify-center gap-4 md:gap-6 w-full h-[320px] mx-auto p-8 rounded-xl bg-white">
                                 <div>

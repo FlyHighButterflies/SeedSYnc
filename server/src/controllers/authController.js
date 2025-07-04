@@ -39,15 +39,9 @@ class AuthController {
 
     async login(req, res) {
         try {
-            const { email, password, role } = req.body;
+            const { email, password } = req.body;
 
-            if (!role || !["farmer", "buyer"].includes(role)) {
-                return res
-                    .status(400)
-                    .json({ message: "Invalid user role specified." });
-            }
-
-            const user = await User.findOne({ email, role });
+            const user = await User.findOne({ email });
 
             if (!user) {
                 return res
@@ -62,15 +56,13 @@ class AuthController {
                     .json({ message: "Invalid credentials." });
             }
 
-            const token = jwt.sign(
-                { id: user._id, role: user.role },
-                process.env.JWT_SECRET,
-                { expiresIn: "1h" }
-            );
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+                expiresIn: "1h",
+            });
 
             res.status(200).json({
                 token,
-                user: { id: user._id, email: user.email, role: user.role },
+                user: { id: user._id, email: user.email },
             });
         } catch (error) {
             res.status(500).json({ message: error.message });

@@ -12,7 +12,7 @@ def extract_province_from_address(address):
         prov_norm = prov.replace("-", "").replace(" ", "").lower()
         if bmhs(addr.replace("-", "").replace(" ", ""), prov_norm) != -1:
             return prov
-        # Also try direct substring match for robustness
+        # Direct substring match for robustness
         if bmhs(addr, prov.lower()) != -1:
             return prov
     return None
@@ -21,7 +21,7 @@ def calculate_score(farmer, buyer):
     score = 0
     score_breakdown = {}
 
-    # Always use A* Proximity (use address)
+    # Use A* Proximity (use address)
     farmer_region = extract_province_from_address(farmer.get("address", ""))
     buyer_region = extract_province_from_address(buyer.get("address", ""))
     path = a_star(philippines_graph, farmer_region, buyer_region)
@@ -61,7 +61,7 @@ def calculate_score(farmer, buyer):
     score += sustainability_score
     score_breakdown["sustainability"] = sustainability_score
 
-    # Always use BMHS keyword match: match buyer's qualityStandards to farmer's certification/farmingPractices
+    # Use BMHS keyword match: match buyer's qualityStandards to farmer's certification/farmingPractices
     desc = (farmer_info.get("certification", "") + " " + farmer_info.get("farmingPractices", "")).strip()
     keyword = buyer.get("buyerInfo", {}).get("qualityStandards", "")
     keyword_score = 0.1 if bmhs(desc.lower(), keyword.lower()) != -1 else 0.0

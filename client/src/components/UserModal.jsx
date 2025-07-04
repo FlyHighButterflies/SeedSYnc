@@ -84,6 +84,16 @@ function UserModal({ user, isOpen, onClose }) {
         setShowRatingForm(false);
     };
 
+    // Extract region and country from address (assumes "street, city, region, country")
+    const getRegionCountry = (address) => {
+        if (!address) return "Location not specified";
+        const parts = address.split(",").map((s) => s.trim());
+        if (parts.length >= 2) {
+            return parts.slice(-2).join(", ");
+        }
+        return address;
+    };
+
     return (
         <>
             {/* Fixed backdrop */}
@@ -108,21 +118,35 @@ function UserModal({ user, isOpen, onClose }) {
                         {/* Avatar and basic info */}
                         <div className="flex items-center gap-4 mb-6">
                             <div className="w-20 h-20 bg-gradient-to-br from-normalGreen to-darkGreen rounded-full flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
-                                {user.firstName?.charAt(0) ||
-                                    user.name?.charAt(0) ||
-                                    user.avatar}
-                                {user.lastName?.charAt(0) || ""}
+                                {user.fullName
+                                    ? user.fullName
+                                          .split(" ")
+                                          .map((n) => n[0])
+                                          .join("")
+                                    : user.firstName?.charAt(0) ||
+                                      user.name?.charAt(0) ||
+                                      user.avatar}
                             </div>
                             <div className="min-w-0 flex-1">
                                 <h3 className="font-bold text-xl text-darkGreen break-words">
-                                    {user.firstName && user.lastName
-                                        ? `${user.firstName} ${user.lastName}`
-                                        : user.name || "Unknown User"}
+                                    {user.fullName ||
+                                        (user.firstName && user.lastName
+                                            ? `${user.firstName} ${user.lastName}`
+                                            : user.name || "Unknown User")}
                                 </h3>
                                 <p className="text-sm text-gray-600 capitalize">
-                                    {user.userType || user.type || "Trader"}
+                                    {user.role ||
+                                        user.userType ||
+                                        user.type ||
+                                        "Trader"}
                                 </p>
-                                <StarRating rating={user.rating || 0} />
+                                <StarRating
+                                    rating={
+                                        typeof user.rating === "number"
+                                            ? user.rating
+                                            : 0
+                                    }
+                                />
                             </div>
                         </div>
 
@@ -131,16 +155,16 @@ function UserModal({ user, isOpen, onClose }) {
                             <div className="flex items-center gap-3">
                                 <MapPin className="w-4 h-4 text-gray-500 flex-shrink-0" />
                                 <span className="text-sm text-gray-700 break-words">
-                                    {user.city && user.province
-                                        ? `${user.city}, ${user.province}`
-                                        : user.location ||
-                                          "Location not specified"}
+                                    {getRegionCountry(user.address)}
                                 </span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Package className="w-4 h-4 text-gray-500 flex-shrink-0" />
                                 <span className="text-sm text-gray-700">
-                                    {user.totalTrades || 0} successful trades
+                                    {typeof user.trades === "number"
+                                        ? user.trades
+                                        : 0}{" "}
+                                    successful trades
                                 </span>
                             </div>
                             <div className="flex items-center gap-3">

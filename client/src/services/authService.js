@@ -7,7 +7,12 @@ const authService = {
     },
 
     async login(credentials) {
-        const response = await api.post("/auth/login", credentials);
+        // Accept a single object
+        const { email, password } = credentials; // Destructure here
+        const response = await api.post("/auth/login", { email, password });
+        if (response.data && response.data.token) {
+            localStorage.setItem("token", response.data.token);
+        }
         return response.data;
     },
 

@@ -18,7 +18,7 @@ function ListingCard({ person, onClick }) {
                     <div className="flex items-center gap-1 mb-1">
                         <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                         <span className="text-sm font-medium">
-                            {person.rating || "4.5"}
+                            {person.rating || "0"}
                         </span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -42,7 +42,10 @@ function ListingCard({ person, onClick }) {
                 <div className="flex items-center gap-2 mb-3">
                     <MapPin className="w-4 h-4 text-gray-500 flex-shrink-0" />
                     <span className="text-sm text-gray-600 truncate">
-                        {person.city && person.province
+                        {/* Use address from UserModel.js as location */}
+                        {person.address
+                            ? person.address
+                            : person.city && person.province
                             ? `${person.city}, ${person.province}`
                             : person.location || "Location not specified"}
                     </span>

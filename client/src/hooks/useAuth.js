@@ -21,9 +21,6 @@ export const useAuth = () => {
             setAuthUser(data.user);
             navigate("/home");
         },
-        onError: (error) => {
-            console.error("Login failed:", error);
-        },
     });
 
     // Logout mutation

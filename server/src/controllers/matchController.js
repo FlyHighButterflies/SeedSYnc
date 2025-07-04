@@ -9,6 +9,13 @@ import Crop from "../models/CropModel.js";
 class MatchController {
     async createMatch(req, res) {
         try {
+            if (!req.user || !req.user._id) {
+                console.error(
+                    "[MatchController] Unauthorized: req.user missing or invalid"
+                );
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
             // Defensive: Check for authenticated user
             if (!req.user) {
                 console.error(
@@ -322,6 +329,13 @@ class MatchController {
 
     async getMatch(req, res) {
         try {
+            if (!req.user || !req.user._id) {
+                console.error(
+                    "[MatchController] Unauthorized: req.user missing or invalid"
+                );
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
             if (!req.user) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
@@ -339,6 +353,13 @@ class MatchController {
 
     async createRecommendations(req, res) {
         try {
+            if (!req.user || !req.user._id) {
+                console.error(
+                    "[MatchController] Unauthorized: req.user missing or invalid"
+                );
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
             if (!req.user) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
@@ -417,15 +438,25 @@ class MatchController {
             );
             const results = aiRes.data;
 
-            // Filter for > 50% score
-            const recommendations = results
-                .filter((r) => r.score > 0.5)
-                .map((r) => ({
-                    farmerId: r.farmer_id,
-                    inventory: r.inventory,
-                    matchedCrops: r.matchedCrops,
-                    score: r.score,
-                }));
+            // Filter for > 50% score and remove duplicates by farmerId
+            const seenFarmerIds = new Set();
+            const recommendations = [];
+            for (const r of results) {
+                const farmerId = r.farmer_id;
+                if (
+                    r.score > 0.5 &&
+                    farmerId &&
+                    !seenFarmerIds.has(String(farmerId))
+                ) {
+                    seenFarmerIds.add(String(farmerId));
+                    recommendations.push({
+                        farmerId: r.farmer_id,
+                        inventory: r.inventory,
+                        matchedCrops: r.matchedCrops,
+                        score: r.score,
+                    });
+                }
+            }
 
             return res.status(200).json({ recommendations });
         } catch (error) {
@@ -439,17 +470,141 @@ class MatchController {
 
     async getRecommendations(req, res) {
         try {
+            if (!req.user || !req.user._id) {
+                console.error(
+                    "[MatchController] Unauthorized: req.user missing or invalid"
+                );
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
             if (!req.user) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
+
+            // If refresh=true, recompute recommendations using AI agent
+            if (req.query.refresh === "true") {
+                const buyer = req.user;
+                // Fetch buyer's inventory (most recent)
+                const buyerInventory = await Inventory.findOne({
+                    userId: buyer._id,
+                })
+                    .sort({ createdAt: -1 })
+                    .lean();
+                let cropNames = [];
+                if (
+                    buyerInventory &&
+                    Array.isArray(buyerInventory.crops) &&
+                    buyerInventory.crops.length > 0
+                ) {
+                    cropNames = buyerInventory.crops
+                        .map((c) => c && c.name)
+                        .filter(Boolean);
+                }
+                if (!cropNames.length) {
+                    return res.status(400).json({
+                        message: "No crops found in buyer inventory.",
+                    });
+                }
+
+                // Fetch all farmers and inventories
+                const farmers = await User.find({ role: "farmer" }).lean();
+                const farmerIds = farmers
+                    .map((f) => f && f._id)
+                    .filter(Boolean);
+                const inventories = await Inventory.find({
+                    userId: { $in: farmerIds },
+                })
+                    .sort({ createdAt: -1 })
+                    .lean();
+
+                // Map userId to crop names
+                const inventoryMap = new Map();
+                inventories.forEach((inv) => {
+                    if (inv && inv.userId) {
+                        const cropNames = Array.isArray(inv.crops)
+                            ? inv.crops.map((c) => c && c.name).filter(Boolean)
+                            : [];
+                        inventoryMap.set(String(inv.userId), cropNames);
+                    }
+                });
+
+                const farmersWithInventory = farmers.map((farmer) => ({
+                    _id: farmer._id,
+                    address: farmer.address,
+                    inventory: inventoryMap.get(String(farmer._id)) || [],
+                    rating: farmer.rating,
+                    farmerInfo: farmer.farmerInfo || {},
+                }));
+
+                const buyerPayload = {
+                    _id: buyer._id,
+                    address: buyer.address,
+                    names: cropNames,
+                    rating: buyer.rating,
+                    buyerInfo: buyer.buyerInfo || {},
+                };
+
+                const aiPayload = {
+                    buyer: buyerPayload,
+                    farmers: farmersWithInventory,
+                    options: {},
+                };
+
+                // Call AI agent
+                const aiRes = await axios.post(
+                    "http://ai-agent:8000/match",
+                    aiPayload
+                );
+                const results = aiRes.data;
+
+                // Filter for > 50% score and remove duplicates by farmerId
+                const seenFarmerIds = new Set();
+                const recommendations = [];
+                for (const r of results) {
+                    const farmerId = r.farmer_id;
+                    if (
+                        r.score > 0.5 &&
+                        farmerId &&
+                        !seenFarmerIds.has(String(farmerId))
+                    ) {
+                        seenFarmerIds.add(String(farmerId));
+                        recommendations.push({
+                            farmerId: r.farmer_id,
+                            inventory: r.inventory,
+                            matchedCrops: r.matchedCrops,
+                            score: r.score,
+                        });
+                    }
+                }
+
+                return res.status(200).json({ recommendations });
+            }
+
+            // Default: fetch latest matches from DB
             const userId = req.user._id;
             const matches = await Match.find({
                 buyerId: userId,
                 matchScore: { $gt: 50 },
             })
                 .populate("farmerId", "-password")
+                .sort({ createdAt: -1 })
                 .lean();
-            res.status(200).json({ recommendations: matches });
+
+            // Deduplicate by farmerId
+            const seenFarmerIds = new Set();
+            const deduped = [];
+            for (const match of matches) {
+                const farmerId =
+                    match.farmerId && match.farmerId._id
+                        ? String(match.farmerId._id)
+                        : String(match.farmerId);
+                if (!seenFarmerIds.has(farmerId)) {
+                    seenFarmerIds.add(farmerId);
+                    deduped.push(match);
+                }
+            }
+
+            res.status(200).json({ recommendations: deduped });
         } catch (error) {
             console.error("[MatchController] getRecommendations Error:", error);
             res.status(400).json({ message: error.message });
